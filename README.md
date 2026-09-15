@@ -1,14 +1,24 @@
 # 🌌 Cosmic FX 🫧
 
+<p align="center">
+  <img src="assets/com.system76.CosmicFx.svg" width="128" height="128" alt="Cosmic FX Icon" />
+</p>
+
 > **Kinematic Bubble Burst, Low-Latency Haptic Audio & Physics Engine for System76 COSMIC™**  
 > *Motor de Físicas Cinemáticas, Efecto Burbuja Pop! y Retroalimentación Acústica Modular para Pop!_OS 24.04 LTS.*
 
-[![Pop!_OS](https://img.shields.io/badge/Pop!_OS-24.04%20LTS-48B9C7?style=for-the-badge&logo=pop-os&logoColor=white)](https://system76.com/pop)
-[![Rust](https://img.shields.io/badge/Rust-1.80+-DEA584?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org)
-[![Wayland](https://img.shields.io/badge/Wayland-COSMIC--Comp-orange?style=for-the-badge)](https://github.com/pop-os/cosmic-comp)
-[![GTK4 & Libadwaita](https://img.shields.io/badge/GUI-Libadwaita%20%2F%20GTK4-blue?style=for-the-badge&logo=gnome&logoColor=white)](https://gnome.pages.gitlab.gnome.org/libadwaita/)
-[![PipeWire](https://img.shields.io/badge/Audio-PipeWire%20Low--Latency-red?style=for-the-badge)](https://pipewire.org)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-green.svg?style=for-the-badge)](./LICENSE)
+<p align="center">
+  <a href="#-english-documentation"><img src="https://img.shields.io/badge/Pop!_OS-24.04%20LTS-48B9C7?style=for-the-badge&logo=pop-os&logoColor=white" /></a>
+  <a href="https://www.rust-lang.org"><img src="https://img.shields.io/badge/Rust-1.80+-DEA584?style=for-the-badge&logo=rust&logoColor=white" /></a>
+  <a href="https://github.com/pop-os/cosmic-comp"><img src="https://img.shields.io/badge/Wayland-COSMIC--Comp-orange?style=for-the-badge" /></a>
+  <a href="https://gnome.pages.gitlab.gnome.org/libadwaita/"><img src="https://img.shields.io/badge/GUI-Libadwaita%20%2F%20GTK4-blue?style=for-the-badge&logo=gnome&logoColor=white" /></a>
+  <a href="https://pipewire.org"><img src="https://img.shields.io/badge/Audio-PipeWire%20Low--Latency-red?style=for-the-badge" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-GPLv3-green.svg?style=for-the-badge" /></a>
+</p>
+
+<p align="center">
+  <img src="assets/cosmic-fx-preview.png" width="850" alt="Cosmic FX Control Center Preview" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);" />
+</p>
 
 ---
 
