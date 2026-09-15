@@ -136,27 +136,27 @@ window.cosmic-fx-window.theme-light preferencesgroup list {
 }
 
 window.cosmic-fx-window.theme-light preferencesgroup > box > label.title {
-    color: #0f172a !important;
-    font-size: 16px !important;
-    font-weight: 800 !important;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 800;
     margin-top: 8px;
     margin-bottom: 2px;
 }
 
 window.cosmic-fx-window.theme-light preferencesgroup > box > label.subtitle {
-    color: #64748b !important;
-    font-size: 13px !important;
+    color: #64748b;
+    font-size: 13px;
     margin-bottom: 10px;
 }
 
 window.cosmic-fx-window.theme-light row label.title {
-    color: #0f172a !important;
+    color: #0f172a;
     font-weight: 700;
     font-size: 14px;
 }
 
 window.cosmic-fx-window.theme-light row label.subtitle {
-    color: #475569 !important;
+    color: #475569;
     font-size: 12.5px;
 }
 
@@ -169,13 +169,13 @@ window.cosmic-fx-window.theme-light .pop-status-banner {
 }
 
 window.cosmic-fx-window.theme-light .pop-status-banner label.banner-title {
-    color: #0f172a !important;
+    color: #0f172a;
     font-size: 15px;
     font-weight: 800;
 }
 
 window.cosmic-fx-window.theme-light .pop-status-banner label.banner-desc {
-    color: #334155 !important;
+    color: #334155;
     font-size: 13px;
 }
 
@@ -200,34 +200,34 @@ window.cosmic-fx-window.theme-light .preset-card.active {
 }
 
 window.cosmic-fx-window.theme-light .preset-card label.card-title {
-    color: #0f172a !important;
+    color: #0f172a;
     font-weight: 800;
     font-size: 14.5px;
 }
 
 window.cosmic-fx-window.theme-light .preset-card.active label.card-title {
-    color: #0b7285 !important;
+    color: #0b7285;
     font-weight: 800;
 }
 
 window.cosmic-fx-window.theme-light .preset-card label.card-desc {
-    color: #475569 !important;
+    color: #475569;
     font-weight: 600;
     font-size: 12px;
 }
 
 window.cosmic-fx-window.theme-light .preset-card.active label.card-desc {
-    color: #1e293b !important;
+    color: #1e293b;
     font-weight: 700;
 }
 
 window.cosmic-fx-window.theme-light .preset-card label.card-sub {
-    color: #64748b !important;
+    color: #64748b;
     font-size: 11px;
 }
 
 window.cosmic-fx-window.theme-light .preset-card.active label.card-sub {
-    color: #0b7285 !important;
+    color: #0b7285;
 }
 
 window.cosmic-fx-window.theme-light viewswitcher button {
@@ -266,19 +266,19 @@ window.cosmic-fx-window.theme-light .mini-window-card {
 }
 
 window.cosmic-fx-window.theme-light .mini-window-card label {
-    color: #0f172a !important;
+    color: #0f172a;
     font-weight: 700;
 }
 
 window.cosmic-fx-window.theme-light button.suggested-action {
     background-color: #2196a6;
-    color: #ffffff !important;
+    color: #ffffff;
     font-weight: 800;
     border-radius: 9999px;
 }
 
 window.cosmic-fx-window.theme-light button.suggested-action label {
-    color: #ffffff !important;
+    color: #ffffff;
     font-weight: 800;
 }
 
@@ -287,19 +287,20 @@ window.cosmic-fx-window.theme-light button.suggested-action:hover {
 }
 
 window.cosmic-fx-window.theme-light button.destructive-action {
-    background-color: rgba(239, 68, 68, 0.1);
-    border: 1.5px solid #ef4444;
-    color: #b91c1c !important;
-    font-weight: 700;
+    background-color: #dc2626;
+    border: 1.5px solid #b91c1c;
+    color: #ffffff;
+    font-weight: 800;
     border-radius: 9999px;
 }
 
 window.cosmic-fx-window.theme-light button.destructive-action label {
-    color: #b91c1c !important;
+    color: #ffffff;
+    font-weight: 800;
 }
 
 window.cosmic-fx-window.theme-light button.destructive-action:hover {
-    background-color: rgba(239, 68, 68, 0.2);
+    background-color: #b91c1c;
 }
 
 window.cosmic-fx-window.theme-light button.preview-btn {
@@ -310,7 +311,7 @@ window.cosmic-fx-window.theme-light button.preview-btn {
 }
 
 window.cosmic-fx-window.theme-light button.preview-btn label {
-    color: #0b7285 !important;
+    color: #0b7285;
     font-weight: 700;
     font-size: 12px;
 }
@@ -327,27 +328,27 @@ window.cosmic-fx-window.theme-dark preferencesgroup list {
 }
 
 window.cosmic-fx-window.theme-dark preferencesgroup > box > label.title {
-    color: #ffffff !important;
-    font-size: 16px !important;
-    font-weight: 800 !important;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 800;
     margin-top: 8px;
     margin-bottom: 2px;
 }
 
 window.cosmic-fx-window.theme-dark preferencesgroup > box > label.subtitle {
-    color: #94a3b8 !important;
-    font-size: 13px !important;
+    color: #94a3b8;
+    font-size: 13px;
     margin-bottom: 10px;
 }
 
 window.cosmic-fx-window.theme-dark row label.title {
-    color: #ffffff !important;
+    color: #ffffff;
     font-weight: 700;
     font-size: 14px;
 }
 
 window.cosmic-fx-window.theme-dark row label.subtitle {
-    color: #cbd5e1 !important;
+    color: #cbd5e1;
     font-size: 12.5px;
 }
 
@@ -360,13 +361,13 @@ window.cosmic-fx-window.theme-dark .pop-status-banner {
 }
 
 window.cosmic-fx-window.theme-dark .pop-status-banner label.banner-title {
-    color: #ffffff !important;
+    color: #ffffff;
     font-size: 15px;
     font-weight: 800;
 }
 
 window.cosmic-fx-window.theme-dark .pop-status-banner label.banner-desc {
-    color: #cbd5e1 !important;
+    color: #cbd5e1;
     font-size: 13px;
 }
 
@@ -390,34 +391,34 @@ window.cosmic-fx-window.theme-dark .preset-card.active {
 }
 
 window.cosmic-fx-window.theme-dark .preset-card label.card-title {
-    color: #ffffff !important;
+    color: #ffffff;
     font-weight: 800;
     font-size: 14.5px;
 }
 
 window.cosmic-fx-window.theme-dark .preset-card.active label.card-title {
-    color: #48b9c7 !important;
+    color: #48b9c7;
     font-weight: 800;
 }
 
 window.cosmic-fx-window.theme-dark .preset-card label.card-desc {
-    color: #cbd5e1 !important;
+    color: #cbd5e1;
     font-weight: 600;
     font-size: 12px;
 }
 
 window.cosmic-fx-window.theme-dark .preset-card.active label.card-desc {
-    color: #f1f5f9 !important;
+    color: #f1f5f9;
     font-weight: 700;
 }
 
 window.cosmic-fx-window.theme-dark .preset-card label.card-sub {
-    color: #94a3b8 !important;
+    color: #94a3b8;
     font-size: 11px;
 }
 
 window.cosmic-fx-window.theme-dark .preset-card.active label.card-sub {
-    color: #cbd5e1 !important;
+    color: #cbd5e1;
 }
 
 window.cosmic-fx-window.theme-dark viewswitcher button {
@@ -456,19 +457,19 @@ window.cosmic-fx-window.theme-dark .mini-window-card {
 }
 
 window.cosmic-fx-window.theme-dark .mini-window-card label {
-    color: #ffffff !important;
+    color: #ffffff;
     font-weight: 700;
 }
 
 window.cosmic-fx-window.theme-dark button.suggested-action {
     background-color: #48b9c7;
-    color: #14171d !important;
+    color: #14171d;
     font-weight: 800;
     border-radius: 9999px;
 }
 
 window.cosmic-fx-window.theme-dark button.suggested-action label {
-    color: #14171d !important;
+    color: #14171d;
     font-weight: 800;
 }
 
@@ -477,19 +478,19 @@ window.cosmic-fx-window.theme-dark button.suggested-action:hover {
 }
 
 window.cosmic-fx-window.theme-dark button.destructive-action {
-    background-color: rgba(239, 68, 68, 0.15);
+    background-color: rgba(239, 68, 68, 0.2);
     border: 1.5px solid #ef4444;
-    color: #fca5a5 !important;
+    color: #fca5a5;
     font-weight: 700;
     border-radius: 9999px;
 }
 
 window.cosmic-fx-window.theme-dark button.destructive-action label {
-    color: #fca5a5 !important;
+    color: #fca5a5;
 }
 
 window.cosmic-fx-window.theme-dark button.destructive-action:hover {
-    background-color: rgba(239, 68, 68, 0.25);
+    background-color: rgba(239, 68, 68, 0.35);
 }
 
 window.cosmic-fx-window.theme-dark button.preview-btn {
@@ -500,7 +501,7 @@ window.cosmic-fx-window.theme-dark button.preview-btn {
 }
 
 window.cosmic-fx-window.theme-dark button.preview-btn label {
-    color: #48b9c7 !important;
+    color: #48b9c7;
     font-weight: 700;
     font-size: 12px;
 }
@@ -583,7 +584,7 @@ class CosmicFxApp(Adw.Application):
         Gtk.StyleContext.add_provider_for_display(
             Gdk.Display.get_default(),
             provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            Gtk.STYLE_PROVIDER_PRIORITY_USER
         )
         Gtk.StyleContext.add_provider_for_display(
             Gdk.Display.get_default(),
