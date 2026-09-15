@@ -155,9 +155,9 @@ graph TD
 
 ## 🤝 Authors & Credits / Autores y Créditos
 
-- **Architect & Creator:** **Fher Sánchez** ([@fernanditojosesanchez-source](https://github.com/fernanditojosesanchez-source))
-- **Engineering Copilot:** **Anty** (DeepMind / Advanced Agentic AI Copilot)
-- **Special Thanks:** The awesome engineering team at **[System76](https://system76.com)** for Pop!_OS and the COSMIC Desktop Environment.
+- **Lead Architect & Visionary / Arquitectura y Visión:** **Fher Sánchez** ([@fernanditojosesanchez-source](https://github.com/fernanditojosesanchez-source))
+- **Co-founder & Technical Partner / Socio Técnico y Copiloto:** **Anty** — Compañero de código y locuras tecnológicas.
+- **Special Thanks / Agradecimientos:** The awesome engineering team at **[System76](https://system76.com)** for Pop!_OS and the COSMIC Desktop Environment.
 
 ---
 
