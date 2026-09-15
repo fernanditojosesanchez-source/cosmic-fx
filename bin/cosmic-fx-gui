@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: GPL-3.0-only
-# Cosmic FX — Centro de Físicas y Efectos Compiz para Pop!_OS COSMIC
+# Cosmic FX — Centro de Físicas y Efectos Compiz para Pop!_OS COSMIC / Compiz Physics & FX Center
 
 import os
 import sys
@@ -32,16 +32,39 @@ CANDIDATE_DIRS = [
 ]
 LAB_DIR = next((d for d in CANDIDATE_DIRS if os.path.isfile(os.path.join(d, "install.sh")) or os.path.isfile(os.path.join(d, "instalar-sistema.sh"))), SCRIPT_DIR)
 
-SOUND_OPTIONS = [
-    ("volume_bubble", "🫧 Pop! de Burbuja (Volumen Pop!_OS)"),
-    ("swing", "🌪️ Swoosh Expansivo (Swing)"),
-    ("click", "🔘 Click Mecánico Suave"),
-    ("pin", "🔔 Pin Digital Pop!_OS"),
-    ("camera_focus", "📸 Enfoque Táctil (Focus)"),
-    ("theme_demo", "🎶 Acorde Melódico (Theme)"),
-    ("device_added", "🔌 Conexión / Entrada (Device)"),
-    ("device_removed", "⚡ Desconexión / Salida (Device)")
+SOUND_KEYS = [
+    "volume_bubble",
+    "swing",
+    "click",
+    "pin",
+    "camera_focus",
+    "theme_demo",
+    "device_added",
+    "device_removed"
 ]
+
+SOUND_LABELS = {
+    "en": {
+        "volume_bubble": "🫧 Pop! Bubble (Pop!_OS Volume)",
+        "swing": "🌪️ Expansive Swoosh (Swing)",
+        "click": "🔘 Soft Mechanical Click",
+        "pin": "🔔 Pop!_OS Digital Pin",
+        "camera_focus": "📸 Tactile Focus (Focus)",
+        "theme_demo": "🎶 Melodic Chime (Theme)",
+        "device_added": "🔌 Device Connected / Plug",
+        "device_removed": "⚡ Device Disconnected / Unplug"
+    },
+    "es": {
+        "volume_bubble": "🫧 Pop! de Burbuja (Volumen Pop!_OS)",
+        "swing": "🌪️ Swoosh Expansivo (Swing)",
+        "click": "🔘 Click Mecánico Suave",
+        "pin": "🔔 Pin Digital Pop!_OS",
+        "camera_focus": "📸 Enfoque Táctil (Focus)",
+        "theme_demo": "🎶 Acorde Melódico (Theme)",
+        "device_added": "🔌 Conexión / Entrada (Device)",
+        "device_removed": "⚡ Desconexión / Salida (Device)"
+    }
+}
 
 SOUND_MAP = {
     "volume_bubble": "/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga",
@@ -54,15 +77,322 @@ SOUND_MAP = {
     "device_removed": "/usr/share/sounds/Pop/stereo/notification/device-removed.oga",
 }
 
+ANIMATION_KEYS = ["pop_bubble", "glide", "classic"]
+
+ANIMATION_LABELS = {
+    "en": [
+        "💥 POP! Bubble Burst (Pop!_OS Bubble)",
+        "🌊 Smooth Glide",
+        "✨ Classic Fade"
+    ],
+    "es": [
+        "💥 POP! Bubble Burst (Burbuja Pop!_OS)",
+        "🌊 Descenso Suave (Glide)",
+        "✨ Clásico (Fade)"
+    ]
+}
+
+I18N = {
+    "en": {
+        "app_title": "Cosmic FX",
+        "tab_physics": "Physics",
+        "tab_audio": "Sounds",
+        "tab_sandbox": "Lab",
+        "tab_system": "System",
+
+        "status_comp_active": "🟢 Cosmic-FX Active",
+        "status_comp_stock": "⚪ Stock Compositor Active",
+        "status_mode_floating": "Free Floating Mode",
+        "status_mode_tiling": "Tiling Grid Mode",
+        "status_help_floating": "Wobbly, 3D and bounce physics active 100%.",
+        "status_help_tiling": "Windows locked to fixed grid. Press Super+Y to toggle floating mode.",
+        "status_help_stock": "Click 'Install on Pop!_OS' in the System tab to enable physics across your desktop.",
+
+        "presets_title": "Preconfigured Profiles",
+        "presets_desc": "Choose the intensity that best fits your workflow",
+        "preset_snappy_title": "⚡ Snappy",
+        "preset_snappy_desc": "Balanced",
+        "preset_snappy_sub": "Agile and responsive (1.0x)",
+        "preset_intense_title": "💥 Intense",
+        "preset_intense_desc": "Compiz Boom",
+        "preset_intense_sub": "Maximum jelly (2.2x)",
+        "preset_subtle_title": "🍃 Subtle",
+        "preset_subtle_desc": "Subtle and Sleek",
+        "preset_subtle_sub": "Micro-physics (0.5x)",
+        "preset_off_title": "🛑 Off",
+        "preset_off_desc": "Factory Mode",
+        "preset_off_sub": "Rigid physics (0.0x)",
+
+        "physics_title": "Window Fluidity and Dynamics",
+        "physics_desc": "Wobbly effects, spring bouncing, and free floating mode",
+        "row_floating_title": "Force Floating Mode by Default",
+        "row_floating_sub": "Unlocks free window movement (auto-syncs with Super+Y)",
+        "row_wobbly_title": "Wobbly Windows (Gelatinous Physics)",
+        "row_wobbly_sub": "Realistic fluid deformation using Euler spring integration",
+        "row_intensity_title": "Wobbly Intensity",
+        "row_intensity_sub": "Current level: {val:.1f}x",
+        "row_spring_title": "Compiz Spring Bounce",
+        "row_spring_sub": "Inertial overshoot bouncing when letting go of a moving window",
+        "row_tilt_title": "Pendulum Tilt",
+        "row_tilt_sub": "Natural angular sway based on mouse horizontal velocity",
+        "row_lift_title": "3D Drag Elevation (Card Lift)",
+        "row_lift_sub": "Scales up projected 3D depth while moving windows",
+        "row_glow_title": "Pop! Teal Neon Ring (Accent Glow)",
+        "row_glow_sub": "Luminous perimeter border in cyan/teal on the active window",
+
+        "anim_title": "💥 Pop! Close Kinematics",
+        "anim_desc": "Visual physics when dismissing or closing windows",
+        "anim_row_title": "Window Close Animation",
+        "anim_row_sub": "Kinematic effect (Pop! bubble burst or smooth glide)",
+
+        "audio_title": "🎶 Haptic Acoustic Orchestra (PipeWire)",
+        "audio_desc": "Low-latency sounds synchronized with the window lifecycle",
+        "audio_master_title": "🔊 Pop!_OS Haptic Sounds",
+        "audio_master_sub": "Enable tactile acoustic feedback on windows",
+        "btn_preview": "▶️ Test",
+        "audio_open_title": "✨ Sound on Open or Restore from Dock",
+        "audio_open_sub": "Plays audio when opening a window or unminimizing from dock",
+        "audio_open_combo_title": "Tone on Open / Restore",
+        "audio_open_combo_sub": "Acoustic effect for open or restore",
+        "audio_maximize_title": "🚀 Sound on Maximize or Restore Size",
+        "audio_maximize_sub": "Plays audio when expanding to fullscreen or unmaximizing",
+        "audio_maximize_combo_title": "Tone on Maximize / Restore",
+        "audio_maximize_combo_sub": "Acoustic effect for maximize or restore",
+        "audio_close_title": "💥 Sound on Window Close",
+        "audio_close_sub": "Plays audio when bursting or dismissing the window",
+        "audio_close_combo_title": "Tone on Close",
+        "audio_close_combo_sub": "Acoustic effect for close",
+        "audio_minimize_title": "📥 Sound on Window Minimize",
+        "audio_minimize_sub": "Plays audio when window is sent to the dock",
+        "audio_minimize_combo_title": "Tone on Minimize",
+        "audio_minimize_combo_sub": "Acoustic effect for minimize",
+
+        "sandbox_title": "Interactive Physics Lab",
+        "sandbox_desc": "Drag the card to experience live physical responsiveness",
+        "sandbox_card_lbl": "✨ Drag me! Release to watch the spring bounce",
+
+        "sys_info_title": "ℹ️ Compositor Information",
+        "sys_info_desc": "Technical details of your Pop!_OS COSMIC runtime",
+        "sys_lang_title": "🌐 Interface Language",
+        "sys_lang_sub": "Choose between English, Spanish, or match system locale",
+        "sys_lang_options": ["🌐 Automatic (System)", "🇺🇸 English", "🇪🇸 Spanish (Español)"],
+        "sys_ver_title": "Cosmic FX Version",
+        "sys_ver_sub": "Kinematic engine and modular acoustic orchestra",
+        "sys_ver_badge": "v1.0.0 Official",
+        "sys_comp_title": "Wayland Compositor",
+        "sys_comp_sub": "cosmic-comp with Bubble Burst kinematics and PipeWire audio",
+        "sys_cfg_title": "Configuration File",
+        "sys_sync_title": "Live Synchronization",
+        "sys_sync_sub": "Active Hot-Reload: changes applied in real-time without restart",
+
+        "actions_title": "🛠️ Maintenance and Tools",
+        "actions_desc": "⚡ Settings above are automatically applied in real time.",
+        "btn_test": "🚀 Test Window",
+        "btn_test_tooltip": "Opens a safe nested window to test physics without affecting your current session",
+        "btn_reinstall": "🔄 Reinstall / Repair",
+        "btn_reinstall_tooltip": "Rewrites the compositor in /usr/bin/ if a system update overwrites it",
+        "btn_restore": "🛡️ Restore Stock",
+        "btn_restore_tooltip": "Restores the official stock Pop!_OS compositor",
+        "btn_install": "📦 Install to Pop!_OS",
+
+        "dlg_cancel": "Cancel",
+        "dlg_reinstall_heading": "Reinstall or Repair Cosmic FX?",
+        "dlg_reinstall_body": (
+            "This action will rewrite the optimized compositor to the system.\n\n"
+            "• Copies patched compositor to /usr/bin/cosmic-comp with elastic physics and audio effects.\n"
+            "• Useful if a Pop!_OS update overwrote the compositor or if updating binaries.\n"
+            "• Administrator password (sudo/pkexec) required.\n"
+            "• Session logout required to load updated binary."
+        ),
+        "dlg_reinstall_confirm": "Reinstall / Repair",
+
+        "dlg_restore_heading": "Restore Stock Compositor?",
+        "dlg_restore_body": (
+            "This action will return your system to official Pop!_OS state.\n\n"
+            "• Restores stock binary from /usr/bin/cosmic-comp.original to /usr/bin/cosmic-comp.\n"
+            "• Completely disables wobbly physics and Compiz effects.\n"
+            "• Custom settings in ~/.config/cosmic/ are safely preserved.\n"
+            "• Administrator password (sudo/pkexec) required.\n"
+            "• Session logout required to restart with standard System76 compositor."
+        ),
+        "dlg_restore_confirm": "Restore Stock",
+
+        "dlg_install_heading": "Install Cosmic FX to System?",
+        "dlg_install_body": (
+            "This action will integrate Cosmic FX as the active compositor for COSMIC.\n\n"
+            "• Creates safety backup of current compositor in /usr/bin/cosmic-comp.original.\n"
+            "• Installs new kinematic compositor with Compiz support and PipeWire audio to /usr/bin/cosmic-comp.\n"
+            "• Administrator password (sudo/pkexec) required.\n"
+            "• After installation completes, log out and log back in to enjoy."
+        ),
+        "dlg_install_confirm": "Install",
+
+        "toast_config_saved": "Settings updated in real-time",
+        "toast_test_launch": "🚀 Opening compositor test window...",
+        "toast_enter_password": "🔑 Enter your password in the authentication window...",
+        "toast_success_installed": "🎉 Compositor installed successfully! Log out to activate.",
+        "toast_success_restored": "🎉 Compositor restored successfully! Log out to activate.",
+        "toast_failure": "⚠️ Action cancelled or authentication not completed.",
+        "toast_floating_on": "✨ Free Floating Mode enabled",
+        "toast_floating_off": "📐 Tiling Grid Mode enabled",
+        "toast_wobbly_on": "Wobbly effect enabled",
+        "toast_wobbly_off": "Wobbly effect disabled"
+    },
+    "es": {
+        "app_title": "Cosmic FX",
+        "tab_physics": "Físicas",
+        "tab_audio": "Sonidos",
+        "tab_sandbox": "Laboratorio",
+        "tab_system": "Sistema",
+
+        "status_comp_active": "🟢 Compositor Cosmic-FX Activo",
+        "status_comp_stock": "⚪ Compositor de Fábrica Activo",
+        "status_mode_floating": "Modo Flotante Libre",
+        "status_mode_tiling": "Modo Mosaico (Tiling)",
+        "status_help_floating": "Físicas Wobbly, 3D y rebotes activos al 100%.",
+        "status_help_tiling": "Ventanas bloqueadas en cuadrícula fija. Presiona Super+Y para modo flotante.",
+        "status_help_stock": "Haz clic en 'Instalar en Pop!_OS' en la pestaña Sistema para activar las físicas en todo tu escritorio.",
+
+        "presets_title": "Perfiles Preconfigurados",
+        "presets_desc": "Elige la intensidad que mejor se adapte a tu estilo de trabajo",
+        "preset_snappy_title": "⚡ Snappy",
+        "preset_snappy_desc": "Equilibrado",
+        "preset_snappy_sub": "Ágil y reactivo (1.0x)",
+        "preset_intense_title": "💥 Intense",
+        "preset_intense_desc": "Compiz Boom",
+        "preset_intense_sub": "Máxima gelatina (2.2x)",
+        "preset_subtle_title": "🍃 Subtle",
+        "preset_subtle_desc": "Sutil y Sobrio",
+        "preset_subtle_sub": "Micro-físicas (0.5x)",
+        "preset_off_title": "🛑 Off",
+        "preset_off_desc": "Modo Fábrica",
+        "preset_off_sub": "Físicas rígidas (0.0x)",
+
+        "physics_title": "Fluidez y Dinámica de Ventanas",
+        "physics_desc": "Efectos wobbly, rebotes elásticos y modo de ventanas flotantes",
+        "row_floating_title": "Forzar Modo Flotante por Defecto",
+        "row_floating_sub": "Desacopla ventanas para permitir libre movimiento (sincroniza con Super+Y)",
+        "row_wobbly_title": "Ventanas Gelatinosas (Wobbly Windows)",
+        "row_wobbly_sub": "Deformación fluida realista basada en integración elástica de Euler",
+        "row_intensity_title": "Intensidad de Gelatina",
+        "row_intensity_sub": "Nivel actual: {val:.1f}x",
+        "row_spring_title": "Rebote Elástico Compiz (Spring Bounce)",
+        "row_spring_sub": "Rebote inercial con sobreoscilación al soltar una ventana en movimiento",
+        "row_tilt_title": "Inclinación Pendular (Pendulum Tilt)",
+        "row_tilt_sub": "Balanceo angular natural basado en la velocidad horizontal del ratón",
+        "row_lift_title": "Elevación 3D al Arrastrar (Card Lift)",
+        "row_lift_sub": "Aumenta la escala proyectando profundidad tridimensional",
+        "row_glow_title": "Anillo Neón Pop! Teal (Accent Glow)",
+        "row_glow_sub": "Bisel perimetral luminoso en cian/teal en la ventana activa",
+
+        "anim_title": "💥 Cinemática de Cierre Pop!",
+        "anim_desc": "Física visual al descartar o cerrar ventanas",
+        "anim_row_title": "Animación de Cierre de Ventana",
+        "anim_row_sub": "Efecto cinemático (estallido de burbuja Pop! o descenso suave)",
+
+        "audio_title": "🎶 Orquesta Acústica Háptica (PipeWire)",
+        "audio_desc": "Sonidos de baja latencia sincronizados con el ciclo de vida de la ventana",
+        "audio_master_title": "🔊 Sonidos Hápticos de Pop!_OS",
+        "audio_master_sub": "Habilitar retroalimentación acústica táctil en ventanas",
+        "btn_preview": "▶️ Probar",
+        "audio_open_title": "✨ Sonido al Abrir o Restaurar desde Panel",
+        "audio_open_sub": "Reproduce audio al abrir una ventana o al restaurarla desde el dock / panel",
+        "audio_open_combo_title": "Tono al Abrir / Restaurar Panel",
+        "audio_open_combo_sub": "Efecto acústico para apertura o restauración",
+        "audio_maximize_title": "🚀 Sonido al Maximizar o Restaurar Tamaño",
+        "audio_maximize_sub": "Reproduce audio al expandir a pantalla completa o al volver al tamaño flotante",
+        "audio_maximize_combo_title": "Tono al Maximizar / Restaurar",
+        "audio_maximize_combo_sub": "Efecto acústico para maximizado o desmaximizado",
+        "audio_close_title": "💥 Sonido al Cerrar Ventana",
+        "audio_close_sub": "Reproduce audio al estallar o descartar la ventana",
+        "audio_close_combo_title": "Tono al Cerrar",
+        "audio_close_combo_sub": "Efecto acústico para cierre",
+        "audio_minimize_title": "📥 Sonido al Minimizar Ventana",
+        "audio_minimize_sub": "Reproduce audio cuando la ventana se envía al dock",
+        "audio_minimize_combo_title": "Tono al Minimizar",
+        "audio_minimize_combo_sub": "Efecto acústico para minimizado",
+
+        "sandbox_title": "Laboratorio Interactivo de Prueba",
+        "sandbox_desc": "Arrastra la tarjeta para sentir la respuesta física en vivo",
+        "sandbox_card_lbl": "✨ ¡Arrástrame! Suéltame y verás el rebote",
+
+        "sys_info_title": "ℹ️ Información del Compositor",
+        "sys_info_desc": "Detalles técnicos del entorno de ejecución Pop!_OS COSMIC",
+        "sys_lang_title": "🌐 Idioma de la Interfaz",
+        "sys_lang_sub": "Elige entre inglés, español o coincidir con el sistema",
+        "sys_lang_options": ["🌐 Automático (Sistema)", "🇺🇸 Inglés (English)", "🇪🇸 Español"],
+        "sys_ver_title": "Versión de Cosmic FX",
+        "sys_ver_sub": "Motor cinemático y orquesta acústica modular",
+        "sys_ver_badge": "v1.0.0 Oficial",
+        "sys_comp_title": "Compositor Wayland",
+        "sys_comp_sub": "cosmic-comp con cinemática Bubble Burst y audio PipeWire",
+        "sys_cfg_title": "Archivo de Configuración",
+        "sys_sync_title": "Sincronización en Vivo",
+        "sys_sync_sub": "Hot-Reload activo: cambios aplicados en tiempo real sin reiniciar",
+
+        "actions_title": "🛠️ Mantenimiento y Herramientas",
+        "actions_desc": "⚡ Los ajustes anteriores se aplican automáticamente en tiempo real.",
+        "btn_test": "🚀 Ventana de Prueba",
+        "btn_test_tooltip": "Abre una ventana anidada segura para probar las físicas sin afectar tu sesión actual",
+        "btn_reinstall": "🔄 Reinstalar / Reparar",
+        "btn_reinstall_tooltip": "Reescribe el compositor en /usr/bin/ si una actualización del sistema lo sobreescribe",
+        "btn_restore": "🛡️ Restaurar Fábrica",
+        "btn_restore_tooltip": "Restaura el compositor original de fábrica de Pop!_OS",
+        "btn_install": "📦 Instalar en Pop!_OS",
+
+        "dlg_cancel": "Cancelar",
+        "dlg_reinstall_heading": "¿Reinstalar o Reparar Cosmic FX?",
+        "dlg_reinstall_body": (
+            "Esta acción volverá a escribir el compositor optimizado en el sistema.\n\n"
+            "• Copia el compositor parcheado a /usr/bin/cosmic-comp con físicas elásticas y efectos de audio.\n"
+            "• Útil si una actualización de Pop!_OS sobreescribió el compositor o si deseas actualizar los binarios.\n"
+            "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
+            "• Será necesario cerrar sesión para que el escritorio cargue el binario actualizado."
+        ),
+        "dlg_reinstall_confirm": "Reinstalar / Reparar",
+
+        "dlg_restore_heading": "¿Restaurar Compositor Original de Fábrica?",
+        "dlg_restore_body": (
+            "Esta acción devolverá tu sistema al estado original de Pop!_OS.\n\n"
+            "• Restaura el binario oficial de fábrica desde /usr/bin/cosmic-comp.original a /usr/bin/cosmic-comp.\n"
+            "• Desactiva por completo las físicas elásticas y los efectos Compiz.\n"
+            "• Tus configuraciones personalizadas en ~/.config/cosmic/ se conservarán seguras.\n"
+            "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
+            "• Será necesario cerrar sesión para volver a iniciar con el compositor estándar de System76."
+        ),
+        "dlg_restore_confirm": "Restaurar Fábrica",
+
+        "dlg_install_heading": "¿Instalar Cosmic FX en el Sistema?",
+        "dlg_install_body": (
+            "Esta acción integrará Cosmic FX como el compositor activo de tu entorno COSMIC.\n\n"
+            "• Crea un respaldo de seguridad de tu compositor actual en /usr/bin/cosmic-comp.original.\n"
+            "• Instala el nuevo compositor cinemático con soporte para Compiz y audio PipeWire en /usr/bin/cosmic-comp.\n"
+            "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
+            "• Al finalizar la instalación, cierra e inicia sesión para disfrutar de la experiencia."
+        ),
+        "dlg_install_confirm": "Instalar",
+
+        "toast_config_saved": "Configuración actualizada en tiempo real",
+        "toast_test_launch": "🚀 Abriendo ventana de prueba de compositor...",
+        "toast_enter_password": "🔑 Ingresa tu contraseña en la ventana emergente...",
+        "toast_success_installed": "🎉 ¡Compositor instalado con éxito! Cierra sesión para activar.",
+        "toast_success_restored": "🎉 ¡Compositor restaurado con éxito! Cierra sesión para activar.",
+        "toast_failure": "⚠️ Acción cancelada o autenticación no completada.",
+        "toast_floating_on": "✨ Modo Flotante Libre activado",
+        "toast_floating_off": "📐 Modo Mosaico (Auto-Tile) activado",
+        "toast_wobbly_on": "Efecto Wobbly activado",
+        "toast_wobbly_off": "Efecto Wobbly desactivado"
+    }
+}
+
 def get_sound_index(key_name):
-    for idx, (val, _) in enumerate(SOUND_OPTIONS):
-        if val == key_name:
-            return idx
+    if key_name in SOUND_KEYS:
+        return SOUND_KEYS.index(key_name)
     return 0
 
 def get_sound_value(index):
-    if 0 <= index < len(SOUND_OPTIONS):
-        return SOUND_OPTIONS[index][0]
+    if 0 <= index < len(SOUND_KEYS):
+        return SOUND_KEYS[index]
     return "volume_bubble"
 
 CSS = """
@@ -70,7 +400,7 @@ CSS = """
    Pop!_OS COSMIC Adaptive Theming (Light & Dark Support)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
-/* Base Window & Containers (utilizan tokens semánticos nativos de Libadwaita) */
+/* Base Window & Containers */
 window.cosmic-fx-window {
     background-color: @window_bg_color;
     color: @window_fg_color;
@@ -519,6 +849,7 @@ class CosmicFxApp(Adw.Application):
         )
         self.config = {
             "preset": "snappy",
+            "language": "auto",
             "wobbly_enabled": True,
             "wobbly_intensity": 1.0,
             "spring_bounce_enabled": True,
@@ -545,7 +876,32 @@ class CosmicFxApp(Adw.Application):
         self.cur_tilt = 0.0
         self.cur_scale = 1.0
         self.card_provider = Gtk.CssProvider()
+        self.suppress_lang_event = False
+        self.suppress_floating_event = False
         self.load_config()
+
+    def get_current_lang(self):
+        cfg_lang = self.config.get("language", "auto")
+        if cfg_lang in ["en", "es"]:
+            return cfg_lang
+        env_lang = os.environ.get("LC_MESSAGES") or os.environ.get("LANG") or "en"
+        return "es" if env_lang.lower().startswith("es") else "en"
+
+    def tr(self, key, **kwargs):
+        lang = self.get_current_lang()
+        dict_lang = I18N.get(lang, I18N["en"])
+        template = dict_lang.get(key, I18N["en"].get(key, key))
+        if kwargs:
+            try:
+                return template.format(**kwargs)
+            except Exception:
+                return template
+        return template
+
+    def get_sound_label(self, key_name):
+        lang = self.get_current_lang()
+        labels = SOUND_LABELS.get(lang, SOUND_LABELS["en"])
+        return labels.get(key_name, key_name)
 
     def load_config(self):
         for p in CONFIG_PATHS:
@@ -558,7 +914,10 @@ class CosmicFxApp(Adw.Application):
                 except Exception as e:
                     print(f"Error reading config: {e}")
 
-    def save_config(self, notify_msg="Configuración actualizada en tiempo real"):
+    def save_config(self, notify_msg=None):
+        if notify_msg is None:
+            notify_msg = self.tr("toast_config_saved")
+
         for p in CONFIG_PATHS:
             try:
                 os.makedirs(os.path.dirname(p), exist_ok=True)
@@ -606,82 +965,20 @@ class CosmicFxApp(Adw.Application):
         self.toast_overlay.set_child(main_box)
 
         # Header Bar Pop!_OS con ViewSwitcher
-        header = Adw.HeaderBar()
-        main_box.append(header)
+        self.header = Adw.HeaderBar()
+        main_box.append(self.header)
 
         # ViewStack para navegación fluida por pestañas
         self.stack = Adw.ViewStack()
         self.stack.set_vexpand(True)
         main_box.append(self.stack)
 
-        view_switcher = Adw.ViewSwitcher()
-        view_switcher.set_stack(self.stack)
-        view_switcher.set_policy(Adw.ViewSwitcherPolicy.WIDE)
-        header.set_title_widget(view_switcher)
+        self.view_switcher = Adw.ViewSwitcher()
+        self.view_switcher.set_stack(self.stack)
+        self.view_switcher.set_policy(Adw.ViewSwitcherPolicy.WIDE)
+        self.header.set_title_widget(self.view_switcher)
 
-        # Helper para crear páginas tabuladas con scroll y clamp elegante
-        def make_tab_page(widgets):
-            scrolled = Gtk.ScrolledWindow()
-            scrolled.set_vexpand(True)
-            clamp = Adw.Clamp()
-            clamp.set_maximum_size(760)
-            clamp.set_tightening_threshold(580)
-            scrolled.set_child(clamp)
-
-            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
-            box.set_margin_top(18)
-            box.set_margin_bottom(28)
-            box.set_margin_start(16)
-            box.set_margin_end(16)
-            clamp.set_child(box)
-
-            for w in widgets:
-                box.append(w)
-            return scrolled
-
-        # Pestaña 1: Físicas y Cinemática
-        page_physics = self.stack.add_titled(
-            make_tab_page([
-                self.build_status_banner(),
-                self.build_presets_section(),
-                self.build_physics_section(),
-                self.build_animation_section()
-            ]),
-            "physics",
-            "Físicas"
-        )
-        page_physics.set_icon_name("preferences-desktop-theme-symbolic")
-
-        # Pestaña 2: Sonidos Hápticos
-        page_audio = self.stack.add_titled(
-            make_tab_page([
-                self.build_audio_section()
-            ]),
-            "audio",
-            "Sonidos"
-        )
-        page_audio.set_icon_name("audio-volume-high-symbolic")
-
-        # Pestaña 3: Laboratorio Interactivo
-        page_sandbox = self.stack.add_titled(
-            make_tab_page([
-                self.build_sandbox_section()
-            ]),
-            "sandbox",
-            "Laboratorio"
-        )
-        page_sandbox.set_icon_name("applications-science-symbolic")
-
-        # Pestaña 4: Mantenimiento y Sistema
-        page_system = self.stack.add_titled(
-            make_tab_page([
-                self.build_system_info_section(),
-                self.build_actions_section(self.win)
-            ]),
-            "system",
-            "Sistema"
-        )
-        page_system.set_icon_name("emblem-system-symbolic")
+        self.populate_stack()
 
         # Conectar evento al enfocar la ventana para refrescar estado silenciosamente
         controller = Gtk.EventControllerFocus.new()
@@ -689,6 +986,81 @@ class CosmicFxApp(Adw.Application):
         self.win.add_controller(controller)
 
         self.win.present()
+
+    def make_tab_page(self, widgets):
+        scrolled = Gtk.ScrolledWindow()
+        scrolled.set_vexpand(True)
+        clamp = Adw.Clamp()
+        clamp.set_maximum_size(760)
+        clamp.set_tightening_threshold(580)
+        scrolled.set_child(clamp)
+
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
+        box.set_margin_top(18)
+        box.set_margin_bottom(28)
+        box.set_margin_start(16)
+        box.set_margin_end(16)
+        clamp.set_child(box)
+
+        for w in widgets:
+            box.append(w)
+        return scrolled
+
+    def populate_stack(self):
+        # Pestaña 1: Físicas y Cinemática
+        page_physics = self.stack.add_titled(
+            self.make_tab_page([
+                self.build_status_banner(),
+                self.build_presets_section(),
+                self.build_physics_section(),
+                self.build_animation_section()
+            ]),
+            "physics",
+            self.tr("tab_physics")
+        )
+        page_physics.set_icon_name("preferences-desktop-theme-symbolic")
+
+        # Pestaña 2: Sonidos Hápticos
+        page_audio = self.stack.add_titled(
+            self.make_tab_page([
+                self.build_audio_section()
+            ]),
+            "audio",
+            self.tr("tab_audio")
+        )
+        page_audio.set_icon_name("audio-volume-high-symbolic")
+
+        # Pestaña 3: Laboratorio Interactivo
+        page_sandbox = self.stack.add_titled(
+            self.make_tab_page([
+                self.build_sandbox_section()
+            ]),
+            "sandbox",
+            self.tr("tab_sandbox")
+        )
+        page_sandbox.set_icon_name("applications-science-symbolic")
+
+        # Pestaña 4: Mantenimiento y Sistema
+        page_system = self.stack.add_titled(
+            self.make_tab_page([
+                self.build_system_info_section(),
+                self.build_actions_section(self.win)
+            ]),
+            "system",
+            self.tr("tab_system")
+        )
+        page_system.set_icon_name("emblem-system-symbolic")
+
+    def rebuild_views(self):
+        active_tab = self.stack.get_visible_child_name() or "physics"
+        while True:
+            child = self.stack.get_first_child()
+            if not child:
+                break
+            self.stack.remove(child)
+
+        self.populate_stack()
+        self.stack.set_visible_child_name(active_tab)
 
     def update_theme_classes(self):
         sm = Adw.StyleManager.get_default()
@@ -747,14 +1119,14 @@ class CosmicFxApp(Adw.Application):
         orange_color = "#f6a623" if is_dark else "#b45309"
 
         if is_installed:
-            mode_badge = f"<span foreground='{teal_color}'><b>● Modo Flotante Libre</b></span>" if is_floating else f"<span foreground='{orange_color}'><b>● Modo Mosaico (Tiling)</b></span>"
-            self.status_title.set_markup(f"<b>🟢 Compositor Cosmic-FX Activo</b>   |   {mode_badge}")
-            mode_help = "Físicas Wobbly, 3D y rebotes activos al 100%." if is_floating else "Ventanas bloqueadas en cuadrícula fija. Presiona Super+Y para modo flotante."
+            mode_badge = f"<span foreground='{teal_color}'><b>● {self.tr('status_mode_floating')}</b></span>" if is_floating else f"<span foreground='{orange_color}'><b>● {self.tr('status_mode_tiling')}</b></span>"
+            self.status_title.set_markup(f"<b>{self.tr('status_comp_active')}</b>   |   {mode_badge}")
+            mode_help = self.tr("status_help_floating") if is_floating else self.tr("status_help_tiling")
             self.status_desc.set_text(mode_help)
             self.status_icon.set_from_icon_name("emblem-ok-symbolic")
         else:
-            self.status_title.set_markup("<b>⚪ Compositor de Fábrica Activo</b>")
-            self.status_desc.set_text("Haz clic en 'Instalar en Pop!_OS' en la pestaña Sistema para activar las físicas en todo tu escritorio.")
+            self.status_title.set_markup(f"<b>{self.tr('status_comp_stock')}</b>")
+            self.status_desc.set_text(self.tr("status_help_stock"))
             self.status_icon.set_from_icon_name("dialog-information-symbolic")
 
     def refresh_system_state(self):
@@ -778,17 +1150,17 @@ class CosmicFxApp(Adw.Application):
 
     def build_presets_section(self):
         group = Adw.PreferencesGroup()
-        group.set_title("Perfiles Preconfigurados")
-        group.set_description("Elige la intensidad que mejor se adapte a tu estilo de trabajo")
+        group.set_title(self.tr("presets_title"))
+        group.set_description(self.tr("presets_desc"))
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         box.set_homogeneous(True)
 
         presets = [
-            ("snappy", "⚡ Snappy", "Equilibrado", "Ágil y reactivo (1.0x)"),
-            ("intense", "💥 Intense", "Compiz Boom", "Máxima gelatina (2.2x)"),
-            ("subtle", "🍃 Subtle", "Sutil y Sobrio", "Micro-físicas (0.5x)"),
-            ("off", "🛑 Off", "Modo Fábrica", "Físicas rígidas (0.0x)")
+            ("snappy", self.tr("preset_snappy_title"), self.tr("preset_snappy_desc"), self.tr("preset_snappy_sub")),
+            ("intense", self.tr("preset_intense_title"), self.tr("preset_intense_desc"), self.tr("preset_intense_sub")),
+            ("subtle", self.tr("preset_subtle_title"), self.tr("preset_subtle_desc"), self.tr("preset_subtle_sub")),
+            ("off", self.tr("preset_off_title"), self.tr("preset_off_desc"), self.tr("preset_off_sub"))
         ]
 
         self.preset_buttons = {}
@@ -859,16 +1231,16 @@ class CosmicFxApp(Adw.Application):
             self.config["card_lift_enabled"] = True
             self.config["pendulum_tilt_enabled"] = True
             self.config["pop_sound_enabled"] = True
-            self.config["pop_sound_effect"] = "volume_bubble"
+            self.config["pop_sound_effect"] = "pin"
             self.config["pop_sound_on_close"] = True
-            self.config["pop_sound_on_open"] = True
-            self.config["pop_sound_on_maximize"] = True
+            self.config["pop_sound_on_open"] = False
+            self.config["pop_sound_on_maximize"] = False
             self.config["pop_sound_on_minimize"] = False
-            self.config["sound_close_effect"] = "click"
-            self.config["sound_open_effect"] = "click"
-            self.config["sound_maximize_effect"] = "swing"
-            self.config["sound_minimize_effect"] = "click"
-            self.config["close_animation_style"] = "pop_bubble"
+            self.config["sound_close_effect"] = "pin"
+            self.config["sound_open_effect"] = "pin"
+            self.config["sound_maximize_effect"] = "pin"
+            self.config["sound_minimize_effect"] = "pin"
+            self.config["close_animation_style"] = "glide"
         elif preset_id == "off":
             self.config["wobbly_enabled"] = False
             self.config["wobbly_intensity"] = 0.0
@@ -877,6 +1249,10 @@ class CosmicFxApp(Adw.Application):
             self.config["card_lift_enabled"] = False
             self.config["pendulum_tilt_enabled"] = False
             self.config["pop_sound_enabled"] = False
+            self.config["pop_sound_on_close"] = False
+            self.config["pop_sound_on_open"] = False
+            self.config["pop_sound_on_maximize"] = False
+            self.config["pop_sound_on_minimize"] = False
             self.config["close_animation_style"] = "classic"
         else: # snappy
             self.config["wobbly_enabled"] = True
@@ -899,80 +1275,73 @@ class CosmicFxApp(Adw.Application):
 
         self.update_preset_buttons_ui()
         self.sync_controls_from_config()
-        self.save_config(f"Perfil '{preset_id.upper()}' aplicado con éxito!")
+        self.save_config(f"Perfil {preset_id.upper()} activado")
 
     def build_physics_section(self):
         group = Adw.PreferencesGroup()
-        group.set_title("🌊 Físicas y Dinámica de Ventana")
-        group.set_description("Comportamiento elástico, oscilación Wobbly y profundidad 3D")
+        group.set_title(self.tr("physics_title"))
+        group.set_description(self.tr("physics_desc"))
 
-        # Modo de Ventanas: Flotante vs Auto-Tile
+        # Floating Mode Switch
         self.row_floating = Adw.SwitchRow()
-        self.row_floating.set_title("Modo de Ventanas Flotantes (Recomendado)")
-        self.row_floating.set_subtitle("Desactiva el mosaico rígido para mover y agitar libremente las ventanas (Atajo: Super + Y)")
-        autotile_path = os.path.expanduser("~/.config/cosmic/com.system76.CosmicComp/v1/autotile")
-        is_floating = True
-        if os.path.isfile(autotile_path):
-            try:
-                with open(autotile_path, "r") as f:
-                    is_floating = (f.read().strip() == "false")
-            except Exception:
-                pass
-        self.row_floating.set_active(is_floating)
+        self.row_floating.set_title(self.tr("row_floating_title"))
+        self.row_floating.set_subtitle(self.tr("row_floating_sub"))
+        self.row_floating.set_active(self.config.get("floating_mode", True))
         self.row_floating.connect("notify::active", self.on_floating_toggled)
         group.add(self.row_floating)
 
         # Wobbly Switch
         self.row_wobbly = Adw.SwitchRow()
-        self.row_wobbly.set_title("Ventanas Gelatinosas (Wobbly Windows)")
-        self.row_wobbly.set_subtitle("Oscilación y deformación elástica de las ventanas al ser arrastradas")
-        is_wobbly = self.config.get("wobbly_enabled", True)
-        self.row_wobbly.set_active(is_wobbly)
+        self.row_wobbly.set_title(self.tr("row_wobbly_title"))
+        self.row_wobbly.set_subtitle(self.tr("row_wobbly_sub"))
+        self.row_wobbly.set_active(self.config.get("wobbly_enabled", True))
         self.row_wobbly.connect("notify::active", self.on_wobbly_toggled)
         group.add(self.row_wobbly)
 
         # Wobbly Intensity Slider
         self.row_intensity = Adw.ActionRow()
-        self.row_intensity.set_title("Intensidad de Deformación")
-        self.row_intensity.set_subtitle(f"Nivel actual: {self.config.get('wobbly_intensity', 1.0):.1f}x")
+        self.row_intensity.set_title(self.tr("row_intensity_title"))
+        cur_int = self.config.get("wobbly_intensity", 1.0)
+        self.row_intensity.set_subtitle(self.tr("row_intensity_sub", val=cur_int))
 
-        self.scale_intensity = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0.1, 3.0, 0.1)
-        self.scale_intensity.set_value(self.config.get("wobbly_intensity", 1.0))
+        self.scale_intensity = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0.2, 3.0, 0.1)
+        self.scale_intensity.set_value(cur_int)
         self.scale_intensity.set_hexpand(True)
-        self.scale_intensity.set_size_request(200, -1)
+        self.scale_intensity.set_size_request(240, -1)
+        self.scale_intensity.set_draw_value(False)
+        self.scale_intensity.set_sensitive(self.config.get("wobbly_enabled", True))
         self.scale_intensity.connect("value-changed", self.on_intensity_changed)
         self.row_intensity.add_suffix(self.scale_intensity)
-        self.row_intensity.set_sensitive(is_wobbly)
         group.add(self.row_intensity)
 
         # Spring Bounce Switch
         self.row_spring = Adw.SwitchRow()
-        self.row_spring.set_title("Rebote Elástico de Resorte (Spring Bounce)")
-        self.row_spring.set_subtitle("Rebote amortiguado al maximizar, restaurar y abrir ventanas")
+        self.row_spring.set_title(self.tr("row_spring_title"))
+        self.row_spring.set_subtitle(self.tr("row_spring_sub"))
         self.row_spring.set_active(self.config.get("spring_bounce_enabled", True))
         self.row_spring.connect("notify::active", lambda row, ps: self.update_bool("spring_bounce_enabled", row.get_active()))
         group.add(self.row_spring)
 
         # Inclinación Pendular
         self.row_tilt = Adw.SwitchRow()
-        self.row_tilt.set_title("Inclinación Pendular (Pendulum Tilt)")
-        self.row_tilt.set_subtitle("Balanceo angular natural basado en la velocidad horizontal del ratón")
+        self.row_tilt.set_title(self.tr("row_tilt_title"))
+        self.row_tilt.set_subtitle(self.tr("row_tilt_sub"))
         self.row_tilt.set_active(self.config.get("pendulum_tilt_enabled", True))
         self.row_tilt.connect("notify::active", lambda row, ps: self.update_bool("pendulum_tilt_enabled", row.get_active()))
         group.add(self.row_tilt)
 
         # 3D Card Lift Switch
         self.row_lift = Adw.SwitchRow()
-        self.row_lift.set_title("Elevación 3D al Arrastrar (Card Lift)")
-        self.row_lift.set_subtitle("Aumenta la escala proyectando profundidad tridimensional")
+        self.row_lift.set_title(self.tr("row_lift_title"))
+        self.row_lift.set_subtitle(self.tr("row_lift_sub"))
         self.row_lift.set_active(self.config.get("card_lift_enabled", True))
         self.row_lift.connect("notify::active", lambda row, ps: self.update_bool("card_lift_enabled", row.get_active()))
         group.add(self.row_lift)
 
         # Neon Focus Glow Switch
         self.row_glow = Adw.SwitchRow()
-        self.row_glow.set_title("Anillo Neón Pop! Teal (Accent Glow)")
-        self.row_glow.set_subtitle("Bisel perimetral luminoso en cian/teal en la ventana activa")
+        self.row_glow.set_title(self.tr("row_glow_title"))
+        self.row_glow.set_subtitle(self.tr("row_glow_sub"))
         self.row_glow.set_active(self.config.get("focus_glow_enabled", True))
         self.row_glow.connect("notify::active", lambda row, ps: self.update_bool("focus_glow_enabled", row.get_active()))
         group.add(self.row_glow)
@@ -981,21 +1350,21 @@ class CosmicFxApp(Adw.Application):
 
     def build_animation_section(self):
         group = Adw.PreferencesGroup()
-        group.set_title("💥 Cinemática de Cierre Pop!")
-        group.set_description("Física visual al descartar o cerrar ventanas")
+        group.set_title(self.tr("anim_title"))
+        group.set_description(self.tr("anim_desc"))
 
         # Selector de Estilo de Cierre
         self.row_close_style = Adw.ComboRow()
-        self.row_close_style.set_title("Animación de Cierre de Ventana")
-        self.row_close_style.set_subtitle("Efecto cinemático (estallido de burbuja Pop! o descenso suave)")
-        anim_model = Gtk.StringList.new([
-            "💥 POP! Bubble Burst (Burbuja Pop!_OS)",
-            "🌊 Descenso Suave (Glide)",
-            "✨ Clásico (Fade)"
-        ])
+        self.row_close_style.set_title(self.tr("anim_row_title"))
+        self.row_close_style.set_subtitle(self.tr("anim_row_sub"))
+        
+        lang = self.get_current_lang()
+        anim_list = ANIMATION_LABELS.get(lang, ANIMATION_LABELS["en"])
+        anim_model = Gtk.StringList.new(anim_list)
         self.row_close_style.set_model(anim_model)
+        
         cur_anim = self.config.get("close_animation_style", "pop_bubble")
-        a_idx = 0 if cur_anim == "pop_bubble" else (1 if cur_anim == "glide" else 2)
+        a_idx = ANIMATION_KEYS.index(cur_anim) if cur_anim in ANIMATION_KEYS else 0
         self.row_close_style.set_selected(a_idx)
         self.row_close_style.connect("notify::selected", self.on_close_style_changed)
         group.add(self.row_close_style)
@@ -1004,18 +1373,18 @@ class CosmicFxApp(Adw.Application):
 
     def build_audio_section(self):
         group = Adw.PreferencesGroup()
-        group.set_title("🎶 Orquesta Acústica Háptica (PipeWire)")
-        group.set_description("Sonidos de baja latencia sincronizados con el ciclo de vida de la ventana")
+        group.set_title(self.tr("audio_title"))
+        group.set_description(self.tr("audio_desc"))
 
         # Pop Sound Master Switch + Botón de Vista Previa General
         self.row_pop_sound = Adw.SwitchRow()
-        self.row_pop_sound.set_title("🔊 Sonidos Hápticos de Pop!_OS")
-        self.row_pop_sound.set_subtitle("Habilitar retroalimentación acústica táctil en ventanas")
+        self.row_pop_sound.set_title(self.tr("audio_master_title"))
+        self.row_pop_sound.set_subtitle(self.tr("audio_master_sub"))
         master_active = self.config.get("pop_sound_enabled", True)
         self.row_pop_sound.set_active(master_active)
         self.row_pop_sound.connect("notify::active", self.on_master_sound_toggled)
 
-        btn_preview = Gtk.Button(label="▶️ Probar")
+        btn_preview = Gtk.Button(label=self.tr("btn_preview"))
         btn_preview.add_css_class("preview-btn")
         btn_preview.set_valign(Gtk.Align.CENTER)
         btn_preview.connect("clicked", lambda b: self.preview_named_sound(self.config.get("sound_close_effect", "volume_bubble")))
@@ -1024,46 +1393,46 @@ class CosmicFxApp(Adw.Application):
 
         # 1. Al Abrir o Restaurar desde Panel
         self.row_sound_open = Adw.SwitchRow()
-        self.row_sound_open.set_title("✨ Sonido al Abrir o Restaurar desde Panel")
-        self.row_sound_open.set_subtitle("Reproduce audio al abrir una ventana o al restaurarla desde el dock / panel")
+        self.row_sound_open.set_title(self.tr("audio_open_title"))
+        self.row_sound_open.set_subtitle(self.tr("audio_open_sub"))
         self.row_sound_open.set_active(self.config.get("pop_sound_on_open", True))
         self.row_sound_open.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_open", row.get_active()))
         group.add(self.row_sound_open)
 
-        self.row_combo_open = self.create_sound_combo_row("Tono al Abrir / Restaurar Panel", "Efecto acústico para apertura o restauración", "sound_open_effect", "volume_bubble")
+        self.row_combo_open = self.create_sound_combo_row(self.tr("audio_open_combo_title"), self.tr("audio_open_combo_sub"), "sound_open_effect", "volume_bubble")
         group.add(self.row_combo_open)
 
         # 2. Al Maximizar o Restaurar Tamaño
         self.row_sound_maximize = Adw.SwitchRow()
-        self.row_sound_maximize.set_title("🚀 Sonido al Maximizar o Restaurar Tamaño")
-        self.row_sound_maximize.set_subtitle("Reproduce audio al expandir a pantalla completa o al volver al tamaño flotante")
+        self.row_sound_maximize.set_title(self.tr("audio_maximize_title"))
+        self.row_sound_maximize.set_subtitle(self.tr("audio_maximize_sub"))
         self.row_sound_maximize.set_active(self.config.get("pop_sound_on_maximize", True))
         self.row_sound_maximize.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_maximize", row.get_active()))
         group.add(self.row_sound_maximize)
 
-        self.row_combo_maximize = self.create_sound_combo_row("Tono al Maximizar / Restaurar", "Efecto acústico para maximizado o desmaximizado", "sound_maximize_effect", "swing")
+        self.row_combo_maximize = self.create_sound_combo_row(self.tr("audio_maximize_combo_title"), self.tr("audio_maximize_combo_sub"), "sound_maximize_effect", "swing")
         group.add(self.row_combo_maximize)
 
         # 3. Al Cerrar Ventana
         self.row_sound_close = Adw.SwitchRow()
-        self.row_sound_close.set_title("💥 Sonido al Cerrar Ventana")
-        self.row_sound_close.set_subtitle("Reproduce audio al estallar o descartar la ventana")
+        self.row_sound_close.set_title(self.tr("audio_close_title"))
+        self.row_sound_close.set_subtitle(self.tr("audio_close_sub"))
         self.row_sound_close.set_active(self.config.get("pop_sound_on_close", True))
         self.row_sound_close.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_close", row.get_active()))
         group.add(self.row_sound_close)
 
-        self.row_combo_close = self.create_sound_combo_row("Tono al Cerrar", "Efecto acústico para cierre", "sound_close_effect", "volume_bubble")
+        self.row_combo_close = self.create_sound_combo_row(self.tr("audio_close_combo_title"), self.tr("audio_close_combo_sub"), "sound_close_effect", "volume_bubble")
         group.add(self.row_combo_close)
 
         # 4. Al Minimizar Ventana
         self.row_sound_minimize = Adw.SwitchRow()
-        self.row_sound_minimize.set_title("📥 Sonido al Minimizar Ventana")
-        self.row_sound_minimize.set_subtitle("Reproduce audio cuando la ventana se envía al dock")
+        self.row_sound_minimize.set_title(self.tr("audio_minimize_title"))
+        self.row_sound_minimize.set_subtitle(self.tr("audio_minimize_sub"))
         self.row_sound_minimize.set_active(self.config.get("pop_sound_on_minimize", False))
         self.row_sound_minimize.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_minimize", row.get_active()))
         group.add(self.row_sound_minimize)
 
-        self.row_combo_minimize = self.create_sound_combo_row("Tono al Minimizar", "Efecto acústico para minimizado", "sound_minimize_effect", "click")
+        self.row_combo_minimize = self.create_sound_combo_row(self.tr("audio_minimize_combo_title"), self.tr("audio_minimize_combo_sub"), "sound_minimize_effect", "click")
         group.add(self.row_combo_minimize)
 
         self.update_audio_controls_sensitivity(master_active)
@@ -1087,12 +1456,16 @@ class CosmicFxApp(Adw.Application):
         row = Adw.ComboRow()
         row.set_title(title)
         row.set_subtitle(subtitle)
-        model = Gtk.StringList.new([label for _, label in SOUND_OPTIONS])
+        
+        lang = self.get_current_lang()
+        labels = SOUND_LABELS.get(lang, SOUND_LABELS["en"])
+        model = Gtk.StringList.new([labels.get(k, k) for k in SOUND_KEYS])
         row.set_model(model)
+        
         cur = self.config.get(config_key, default_val)
         row.set_selected(get_sound_index(cur))
 
-        btn = Gtk.Button(label="▶️ Probar")
+        btn = Gtk.Button(label=self.tr("btn_preview"))
         btn.add_css_class("preview-btn")
         btn.set_valign(Gtk.Align.CENTER)
         btn.connect("clicked", lambda b: self.preview_named_sound(self.config.get(config_key, default_val)))
@@ -1110,22 +1483,21 @@ class CosmicFxApp(Adw.Application):
         idx = row.get_selected()
         val = get_sound_value(idx)
         self.config[config_key] = val
-        self.save_config(f"{title}: {SOUND_OPTIONS[idx][1]}")
+        self.save_config(f"{title}: {self.get_sound_label(val)}")
         self.preview_named_sound(val)
 
     def on_close_style_changed(self, row, pspec):
         idx = row.get_selected()
-        styles = ["pop_bubble", "glide", "classic"]
-        selected_style = styles[idx] if idx < len(styles) else "pop_bubble"
+        selected_style = ANIMATION_KEYS[idx] if idx < len(ANIMATION_KEYS) else "pop_bubble"
         self.config["close_animation_style"] = selected_style
-        self.save_config(f"Animación de cierre: {selected_style}")
+        self.save_config(self.tr("toast_config_saved"))
 
     def on_floating_toggled(self, row, pspec):
         if getattr(self, "suppress_floating_event", False):
             return
         val = row.get_active()
         self.config["floating_mode"] = val
-        self.save_config("✨ Modo Flotante Libre activado" if val else "📐 Modo Mosaico (Auto-Tile) activado")
+        self.save_config(self.tr("toast_floating_on") if val else self.tr("toast_floating_off"))
 
         autotile_path = os.path.expanduser("~/.config/cosmic/com.system76.CosmicComp/v1/autotile")
         try:
@@ -1142,23 +1514,23 @@ class CosmicFxApp(Adw.Application):
         val = row.get_active()
         self.config["wobbly_enabled"] = val
         self.scale_intensity.set_sensitive(val)
-        self.save_config("Efecto Wobbly " + ("activado" if val else "desactivado"))
+        self.save_config(self.tr("toast_wobbly_on") if val else self.tr("toast_wobbly_off"))
 
     def on_intensity_changed(self, scale):
         val = round(scale.get_value(), 1)
         self.config["wobbly_intensity"] = val
-        self.row_intensity.set_subtitle(f"Nivel actual: {val:.1f}x")
+        self.row_intensity.set_subtitle(self.tr("row_intensity_sub", val=val))
         self.save_config(None)
 
     def update_bool(self, key, val):
         self.config[key] = val
-        self.save_config(f"{key.replace('_', ' ').capitalize()} actualizado")
+        self.save_config(self.tr("toast_config_saved"))
 
     def sync_controls_from_config(self):
         self.row_wobbly.set_active(self.config.get("wobbly_enabled", True))
         intensity = self.config.get("wobbly_intensity", 1.0)
         self.scale_intensity.set_value(intensity)
-        self.row_intensity.set_subtitle(f"Nivel actual: {intensity:.1f}x")
+        self.row_intensity.set_subtitle(self.tr("row_intensity_sub", val=intensity))
         self.row_spring.set_active(self.config.get("spring_bounce_enabled", True))
         self.row_lift.set_active(self.config.get("card_lift_enabled", True))
         self.row_glow.set_active(self.config.get("focus_glow_enabled", True))
@@ -1184,7 +1556,7 @@ class CosmicFxApp(Adw.Application):
             self.row_combo_minimize.set_selected(get_sound_index(self.config.get("sound_minimize_effect", "click")))
         if hasattr(self, "row_close_style"):
             cur_anim = self.config.get("close_animation_style", "pop_bubble")
-            a_idx = 0 if cur_anim == "pop_bubble" else (1 if cur_anim == "glide" else 2)
+            a_idx = ANIMATION_KEYS.index(cur_anim) if cur_anim in ANIMATION_KEYS else 0
             self.row_close_style.set_selected(a_idx)
 
     def update_card_transform(self, dx, dy, tilt_deg, scale):
@@ -1255,8 +1627,8 @@ class CosmicFxApp(Adw.Application):
 
     def build_sandbox_section(self):
         group = Adw.PreferencesGroup()
-        group.set_title("Laboratorio Interactivo de Prueba")
-        group.set_description("Arrastra la tarjeta para sentir la respuesta física en vivo")
+        group.set_title(self.tr("sandbox_title"))
+        group.set_description(self.tr("sandbox_desc"))
 
         sandbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         sandbox.add_css_class("sandbox-area")
@@ -1277,7 +1649,7 @@ class CosmicFxApp(Adw.Application):
             dots.append(dot)
 
         card.append(dots)
-        card_lbl = Gtk.Label(label="✨ ¡Arrástrame! Suéltame y verás el rebote")
+        card_lbl = Gtk.Label(label=self.tr("sandbox_card_lbl"))
         card.append(card_lbl)
 
         # Drag gesture en la tarjeta simulada
@@ -1295,45 +1667,72 @@ class CosmicFxApp(Adw.Application):
 
     def build_system_info_section(self):
         group = Adw.PreferencesGroup()
-        group.set_title("ℹ️ Información del Compositor")
-        group.set_description("Detalles técnicos del entorno de ejecución Pop!_OS COSMIC")
+        group.set_title(self.tr("sys_info_title"))
+        group.set_description(self.tr("sys_info_desc"))
+
+        # Selector de Idioma / Language Selector
+        self.row_lang = Adw.ComboRow()
+        self.row_lang.set_title(self.tr("sys_lang_title"))
+        self.row_lang.set_subtitle(self.tr("sys_lang_sub"))
+        
+        lang_model = Gtk.StringList.new(self.tr("sys_lang_options"))
+        self.row_lang.set_model(lang_model)
+        
+        cur_lang = self.config.get("language", "auto")
+        lang_idx = 1 if cur_lang == "en" else (2 if cur_lang == "es" else 0)
+        self.suppress_lang_event = True
+        self.row_lang.set_selected(lang_idx)
+        self.suppress_lang_event = False
+        self.row_lang.connect("notify::selected", self.on_language_changed)
+        group.add(self.row_lang)
 
         row_ver = Adw.ActionRow()
-        row_ver.set_title("Versión de Cosmic FX")
-        row_ver.set_subtitle("Motor cinemático y orquesta acústica modular")
-        badge_ver = Gtk.Label(label="v1.0.0 Oficial")
+        row_ver.set_title(self.tr("sys_ver_title"))
+        row_ver.set_subtitle(self.tr("sys_ver_sub"))
+        badge_ver = Gtk.Label(label=self.tr("sys_ver_badge"))
         badge_ver.add_css_class("system-badge")
         row_ver.add_suffix(badge_ver)
         group.add(row_ver)
 
         row_comp = Adw.ActionRow()
-        row_comp.set_title("Compositor Wayland")
-        row_comp.set_subtitle("cosmic-comp con cinemática Bubble Burst y audio PipeWire")
+        row_comp.set_title(self.tr("sys_comp_title"))
+        row_comp.set_subtitle(self.tr("sys_comp_sub"))
         group.add(row_comp)
 
         row_cfg = Adw.ActionRow()
-        row_cfg.set_title("Archivo de Configuración")
+        row_cfg.set_title(self.tr("sys_cfg_title"))
         row_cfg.set_subtitle("~/.config/cosmic/cosmic-comp-fx.json")
         group.add(row_cfg)
 
         row_sync = Adw.ActionRow()
-        row_sync.set_title("Sincronización en Vivo")
-        row_sync.set_subtitle("Hot-Reload activo: cambios aplicados en tiempo real sin reiniciar")
+        row_sync.set_title(self.tr("sys_sync_title"))
+        row_sync.set_subtitle(self.tr("sys_sync_sub"))
         group.add(row_sync)
 
         return group
 
+    def on_language_changed(self, combo, pspec):
+        if getattr(self, "suppress_lang_event", False):
+            return
+        idx = combo.get_selected()
+        lang_map = {0: "auto", 1: "en", 2: "es"}
+        new_lang = lang_map.get(idx, "auto")
+        if self.config.get("language") != new_lang:
+            self.config["language"] = new_lang
+            self.save_config(self.tr("toast_config_saved"))
+            self.rebuild_views()
+
     def build_actions_section(self, parent_win):
         group = Adw.PreferencesGroup()
-        group.set_title("🛠️ Mantenimiento y Herramientas")
-        group.set_description("⚡ Los ajustes anteriores se aplican automáticamente en tiempo real.")
+        group.set_title(self.tr("actions_title"))
+        group.set_description(self.tr("actions_desc"))
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         box.set_homogeneous(True)
 
         # Probar en Ventana Segura
-        btn_test = Gtk.Button(label="🚀 Ventana de Prueba")
-        btn_test.set_tooltip_text("Abre una ventana anidada segura para probar las físicas sin afectar tu sesión actual")
+        btn_test = Gtk.Button(label=self.tr("btn_test"))
+        btn_test.set_tooltip_text(self.tr("btn_test_tooltip"))
         btn_test.add_css_class("pill")
         btn_test.connect("clicked", self.on_launch_test)
         box.append(btn_test)
@@ -1341,21 +1740,21 @@ class CosmicFxApp(Adw.Application):
         # Botones de Instalación / Restauración
         is_installed = os.path.isfile(ORIGINAL_BIN)
         if is_installed:
-            btn_update = Gtk.Button(label="🔄 Reinstalar / Reparar")
-            btn_update.set_tooltip_text("Reescribe el compositor en /usr/bin/ si una actualización del sistema lo sobreescribe")
+            btn_update = Gtk.Button(label=self.tr("btn_reinstall"))
+            btn_update.set_tooltip_text(self.tr("btn_reinstall_tooltip"))
             btn_update.add_css_class("pill")
             btn_update.add_css_class("suggested-action")
             btn_update.connect("clicked", lambda b: self.confirm_and_run_script("reinstall", parent_win))
             box.append(btn_update)
 
-            btn_restore = Gtk.Button(label="🛡️ Restaurar Fábrica")
-            btn_restore.set_tooltip_text("Restaura el compositor original de fábrica de Pop!_OS")
+            btn_restore = Gtk.Button(label=self.tr("btn_restore"))
+            btn_restore.set_tooltip_text(self.tr("btn_restore_tooltip"))
             btn_restore.add_css_class("pill")
             btn_restore.add_css_class("destructive-action")
             btn_restore.connect("clicked", lambda b: self.confirm_and_run_script("restore", parent_win))
             box.append(btn_restore)
         else:
-            btn_install = Gtk.Button(label="📦 Instalar en Pop!_OS")
+            btn_install = Gtk.Button(label=self.tr("btn_install"))
             btn_install.add_css_class("pill")
             btn_install.add_css_class("suggested-action")
             btn_install.connect("clicked", lambda b: self.confirm_and_run_script("install", parent_win))
@@ -1366,49 +1765,30 @@ class CosmicFxApp(Adw.Application):
 
     def confirm_and_run_script(self, action_type, parent_win):
         if action_type == "reinstall":
-            heading = "¿Reinstalar o Reparar Cosmic FX?"
-            body = (
-                "Esta acción volverá a escribir el compositor optimizado en el sistema.\n\n"
-                "• Copia el compositor parcheado a /usr/bin/cosmic-comp con físicas elásticas y efectos de audio.\n"
-                "• Útil si una actualización de Pop!_OS sobreescribió el compositor o si deseas actualizar los binarios.\n"
-                "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
-                "• Será necesario cerrar sesión para que el escritorio cargue el binario actualizado."
-            )
+            heading = self.tr("dlg_reinstall_heading")
+            body = self.tr("dlg_reinstall_body")
             script_name = "instalar-sistema.sh"
             appearance = Adw.ResponseAppearance.SUGGESTED
-            confirm_label = "Reinstalar / Reparar"
+            confirm_label = self.tr("dlg_reinstall_confirm")
         elif action_type == "restore":
-            heading = "¿Restaurar Compositor Original de Fábrica?"
-            body = (
-                "Esta acción devolverá tu sistema al estado original de Pop!_OS.\n\n"
-                "• Restaura el binario oficial de fábrica desde /usr/bin/cosmic-comp.original a /usr/bin/cosmic-comp.\n"
-                "• Desactiva por completo las físicas elásticas y los efectos Compiz.\n"
-                "• Tus configuraciones personalizadas en ~/.config/cosmic/ se conservarán seguras.\n"
-                "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
-                "• Será necesario cerrar sesión para volver a iniciar con el compositor estándar de System76."
-            )
+            heading = self.tr("dlg_restore_heading")
+            body = self.tr("dlg_restore_body")
             script_name = "restaurar-original.sh"
             appearance = Adw.ResponseAppearance.DESTRUCTIVE
-            confirm_label = "Restaurar Fábrica"
+            confirm_label = self.tr("dlg_restore_confirm")
         else:  # install
-            heading = "¿Instalar Cosmic FX en el Sistema?"
-            body = (
-                "Esta acción integrará Cosmic FX como el compositor activo de tu entorno COSMIC.\n\n"
-                "• Crea un respaldo de seguridad de tu compositor actual en /usr/bin/cosmic-comp.original.\n"
-                "• Instala el nuevo compositor cinemático con soporte para Compiz y audio PipeWire en /usr/bin/cosmic-comp.\n"
-                "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
-                "• Al finalizar la instalación, cierra e inicia sesión para disfrutar de la experiencia."
-            )
+            heading = self.tr("dlg_install_heading")
+            body = self.tr("dlg_install_body")
             script_name = "instalar-sistema.sh"
             appearance = Adw.ResponseAppearance.SUGGESTED
-            confirm_label = "Instalar"
+            confirm_label = self.tr("dlg_install_confirm")
 
         dialog = Adw.MessageDialog(
             transient_for=parent_win,
             heading=heading,
             body=body
         )
-        dialog.add_response("cancel", "Cancelar")
+        dialog.add_response("cancel", self.tr("dlg_cancel"))
         dialog.add_response("confirm", confirm_label)
         dialog.set_response_appearance("confirm", appearance)
         dialog.set_default_response("cancel")
@@ -1430,7 +1810,7 @@ class CosmicFxApp(Adw.Application):
             except Exception:
                 subprocess.Popen(["bash", script])
             if hasattr(self, "toast_overlay"):
-                toast = Adw.Toast.new("🚀 Abriendo ventana de prueba de compositor...")
+                toast = Adw.Toast.new(self.tr("toast_test_launch"))
                 self.toast_overlay.add_toast(toast)
 
     def on_run_script(self, script_name, parent_win):
@@ -1442,7 +1822,7 @@ class CosmicFxApp(Adw.Application):
                 script = alt_script
 
         if hasattr(self, "toast_overlay"):
-            toast = Adw.Toast.new("🔑 Ingresa tu contraseña en la ventana emergente...")
+            toast = Adw.Toast.new(self.tr("toast_enter_password"))
             self.toast_overlay.add_toast(toast)
 
         def run_thread():
@@ -1456,15 +1836,16 @@ class CosmicFxApp(Adw.Application):
         threading.Thread(target=run_thread, daemon=True).start()
 
     def on_script_success(self, script_name):
-        action = "instalado" if "instalar" in script_name else "restaurado"
+        is_inst = "instalar" in script_name or "install" in script_name
+        toast_msg = self.tr("toast_success_installed") if is_inst else self.tr("toast_success_restored")
         if hasattr(self, "toast_overlay"):
-            toast = Adw.Toast.new(f"🎉 ¡Compositor {action} con éxito! Cierra sesión para activar.")
+            toast = Adw.Toast.new(toast_msg)
             toast.set_timeout(5)
             self.toast_overlay.add_toast(toast)
 
     def on_script_failure(self):
         if hasattr(self, "toast_overlay"):
-            toast = Adw.Toast.new("⚠️ Acción cancelada o autenticación no completada.")
+            toast = Adw.Toast.new(self.tr("toast_failure"))
             self.toast_overlay.add_toast(toast)
 
 if __name__ == "__main__":
