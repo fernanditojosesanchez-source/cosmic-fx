@@ -121,17 +121,35 @@ preferencesgroup > box > label.subtitle {
     margin-bottom: 10px;
 }
 
-/* Filas de Preferencias (ActionRow, SwitchRow, ComboRow) */
-row {
+/* Card Unificada de Preferencias (Estilo Libadwaita / COSMIC) */
+preferencesgroup list {
     background-color: #242933;
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.07);
-    border-radius: 12px;
-    padding: 8px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
-row:hover {
-    background-color: #2b313d;
+preferencesgroup list > row {
+    background-color: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+preferencesgroup list > row:first-child {
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+}
+
+preferencesgroup list > row:last-child {
+    border-bottom-left-radius: 14px;
+    border-bottom-right-radius: 14px;
+    border-bottom: none;
+}
+
+preferencesgroup list > row:hover {
+    background-color: rgba(255, 255, 255, 0.035);
 }
 
 row label.title {
@@ -401,13 +419,13 @@ class CosmicFxApp(Adw.Application):
         main_box.append(scrolled)
 
         clamp = Adw.Clamp()
-        clamp.set_maximum_size(720)
-        clamp.set_tightening_threshold(540)
+        clamp.set_maximum_size(760)
+        clamp.set_tightening_threshold(580)
         scrolled.set_child(clamp)
 
         content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=24)
         content_box.set_margin_top(18)
-        content_box.set_margin_bottom(24)
+        content_box.set_margin_bottom(28)
         content_box.set_margin_start(16)
         content_box.set_margin_end(16)
         clamp.set_child(content_box)
@@ -418,13 +436,19 @@ class CosmicFxApp(Adw.Application):
         # 2. Selector de Preajustes
         content_box.append(self.build_presets_section())
 
-        # 3. Controles Detallados
-        content_box.append(self.build_controls_section())
+        # 3. Físicas y Movimiento de Ventana
+        content_box.append(self.build_physics_section())
 
-        # 4. Laboratorio Interactivo
+        # 4. Cinemática de Cierre Pop!
+        content_box.append(self.build_animation_section())
+
+        # 5. Orquesta Acústica Háptica
+        content_box.append(self.build_audio_section())
+
+        # 6. Laboratorio Interactivo
         content_box.append(self.build_sandbox_section())
 
-        # 5. Herramientas del Sistema
+        # 7. Herramientas del Sistema
         content_box.append(self.build_actions_section(win))
 
         # Conectar evento al enfocar la ventana para refrescar estado silenciosamente
@@ -629,10 +653,10 @@ class CosmicFxApp(Adw.Application):
         self.sync_controls_from_config()
         self.save_config(f"Perfil '{preset_id.upper()}' aplicado con éxito!")
 
-    def build_controls_section(self):
+    def build_physics_section(self):
         group = Adw.PreferencesGroup()
-        group.set_title("Ajustes Detallados de Físicas y Sonido")
-        group.set_description("Personaliza cada comportamiento a tu gusto exacto")
+        group.set_title("🌊 Físicas y Dinámica de Ventana")
+        group.set_description("Comportamiento elástico, oscilación Wobbly y profundidad 3D")
 
         # Modo de Ventanas: Flotante vs Auto-Tile
         self.row_floating = Adw.SwitchRow()
@@ -654,7 +678,8 @@ class CosmicFxApp(Adw.Application):
         self.row_wobbly = Adw.SwitchRow()
         self.row_wobbly.set_title("Ventanas Gelatinosas (Wobbly Windows)")
         self.row_wobbly.set_subtitle("Oscilación y deformación elástica de las ventanas al ser arrastradas")
-        self.row_wobbly.set_active(self.config.get("wobbly_enabled", True))
+        is_wobbly = self.config.get("wobbly_enabled", True)
+        self.row_wobbly.set_active(is_wobbly)
         self.row_wobbly.connect("notify::active", self.on_wobbly_toggled)
         group.add(self.row_wobbly)
 
@@ -669,6 +694,7 @@ class CosmicFxApp(Adw.Application):
         self.scale_intensity.set_size_request(200, -1)
         self.scale_intensity.connect("value-changed", self.on_intensity_changed)
         self.row_intensity.add_suffix(self.scale_intensity)
+        self.row_intensity.set_sensitive(is_wobbly)
         group.add(self.row_intensity)
 
         # Spring Bounce Switch
@@ -678,6 +704,14 @@ class CosmicFxApp(Adw.Application):
         self.row_spring.set_active(self.config.get("spring_bounce_enabled", True))
         self.row_spring.connect("notify::active", lambda row, ps: self.update_bool("spring_bounce_enabled", row.get_active()))
         group.add(self.row_spring)
+
+        # Inclinación Pendular
+        self.row_tilt = Adw.SwitchRow()
+        self.row_tilt.set_title("Inclinación Pendular (Pendulum Tilt)")
+        self.row_tilt.set_subtitle("Balanceo angular natural basado en la velocidad horizontal del ratón")
+        self.row_tilt.set_active(self.config.get("pendulum_tilt_enabled", True))
+        self.row_tilt.connect("notify::active", lambda row, ps: self.update_bool("pendulum_tilt_enabled", row.get_active()))
+        group.add(self.row_tilt)
 
         # 3D Card Lift Switch
         self.row_lift = Adw.SwitchRow()
@@ -695,71 +729,12 @@ class CosmicFxApp(Adw.Application):
         self.row_glow.connect("notify::active", lambda row, ps: self.update_bool("focus_glow_enabled", row.get_active()))
         group.add(self.row_glow)
 
-        # Pendulum Tilt Switch
-        self.row_tilt = Adw.SwitchRow()
-        self.row_tilt.set_title("Inclinación Pendular (Pendulum Tilt)")
-        self.row_tilt.set_subtitle("Balanceo angular natural basado en la velocidad horizontal del ratón")
-        self.row_tilt.set_active(self.config.get("pendulum_tilt_enabled", True))
-        self.row_tilt.connect("notify::active", lambda row, ps: self.update_bool("pendulum_tilt_enabled", row.get_active()))
-        group.add(self.row_tilt)
+        return group
 
-        # Pop Sound Master Switch + Botón de Vista Previa General
-        self.row_pop_sound = Adw.SwitchRow()
-        self.row_pop_sound.set_title("🔊 Sonidos Hápticos de Pop!_OS")
-        self.row_pop_sound.set_subtitle("Habilitar retroalimentación acústica táctil en ventanas")
-        self.row_pop_sound.set_active(self.config.get("pop_sound_enabled", True))
-        self.row_pop_sound.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_enabled", row.get_active()))
-
-        btn_preview = Gtk.Button(label="▶️ Probar")
-        btn_preview.add_css_class("preview-btn")
-        btn_preview.set_valign(Gtk.Align.CENTER)
-        btn_preview.connect("clicked", lambda b: self.preview_named_sound(self.config.get("sound_close_effect", "volume_bubble")))
-        self.row_pop_sound.add_suffix(btn_preview)
-        group.add(self.row_pop_sound)
-
-        # 1. Al Cerrar Ventana
-        self.row_sound_close = Adw.SwitchRow()
-        self.row_sound_close.set_title("💥 Sonido al Cerrar Ventana")
-        self.row_sound_close.set_subtitle("Reproduce audio al estallar o descartar la ventana")
-        self.row_sound_close.set_active(self.config.get("pop_sound_on_close", True))
-        self.row_sound_close.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_close", row.get_active()))
-        group.add(self.row_sound_close)
-
-        self.row_combo_close = self.create_sound_combo_row("Tono al Cerrar", "Efecto acústico para cierre", "sound_close_effect", "volume_bubble")
-        group.add(self.row_combo_close)
-
-        # 2. Al Abrir o Restaurar desde Panel
-        self.row_sound_open = Adw.SwitchRow()
-        self.row_sound_open.set_title("✨ Sonido al Abrir o Restaurar desde Panel")
-        self.row_sound_open.set_subtitle("Reproduce audio al abrir una ventana o al restaurarla desde el dock / panel")
-        self.row_sound_open.set_active(self.config.get("pop_sound_on_open", True))
-        self.row_sound_open.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_open", row.get_active()))
-        group.add(self.row_sound_open)
-
-        self.row_combo_open = self.create_sound_combo_row("Tono al Abrir / Restaurar Panel", "Efecto acústico para apertura o restauración", "sound_open_effect", "volume_bubble")
-        group.add(self.row_combo_open)
-
-        # 3. Al Maximizar o Restaurar Tamaño
-        self.row_sound_maximize = Adw.SwitchRow()
-        self.row_sound_maximize.set_title("🚀 Sonido al Maximizar o Restaurar Tamaño")
-        self.row_sound_maximize.set_subtitle("Reproduce audio al expandir a pantalla completa o al volver al tamaño flotante")
-        self.row_sound_maximize.set_active(self.config.get("pop_sound_on_maximize", True))
-        self.row_sound_maximize.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_maximize", row.get_active()))
-        group.add(self.row_sound_maximize)
-
-        self.row_combo_maximize = self.create_sound_combo_row("Tono al Maximizar / Restaurar", "Efecto acústico para maximizado o desmaximizado", "sound_maximize_effect", "swing")
-        group.add(self.row_combo_maximize)
-
-        # 4. Al Minimizar Ventana
-        self.row_sound_minimize = Adw.SwitchRow()
-        self.row_sound_minimize.set_title("📥 Sonido al Minimizar Ventana")
-        self.row_sound_minimize.set_subtitle("Reproduce audio cuando la ventana se envía al dock")
-        self.row_sound_minimize.set_active(self.config.get("pop_sound_on_minimize", False))
-        self.row_sound_minimize.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_minimize", row.get_active()))
-        group.add(self.row_sound_minimize)
-
-        self.row_combo_minimize = self.create_sound_combo_row("Tono al Minimizar", "Efecto acústico para minimizado", "sound_minimize_effect", "click")
-        group.add(self.row_combo_minimize)
+    def build_animation_section(self):
+        group = Adw.PreferencesGroup()
+        group.set_title("💥 Cinemática de Cierre Pop!")
+        group.set_description("Física visual al descartar o cerrar ventanas")
 
         # Selector de Estilo de Cierre
         self.row_close_style = Adw.ComboRow()
@@ -778,6 +753,87 @@ class CosmicFxApp(Adw.Application):
         group.add(self.row_close_style)
 
         return group
+
+    def build_audio_section(self):
+        group = Adw.PreferencesGroup()
+        group.set_title("🎶 Orquesta Acústica Háptica (PipeWire)")
+        group.set_description("Sonidos de baja latencia sincronizados con el ciclo de vida de la ventana")
+
+        # Pop Sound Master Switch + Botón de Vista Previa General
+        self.row_pop_sound = Adw.SwitchRow()
+        self.row_pop_sound.set_title("🔊 Sonidos Hápticos de Pop!_OS")
+        self.row_pop_sound.set_subtitle("Habilitar retroalimentación acústica táctil en ventanas")
+        master_active = self.config.get("pop_sound_enabled", True)
+        self.row_pop_sound.set_active(master_active)
+        self.row_pop_sound.connect("notify::active", self.on_master_sound_toggled)
+
+        btn_preview = Gtk.Button(label="▶️ Probar")
+        btn_preview.add_css_class("preview-btn")
+        btn_preview.set_valign(Gtk.Align.CENTER)
+        btn_preview.connect("clicked", lambda b: self.preview_named_sound(self.config.get("sound_close_effect", "volume_bubble")))
+        self.row_pop_sound.add_suffix(btn_preview)
+        group.add(self.row_pop_sound)
+
+        # 1. Al Abrir o Restaurar desde Panel
+        self.row_sound_open = Adw.SwitchRow()
+        self.row_sound_open.set_title("✨ Sonido al Abrir o Restaurar desde Panel")
+        self.row_sound_open.set_subtitle("Reproduce audio al abrir una ventana o al restaurarla desde el dock / panel")
+        self.row_sound_open.set_active(self.config.get("pop_sound_on_open", True))
+        self.row_sound_open.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_open", row.get_active()))
+        group.add(self.row_sound_open)
+
+        self.row_combo_open = self.create_sound_combo_row("Tono al Abrir / Restaurar Panel", "Efecto acústico para apertura o restauración", "sound_open_effect", "volume_bubble")
+        group.add(self.row_combo_open)
+
+        # 2. Al Maximizar o Restaurar Tamaño
+        self.row_sound_maximize = Adw.SwitchRow()
+        self.row_sound_maximize.set_title("🚀 Sonido al Maximizar o Restaurar Tamaño")
+        self.row_sound_maximize.set_subtitle("Reproduce audio al expandir a pantalla completa o al volver al tamaño flotante")
+        self.row_sound_maximize.set_active(self.config.get("pop_sound_on_maximize", True))
+        self.row_sound_maximize.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_maximize", row.get_active()))
+        group.add(self.row_sound_maximize)
+
+        self.row_combo_maximize = self.create_sound_combo_row("Tono al Maximizar / Restaurar", "Efecto acústico para maximizado o desmaximizado", "sound_maximize_effect", "swing")
+        group.add(self.row_combo_maximize)
+
+        # 3. Al Cerrar Ventana
+        self.row_sound_close = Adw.SwitchRow()
+        self.row_sound_close.set_title("💥 Sonido al Cerrar Ventana")
+        self.row_sound_close.set_subtitle("Reproduce audio al estallar o descartar la ventana")
+        self.row_sound_close.set_active(self.config.get("pop_sound_on_close", True))
+        self.row_sound_close.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_close", row.get_active()))
+        group.add(self.row_sound_close)
+
+        self.row_combo_close = self.create_sound_combo_row("Tono al Cerrar", "Efecto acústico para cierre", "sound_close_effect", "volume_bubble")
+        group.add(self.row_combo_close)
+
+        # 4. Al Minimizar Ventana
+        self.row_sound_minimize = Adw.SwitchRow()
+        self.row_sound_minimize.set_title("📥 Sonido al Minimizar Ventana")
+        self.row_sound_minimize.set_subtitle("Reproduce audio cuando la ventana se envía al dock")
+        self.row_sound_minimize.set_active(self.config.get("pop_sound_on_minimize", False))
+        self.row_sound_minimize.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_minimize", row.get_active()))
+        group.add(self.row_sound_minimize)
+
+        self.row_combo_minimize = self.create_sound_combo_row("Tono al Minimizar", "Efecto acústico para minimizado", "sound_minimize_effect", "click")
+        group.add(self.row_combo_minimize)
+
+        self.update_audio_controls_sensitivity(master_active)
+        return group
+
+    def on_master_sound_toggled(self, row, ps):
+        active = row.get_active()
+        self.update_audio_controls_sensitivity(active)
+        self.update_bool("pop_sound_enabled", active)
+
+    def update_audio_controls_sensitivity(self, active):
+        for attr in ["row_sound_open", "row_combo_open",
+                     "row_sound_maximize", "row_combo_maximize",
+                     "row_sound_close", "row_combo_close",
+                     "row_sound_minimize", "row_combo_minimize"]:
+            w = getattr(self, attr, None)
+            if w:
+                w.set_sensitive(active)
 
     def create_sound_combo_row(self, title, subtitle, config_key, default_val):
         row = Adw.ComboRow()
@@ -991,13 +1047,15 @@ class CosmicFxApp(Adw.Application):
 
     def build_actions_section(self, parent_win):
         group = Adw.PreferencesGroup()
-        group.set_title("Herramientas del Sistema")
+        group.set_title("🛠️ Mantenimiento y Herramientas")
+        group.set_description("⚡ Los ajustes anteriores se aplican automáticamente en tiempo real.")
 
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         box.set_homogeneous(True)
 
         # Probar en Ventana Segura
-        btn_test = Gtk.Button(label="🚀 Probar en Ventana Segura")
+        btn_test = Gtk.Button(label="🚀 Ventana de Prueba")
+        btn_test.set_tooltip_text("Abre una ventana anidada segura para probar las físicas sin afectar tu sesión actual")
         btn_test.add_css_class("pill")
         btn_test.connect("clicked", self.on_launch_test)
         box.append(btn_test)
@@ -1005,13 +1063,15 @@ class CosmicFxApp(Adw.Application):
         # Botones de Instalación / Restauración
         is_installed = os.path.isfile(ORIGINAL_BIN)
         if is_installed:
-            btn_update = Gtk.Button(label="🔄 Actualizar Físicas")
+            btn_update = Gtk.Button(label="🔄 Reinstalar / Reparar")
+            btn_update.set_tooltip_text("Reescribe el compositor en /usr/bin/ si una actualización del sistema lo sobreescribe")
             btn_update.add_css_class("pill")
             btn_update.add_css_class("suggested-action")
             btn_update.connect("clicked", lambda b: self.on_run_script("instalar-sistema.sh", parent_win))
             box.append(btn_update)
 
             btn_restore = Gtk.Button(label="🛡️ Restaurar Fábrica")
+            btn_restore.set_tooltip_text("Restaura el compositor original de fábrica de Pop!_OS")
             btn_restore.add_css_class("pill")
             btn_restore.add_css_class("destructive-action")
             btn_restore.connect("clicked", lambda b: self.on_run_script("restaurar-original.sh", parent_win))
