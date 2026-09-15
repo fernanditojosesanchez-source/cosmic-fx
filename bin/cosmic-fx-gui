@@ -67,66 +67,25 @@ def get_sound_value(index):
 
 CSS = """
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Pop!_OS COSMIC Style Tokens & High-Contrast Styling
+   Pop!_OS COSMIC Adaptive Theming (Light & Dark Support)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-@define-color pop_bg #1a1e24;
-@define-color pop_surface #242933;
-@define-color pop_surface_hover #2c3340;
-@define-color pop_teal #48b9c7;
-@define-color pop_orange #f6a623;
-@define-color pop_green #10b981;
-@define-color pop_text_primary #ffffff;
-@define-color pop_text_secondary #cbd5e1;
-@define-color pop_text_muted #94a3b8;
-@define-color pop_border rgba(255, 255, 255, 0.08);
 
+/* Base Window & Containers (utilizan tokens semánticos nativos de Libadwaita) */
 window.cosmic-fx-window {
-    background-color: #1a1e24;
-    color: #ffffff;
+    background-color: @window_bg_color;
+    color: @window_fg_color;
 }
 
 headerbar {
-    background-color: #1a1e24;
-    color: #ffffff;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: @headerbar_bg_color;
+    color: @headerbar_fg_color;
 }
 
-headerbar label.title {
-    color: #ffffff !important;
-    font-weight: 800;
-}
-
-headerbar label.subtitle {
-    color: #48b9c7 !important;
-    font-weight: 600;
-}
-
-/* Forzar que todos los labels sean legibles con alto contraste */
-window.cosmic-fx-window label {
-    color: #ffffff;
-}
-
-/* PreferencesGroup Titles & Subtitles */
-preferencesgroup > box > label.title {
-    color: #ffffff !important;
-    font-size: 16px !important;
-    font-weight: 800 !important;
-    margin-top: 8px;
-    margin-bottom: 2px;
-}
-
-preferencesgroup > box > label.subtitle {
-    color: #94a3b8 !important;
-    font-size: 13px !important;
-    margin-bottom: 10px;
-}
-
-/* Card Unificada de Preferencias (Estilo Libadwaita / COSMIC) */
+/* PreferencesGroup & Cards */
 preferencesgroup list {
-    background-color: #242933;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: @card_bg_color;
+    border: 1px solid @card_border_color;
     border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
 preferencesgroup list > row {
@@ -134,7 +93,7 @@ preferencesgroup list > row {
     border: none;
     border-radius: 0;
     padding: 10px 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid @card_border_color;
 }
 
 preferencesgroup list > row:first-child {
@@ -149,94 +108,7 @@ preferencesgroup list > row:last-child {
 }
 
 preferencesgroup list > row:hover {
-    background-color: rgba(255, 255, 255, 0.035);
-}
-
-row label.title {
-    color: #ffffff !important;
-    font-weight: 700;
-    font-size: 14px;
-}
-
-row label.subtitle {
-    color: #cbd5e1 !important;
-    font-size: 12.5px;
-}
-
-/* Pop!_OS Status Banner */
-.pop-status-banner {
-    background: linear-gradient(135deg, #242a34 0%, #1c2128 100%);
-    border: 1.5px solid rgba(72, 185, 199, 0.45);
-    border-radius: 14px;
-    padding: 16px 20px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
-}
-
-.pop-status-banner label.banner-title {
-    color: #ffffff !important;
-    font-size: 15px;
-    font-weight: 800;
-}
-
-.pop-status-banner label.banner-desc {
-    color: #cbd5e1 !important;
-    font-size: 13px;
-}
-
-/* Tarjetas de Preajuste (Presets) */
-.preset-card {
-    border-radius: 14px;
-    padding: 14px 10px;
-    transition: all 180ms ease;
-    border: 1.5px solid rgba(255, 255, 255, 0.09);
-    background-color: #242933;
-}
-
-.preset-card:hover {
-    background-color: #2c3340;
-    border-color: rgba(72, 185, 199, 0.4);
-}
-
-.preset-card.active {
-    background: linear-gradient(180deg, rgba(72, 185, 199, 0.22) 0%, rgba(36, 42, 52, 0.95) 100%);
-    border: 2px solid #48b9c7;
-    box-shadow: 0 0 16px rgba(72, 185, 199, 0.35);
-}
-
-.preset-card label.card-title {
-    color: #ffffff !important;
-    font-weight: 800;
-    font-size: 14.5px;
-}
-
-.preset-card.active label.card-title {
-    color: #48b9c7 !important;
-    font-weight: 800;
-}
-
-.preset-card label.card-desc {
-    color: #cbd5e1 !important;
-    font-weight: 600;
-    font-size: 12px;
-}
-
-.preset-card.active label.card-desc {
-    color: #f1f5f9 !important;
-    font-weight: 700;
-}
-
-.preset-card label.card-sub {
-    color: #94a3b8 !important;
-    font-size: 11px;
-}
-
-.preset-card.active label.card-sub {
-    color: #cbd5e1 !important;
-}
-
-/* Pop Switches */
-switch:checked {
-    background-color: #48b9c7;
+    background-color: alpha(@window_fg_color, 0.04);
 }
 
 /* ViewSwitcher Pestañas Pop!_OS */
@@ -248,14 +120,318 @@ viewswitcher button {
     transition: all 180ms ease;
 }
 
-viewswitcher button:checked {
+/* Switch Pop */
+switch:checked {
+    background-color: #2196a6;
+}
+
+/* Dots */
+.dot-red { background-color: #ef4444; border-radius: 9999px; min-width: 10px; min-height: 10px; }
+.dot-yellow { background-color: #f59e0b; border-radius: 9999px; min-width: 10px; min-height: 10px; }
+.dot-green { background-color: #10b981; border-radius: 9999px; min-width: 10px; min-height: 10px; }
+
+/* ─── Reglas Específicas: MODO CLARO (theme-light) ─── */
+window.cosmic-fx-window.theme-light preferencesgroup list {
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+window.cosmic-fx-window.theme-light preferencesgroup > box > label.title {
+    color: #0f172a !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+window.cosmic-fx-window.theme-light preferencesgroup > box > label.subtitle {
+    color: #64748b !important;
+    font-size: 13px !important;
+    margin-bottom: 10px;
+}
+
+window.cosmic-fx-window.theme-light row label.title {
+    color: #0f172a !important;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+window.cosmic-fx-window.theme-light row label.subtitle {
+    color: #475569 !important;
+    font-size: 12.5px;
+}
+
+window.cosmic-fx-window.theme-light .pop-status-banner {
+    background: linear-gradient(135deg, rgba(33, 150, 166, 0.12) 0%, rgba(33, 150, 166, 0.04) 100%);
+    border: 1.5px solid rgba(33, 150, 166, 0.45);
+    border-radius: 14px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+window.cosmic-fx-window.theme-light .pop-status-banner label.banner-title {
+    color: #0f172a !important;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+window.cosmic-fx-window.theme-light .pop-status-banner label.banner-desc {
+    color: #334155 !important;
+    font-size: 13px;
+}
+
+window.cosmic-fx-window.theme-light .preset-card {
+    border-radius: 14px;
+    padding: 14px 10px;
+    transition: all 180ms ease;
+    border: 1.5px solid rgba(0, 0, 0, 0.12);
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+window.cosmic-fx-window.theme-light .preset-card:hover {
+    background-color: #f8fafc;
+    border-color: rgba(33, 150, 166, 0.5);
+}
+
+window.cosmic-fx-window.theme-light .preset-card.active {
+    background: linear-gradient(180deg, rgba(33, 150, 166, 0.15) 0%, #ffffff 100%);
+    border: 2px solid #2196a6;
+    box-shadow: 0 0 14px rgba(33, 150, 166, 0.22);
+}
+
+window.cosmic-fx-window.theme-light .preset-card label.card-title {
+    color: #0f172a !important;
+    font-weight: 800;
+    font-size: 14.5px;
+}
+
+window.cosmic-fx-window.theme-light .preset-card.active label.card-title {
+    color: #0b7285 !important;
+    font-weight: 800;
+}
+
+window.cosmic-fx-window.theme-light .preset-card label.card-desc {
+    color: #475569 !important;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+window.cosmic-fx-window.theme-light .preset-card.active label.card-desc {
+    color: #1e293b !important;
+    font-weight: 700;
+}
+
+window.cosmic-fx-window.theme-light .preset-card label.card-sub {
+    color: #64748b !important;
+    font-size: 11px;
+}
+
+window.cosmic-fx-window.theme-light .preset-card.active label.card-sub {
+    color: #0b7285 !important;
+}
+
+window.cosmic-fx-window.theme-light viewswitcher button {
+    color: #334155;
+}
+
+window.cosmic-fx-window.theme-light viewswitcher button:checked {
+    background: rgba(33, 150, 166, 0.16);
+    color: #0b7285;
+    border: 1.5px solid rgba(33, 150, 166, 0.5);
+    box-shadow: 0 0 10px rgba(33, 150, 166, 0.18);
+}
+
+window.cosmic-fx-window.theme-light .system-badge {
+    background-color: rgba(33, 150, 166, 0.15);
+    color: #0b7285;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+window.cosmic-fx-window.theme-light .sandbox-area {
+    background: radial-gradient(circle at center, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 16px;
+    border: 1.5px solid rgba(33, 150, 166, 0.35);
+    min-height: 145px;
+}
+
+window.cosmic-fx-window.theme-light .mini-window-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
+    border: 1.5px solid #2196a6;
+    border-radius: 12px;
+    padding: 8px 16px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1), 0 0 12px rgba(33, 150, 166, 0.2);
+}
+
+window.cosmic-fx-window.theme-light .mini-window-card label {
+    color: #0f172a !important;
+    font-weight: 700;
+}
+
+window.cosmic-fx-window.theme-light button.suggested-action {
+    background-color: #2196a6;
+    color: #ffffff !important;
+    font-weight: 800;
+    border-radius: 9999px;
+}
+
+window.cosmic-fx-window.theme-light button.suggested-action label {
+    color: #ffffff !important;
+    font-weight: 800;
+}
+
+window.cosmic-fx-window.theme-light button.suggested-action:hover {
+    background-color: #178291;
+}
+
+window.cosmic-fx-window.theme-light button.destructive-action {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1.5px solid #ef4444;
+    color: #b91c1c !important;
+    font-weight: 700;
+    border-radius: 9999px;
+}
+
+window.cosmic-fx-window.theme-light button.destructive-action label {
+    color: #b91c1c !important;
+}
+
+window.cosmic-fx-window.theme-light button.destructive-action:hover {
+    background-color: rgba(239, 68, 68, 0.2);
+}
+
+window.cosmic-fx-window.theme-light button.preview-btn {
+    background-color: rgba(33, 150, 166, 0.12);
+    border: 1px solid #2196a6;
+    border-radius: 9999px;
+    padding: 3px 12px;
+}
+
+window.cosmic-fx-window.theme-light button.preview-btn label {
+    color: #0b7285 !important;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+window.cosmic-fx-window.theme-light button.preview-btn:hover {
+    background-color: rgba(33, 150, 166, 0.22);
+}
+
+/* ─── Reglas Específicas: MODO OSCURO (theme-dark) ─── */
+window.cosmic-fx-window.theme-dark preferencesgroup list {
+    background-color: #242933;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+window.cosmic-fx-window.theme-dark preferencesgroup > box > label.title {
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+window.cosmic-fx-window.theme-dark preferencesgroup > box > label.subtitle {
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    margin-bottom: 10px;
+}
+
+window.cosmic-fx-window.theme-dark row label.title {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+window.cosmic-fx-window.theme-dark row label.subtitle {
+    color: #cbd5e1 !important;
+    font-size: 12.5px;
+}
+
+window.cosmic-fx-window.theme-dark .pop-status-banner {
+    background: linear-gradient(135deg, #242a34 0%, #1c2128 100%);
+    border: 1.5px solid rgba(72, 185, 199, 0.45);
+    border-radius: 14px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+window.cosmic-fx-window.theme-dark .pop-status-banner label.banner-title {
+    color: #ffffff !important;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+window.cosmic-fx-window.theme-dark .pop-status-banner label.banner-desc {
+    color: #cbd5e1 !important;
+    font-size: 13px;
+}
+
+window.cosmic-fx-window.theme-dark .preset-card {
+    border-radius: 14px;
+    padding: 14px 10px;
+    transition: all 180ms ease;
+    border: 1.5px solid rgba(255, 255, 255, 0.09);
+    background-color: #242933;
+}
+
+window.cosmic-fx-window.theme-dark .preset-card:hover {
+    background-color: #2c3340;
+    border-color: rgba(72, 185, 199, 0.4);
+}
+
+window.cosmic-fx-window.theme-dark .preset-card.active {
+    background: linear-gradient(180deg, rgba(72, 185, 199, 0.22) 0%, rgba(36, 42, 52, 0.95) 100%);
+    border: 2px solid #48b9c7;
+    box-shadow: 0 0 16px rgba(72, 185, 199, 0.35);
+}
+
+window.cosmic-fx-window.theme-dark .preset-card label.card-title {
+    color: #ffffff !important;
+    font-weight: 800;
+    font-size: 14.5px;
+}
+
+window.cosmic-fx-window.theme-dark .preset-card.active label.card-title {
+    color: #48b9c7 !important;
+    font-weight: 800;
+}
+
+window.cosmic-fx-window.theme-dark .preset-card label.card-desc {
+    color: #cbd5e1 !important;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+window.cosmic-fx-window.theme-dark .preset-card.active label.card-desc {
+    color: #f1f5f9 !important;
+    font-weight: 700;
+}
+
+window.cosmic-fx-window.theme-dark .preset-card label.card-sub {
+    color: #94a3b8 !important;
+    font-size: 11px;
+}
+
+window.cosmic-fx-window.theme-dark .preset-card.active label.card-sub {
+    color: #cbd5e1 !important;
+}
+
+window.cosmic-fx-window.theme-dark viewswitcher button {
+    color: #ffffff;
+}
+
+window.cosmic-fx-window.theme-dark viewswitcher button:checked {
     background: rgba(72, 185, 199, 0.22);
     color: #48b9c7;
     border: 1.5px solid rgba(72, 185, 199, 0.5);
     box-shadow: 0 0 12px rgba(72, 185, 199, 0.25);
 }
 
-.system-badge {
+window.cosmic-fx-window.theme-dark .system-badge {
     background-color: rgba(72, 185, 199, 0.2);
     color: #48b9c7;
     border-radius: 8px;
@@ -264,15 +440,14 @@ viewswitcher button:checked {
     font-weight: 800;
 }
 
-/* Área de Laboratorio Interactivo */
-.sandbox-area {
+window.cosmic-fx-window.theme-dark .sandbox-area {
     background: radial-gradient(circle at center, #262c37 0%, #171b22 100%);
     border-radius: 16px;
     border: 1.5px solid rgba(72, 185, 199, 0.25);
     min-height: 145px;
 }
 
-.mini-window-card {
+window.cosmic-fx-window.theme-dark .mini-window-card {
     background: linear-gradient(135deg, #2a313d 0%, #1f242c 100%);
     border: 1.5px solid #48b9c7;
     border-radius: 12px;
@@ -280,33 +455,28 @@ viewswitcher button:checked {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(72, 185, 199, 0.3);
 }
 
-.mini-window-card label {
+window.cosmic-fx-window.theme-dark .mini-window-card label {
     color: #ffffff !important;
     font-weight: 700;
 }
 
-.dot-red { background-color: #ef4444; border-radius: 9999px; min-width: 10px; min-height: 10px; }
-.dot-yellow { background-color: #f59e0b; border-radius: 9999px; min-width: 10px; min-height: 10px; }
-.dot-green { background-color: #10b981; border-radius: 9999px; min-width: 10px; min-height: 10px; }
-
-/* Botones con estilo Pop!_OS */
-button.suggested-action {
+window.cosmic-fx-window.theme-dark button.suggested-action {
     background-color: #48b9c7;
     color: #14171d !important;
     font-weight: 800;
     border-radius: 9999px;
 }
 
-button.suggested-action label {
+window.cosmic-fx-window.theme-dark button.suggested-action label {
     color: #14171d !important;
     font-weight: 800;
 }
 
-button.suggested-action:hover {
+window.cosmic-fx-window.theme-dark button.suggested-action:hover {
     background-color: #5dd4e3;
 }
 
-button.destructive-action {
+window.cosmic-fx-window.theme-dark button.destructive-action {
     background-color: rgba(239, 68, 68, 0.15);
     border: 1.5px solid #ef4444;
     color: #fca5a5 !important;
@@ -314,28 +484,28 @@ button.destructive-action {
     border-radius: 9999px;
 }
 
-button.destructive-action label {
+window.cosmic-fx-window.theme-dark button.destructive-action label {
     color: #fca5a5 !important;
 }
 
-button.destructive-action:hover {
+window.cosmic-fx-window.theme-dark button.destructive-action:hover {
     background-color: rgba(239, 68, 68, 0.25);
 }
 
-button.preview-btn {
+window.cosmic-fx-window.theme-dark button.preview-btn {
     background-color: rgba(72, 185, 199, 0.14);
     border: 1px solid #48b9c7;
     border-radius: 9999px;
     padding: 3px 12px;
 }
 
-button.preview-btn label {
+window.cosmic-fx-window.theme-dark button.preview-btn label {
     color: #48b9c7 !important;
     font-weight: 700;
     font-size: 12px;
 }
 
-button.preview-btn:hover {
+window.cosmic-fx-window.theme-dark button.preview-btn:hover {
     background-color: rgba(72, 185, 199, 0.30);
 }
 """
@@ -405,7 +575,7 @@ class CosmicFxApp(Adw.Application):
 
     def do_activate(self):
         style_manager = Adw.StyleManager.get_default()
-        style_manager.set_color_scheme(Adw.ColorScheme.FORCE_DARK)
+        style_manager.set_color_scheme(Adw.ColorScheme.DEFAULT)
 
         # Cargar estilos Pop!_OS
         provider = Gtk.CssProvider()
@@ -421,12 +591,14 @@ class CosmicFxApp(Adw.Application):
             Gtk.STYLE_PROVIDER_PRIORITY_USER
         )
 
-        win = Adw.ApplicationWindow(application=self, title="Cosmic FX")
-        win.set_default_size(840, 700)
-        win.add_css_class("cosmic-fx-window")
+        self.win = Adw.ApplicationWindow(application=self, title="Cosmic FX")
+        self.win.set_default_size(840, 700)
+        self.win.add_css_class("cosmic-fx-window")
+        self.update_theme_classes()
+        style_manager.connect("notify::dark", lambda sm, pspec: self.update_theme_classes())
 
         self.toast_overlay = Adw.ToastOverlay()
-        win.set_content(self.toast_overlay)
+        self.win.set_content(self.toast_overlay)
 
         # Contenedor Principal
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
@@ -503,7 +675,7 @@ class CosmicFxApp(Adw.Application):
         page_system = self.stack.add_titled(
             make_tab_page([
                 self.build_system_info_section(),
-                self.build_actions_section(win)
+                self.build_actions_section(self.win)
             ]),
             "system",
             "Sistema"
@@ -513,9 +685,20 @@ class CosmicFxApp(Adw.Application):
         # Conectar evento al enfocar la ventana para refrescar estado silenciosamente
         controller = Gtk.EventControllerFocus.new()
         controller.connect("enter", lambda c: self.refresh_system_state())
-        win.add_controller(controller)
+        self.win.add_controller(controller)
 
-        win.present()
+        self.win.present()
+
+    def update_theme_classes(self):
+        sm = Adw.StyleManager.get_default()
+        if sm.get_dark():
+            self.win.add_css_class("theme-dark")
+            self.win.remove_css_class("theme-light")
+        else:
+            self.win.add_css_class("theme-light")
+            self.win.remove_css_class("theme-dark")
+        if hasattr(self, "status_title"):
+            self.update_status_banner_ui()
 
     def build_status_banner(self):
         card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
@@ -557,15 +740,20 @@ class CosmicFxApp(Adw.Application):
             except Exception:
                 pass
 
+        sm = Adw.StyleManager.get_default()
+        is_dark = sm.get_dark()
+        teal_color = "#48b9c7" if is_dark else "#0b7285"
+        orange_color = "#f6a623" if is_dark else "#b45309"
+
         if is_installed:
-            mode_badge = "<span foreground='#48b9c7'><b>● Modo Flotante Libre</b></span>" if is_floating else "<span foreground='#f6a623'><b>● Modo Mosaico (Tiling)</b></span>"
-            self.status_title.set_markup(f"<b><span foreground='#ffffff'>🟢 Compositor Cosmic-FX Activo</span></b>   |   {mode_badge}")
+            mode_badge = f"<span foreground='{teal_color}'><b>● Modo Flotante Libre</b></span>" if is_floating else f"<span foreground='{orange_color}'><b>● Modo Mosaico (Tiling)</b></span>"
+            self.status_title.set_markup(f"<b>🟢 Compositor Cosmic-FX Activo</b>   |   {mode_badge}")
             mode_help = "Físicas Wobbly, 3D y rebotes activos al 100%." if is_floating else "Ventanas bloqueadas en cuadrícula fija. Presiona Super+Y para modo flotante."
-            self.status_desc.set_markup(f"<span foreground='#cbd5e1'>{mode_help}</span>")
+            self.status_desc.set_text(mode_help)
             self.status_icon.set_from_icon_name("emblem-ok-symbolic")
         else:
-            self.status_title.set_markup("<b><span foreground='#ffffff'>⚪ Compositor de Fábrica Activo</span></b>")
-            self.status_desc.set_markup("<span foreground='#cbd5e1'>Haz clic en 'Instalar en Pop!_OS' abajo para activar las físicas en todo tu escritorio.</span>")
+            self.status_title.set_markup("<b>⚪ Compositor de Fábrica Activo</b>")
+            self.status_desc.set_text("Haz clic en 'Instalar en Pop!_OS' en la pestaña Sistema para activar las físicas en todo tu escritorio.")
             self.status_icon.set_from_icon_name("dialog-information-symbolic")
 
     def refresh_system_state(self):
