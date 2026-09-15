@@ -195,6 +195,9 @@ I18N = {
         "btn_restore_tooltip": "Restores the official stock Pop!_OS compositor",
         "btn_install": "📦 Install to Pop!_OS",
 
+        "footer_authors": "<b>Lead Architect:</b> Fher Sánchez   •   <b>Copilot:</b> Anty",
+        "footer_motto": "<small><i>Crafted with ❤️ for Pop!_OS COSMIC</i></small>",
+
         "dlg_cancel": "Cancel",
         "dlg_reinstall_heading": "Reinstall or Repair Cosmic FX?",
         "dlg_reinstall_body": (
@@ -339,6 +342,9 @@ I18N = {
         "btn_restore": "🛡️ Restaurar Fábrica",
         "btn_restore_tooltip": "Restaura el compositor original de fábrica de Pop!_OS",
         "btn_install": "📦 Instalar en Pop!_OS",
+
+        "footer_authors": "<b>Arquitectura:</b> Fher Sánchez   •   <b>Copiloto:</b> Anty",
+        "footer_motto": "<small><i>Creado con ❤️ para Pop!_OS COSMIC</i></small>",
 
         "dlg_cancel": "Cancelar",
         "dlg_reinstall_heading": "¿Reinstalar o Reparar Cosmic FX?",
@@ -650,6 +656,16 @@ window.cosmic-fx-window.theme-light button.preview-btn:hover {
     background-color: rgba(33, 150, 166, 0.22);
 }
 
+window.cosmic-fx-window.theme-light .footer-authors-label {
+    color: #334155;
+    font-size: 12.5px;
+}
+
+window.cosmic-fx-window.theme-light .footer-motto-label {
+    color: #64748b;
+    font-size: 11.5px;
+}
+
 /* ─── Reglas Específicas: MODO OSCURO (theme-dark) ─── */
 window.cosmic-fx-window.theme-dark preferencesgroup list {
     background-color: #242933;
@@ -838,6 +854,16 @@ window.cosmic-fx-window.theme-dark button.preview-btn label {
 
 window.cosmic-fx-window.theme-dark button.preview-btn:hover {
     background-color: rgba(72, 185, 199, 0.30);
+}
+
+window.cosmic-fx-window.theme-dark .footer-authors-label {
+    color: #cbd5e1;
+    font-size: 12.5px;
+}
+
+window.cosmic-fx-window.theme-dark .footer-motto-label {
+    color: #94a3b8;
+    font-size: 11.5px;
 }
 """
 
@@ -1044,12 +1070,33 @@ class CosmicFxApp(Adw.Application):
         page_system = self.stack.add_titled(
             self.make_tab_page([
                 self.build_system_info_section(),
-                self.build_actions_section(self.win)
+                self.build_actions_section(self.win),
+                self.build_footer_section()
             ]),
             "system",
             self.tr("tab_system")
         )
         page_system.set_icon_name("emblem-system-symbolic")
+
+    def build_footer_section(self):
+        footer_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        footer_box.set_margin_top(18)
+        footer_box.set_margin_bottom(8)
+        footer_box.set_halign(Gtk.Align.CENTER)
+
+        lbl_authors = Gtk.Label()
+        lbl_authors.set_markup(self.tr("footer_authors"))
+        lbl_authors.add_css_class("footer-authors-label")
+        lbl_authors.set_justify(Gtk.Justification.CENTER)
+
+        lbl_motto = Gtk.Label()
+        lbl_motto.set_markup(self.tr("footer_motto"))
+        lbl_motto.add_css_class("footer-motto-label")
+        lbl_motto.set_justify(Gtk.Justification.CENTER)
+
+        footer_box.append(lbl_authors)
+        footer_box.append(lbl_motto)
+        return footer_box
 
     def rebuild_views(self):
         active_tab = self.stack.get_visible_child_name() or "physics"
