@@ -1,0 +1,387 @@
+From b2b4920d909797458e9d3f519cb9ee1874a58ff4 Mon Sep 17 00:00:00 2001
+From: Fher Sanchez <fernanditojosesanchez-source@users.noreply.github.com>
+Date: Mon, 14 Sep 2026 20:50:12 -0600
+Subject: [PATCH 6/7] feat(fx): visual bubble pop close kinematics and
+ per-action sound palette
+
+---
+ src/config/fx.rs                 | 126 +++++++++++++++++++++++++++----
+ src/shell/layout/floating/mod.rs |  87 +++++++++++++--------
+ 2 files changed, 166 insertions(+), 47 deletions(-)
+
+diff --git a/src/config/fx.rs b/src/config/fx.rs
+index 609b65f5..336cf768 100644
+--- a/src/config/fx.rs
++++ b/src/config/fx.rs
+@@ -25,8 +25,22 @@ pub struct FxConfig {
+     pub close_animation_style: String,
+     #[serde(default = "default_sound_effect")]
+     pub pop_sound_effect: String,
++    #[serde(default = "default_true")]
++    pub pop_sound_on_close: bool,
++    #[serde(default = "default_true")]
++    pub pop_sound_on_open: bool,
++    #[serde(default = "default_true")]
++    pub pop_sound_on_maximize: bool,
+     #[serde(default = "default_false")]
+     pub pop_sound_on_minimize: bool,
++    #[serde(default = "default_sound_close")]
++    pub sound_close_effect: String,
++    #[serde(default = "default_sound_open")]
++    pub sound_open_effect: String,
++    #[serde(default = "default_sound_maximize")]
++    pub sound_maximize_effect: String,
++    #[serde(default = "default_sound_minimize")]
++    pub sound_minimize_effect: String,
+ }
+ 
+ fn default_true() -> bool {
+@@ -45,6 +59,22 @@ fn default_sound_effect() -> String {
+     "volume_bubble".to_string()
+ }
+ 
++fn default_sound_close() -> String {
++    "volume_bubble".to_string()
++}
++
++fn default_sound_open() -> String {
++    "volume_bubble".to_string()
++}
++
++fn default_sound_maximize() -> String {
++    "swing".to_string()
++}
++
++fn default_sound_minimize() -> String {
++    "click".to_string()
++}
++
+ impl Default for FxConfig {
+     fn default() -> Self {
+         Self::preset_snappy()
+@@ -73,7 +103,14 @@ impl FxConfig {
+             pop_sound_enabled: true,
+             close_animation_style: "pop_bubble".to_string(),
+             pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_close: true,
++            pop_sound_on_open: true,
++            pop_sound_on_maximize: true,
+             pop_sound_on_minimize: false,
++            sound_close_effect: "volume_bubble".to_string(),
++            sound_open_effect: "volume_bubble".to_string(),
++            sound_maximize_effect: "swing".to_string(),
++            sound_minimize_effect: "click".to_string(),
+         }
+     }
+ 
+@@ -90,7 +127,14 @@ impl FxConfig {
+             pop_sound_enabled: true,
+             close_animation_style: "pop_bubble".to_string(),
+             pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_close: true,
++            pop_sound_on_open: true,
++            pop_sound_on_maximize: true,
+             pop_sound_on_minimize: false,
++            sound_close_effect: "volume_bubble".to_string(),
++            sound_open_effect: "volume_bubble".to_string(),
++            sound_maximize_effect: "swing".to_string(),
++            sound_minimize_effect: "click".to_string(),
+         }
+     }
+ 
+@@ -107,7 +151,14 @@ impl FxConfig {
+             pop_sound_enabled: true,
+             close_animation_style: "pop_bubble".to_string(),
+             pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_close: true,
++            pop_sound_on_open: true,
++            pop_sound_on_maximize: true,
+             pop_sound_on_minimize: false,
++            sound_close_effect: "click".to_string(),
++            sound_open_effect: "click".to_string(),
++            sound_maximize_effect: "swing".to_string(),
++            sound_minimize_effect: "click".to_string(),
+         }
+     }
+ 
+@@ -124,7 +175,14 @@ impl FxConfig {
+             pop_sound_enabled: false,
+             close_animation_style: "classic".to_string(),
+             pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_close: false,
++            pop_sound_on_open: false,
++            pop_sound_on_maximize: false,
+             pop_sound_on_minimize: false,
++            sound_close_effect: "volume_bubble".to_string(),
++            sound_open_effect: "volume_bubble".to_string(),
++            sound_maximize_effect: "swing".to_string(),
++            sound_minimize_effect: "click".to_string(),
+         }
+     }
+ 
+@@ -188,25 +246,32 @@ impl FxConfig {
+     }
+ }
+ 
+-/// Reproduce de forma táctil y no bloqueante el icónico sonido de burbuja Pop! del control de volumen de Pop!_OS
+-pub fn play_pop_sound() {
++pub fn resolve_sound_path(effect_name: &str) -> &'static str {
++    match effect_name {
++        "pin" => "/usr/share/sounds/Pop/stereo/action/audio-volume-change.oga",
++        "click" => "/usr/share/sounds/gnome/default/alerts/click.ogg",
++        "swing" => "/usr/share/sounds/gnome/default/alerts/swing.ogg",
++        "camera_focus" => "/usr/share/sounds/Pop/stereo/action/camera-focus.oga",
++        "theme_demo" => "/usr/share/sounds/Pop/stereo/notification/theme-demo.oga",
++        "device_added" => "/usr/share/sounds/Pop/stereo/notification/device-added.oga",
++        "device_removed" => "/usr/share/sounds/Pop/stereo/notification/device-removed.oga",
++        _ => "/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga",
++    }
++}
++
++pub fn play_sound_effect(effect_name: &str) {
+     let cfg = FxConfig::current();
+     if !cfg.pop_sound_enabled {
+         return;
+     }
++    let sound_path = resolve_sound_path(effect_name);
++    if !std::path::Path::new(sound_path).exists() {
++        return;
++    }
++    let sound_path = sound_path.to_string();
+     std::thread::spawn(move || {
+-        let sound_path = match cfg.pop_sound_effect.as_str() {
+-            "pin" => "/usr/share/sounds/Pop/stereo/action/audio-volume-change.oga",
+-            "click" => "/usr/share/sounds/gnome/default/alerts/click.ogg",
+-            _ => "/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga",
+-        };
+-
+-        if !std::path::Path::new(sound_path).exists() {
+-            return;
+-        }
+-        // Intentar primero con pw-play (PipeWire nativo de bajísima latencia)
+         let played = std::process::Command::new("pw-play")
+-            .arg(sound_path)
++            .arg(&sound_path)
+             .stdout(std::process::Stdio::null())
+             .stderr(std::process::Stdio::null())
+             .spawn()
+@@ -215,7 +280,7 @@ pub fn play_pop_sound() {
+ 
+         if !played {
+             let _ = std::process::Command::new("paplay")
+-                .arg(sound_path)
++                .arg(&sound_path)
+                 .stdout(std::process::Stdio::null())
+                 .stderr(std::process::Stdio::null())
+                 .spawn()
+@@ -223,3 +288,36 @@ pub fn play_pop_sound() {
+         }
+     });
+ }
++
++pub fn play_sound_close() {
++    let cfg = FxConfig::current();
++    if cfg.pop_sound_enabled && cfg.pop_sound_on_close {
++        play_sound_effect(&cfg.sound_close_effect);
++    }
++}
++
++pub fn play_sound_open() {
++    let cfg = FxConfig::current();
++    if cfg.pop_sound_enabled && cfg.pop_sound_on_open {
++        play_sound_effect(&cfg.sound_open_effect);
++    }
++}
++
++pub fn play_sound_maximize() {
++    let cfg = FxConfig::current();
++    if cfg.pop_sound_enabled && cfg.pop_sound_on_maximize {
++        play_sound_effect(&cfg.sound_maximize_effect);
++    }
++}
++
++pub fn play_sound_minimize() {
++    let cfg = FxConfig::current();
++    if cfg.pop_sound_enabled && cfg.pop_sound_on_minimize {
++        play_sound_effect(&cfg.sound_minimize_effect);
++    }
++}
++
++/// Reproduce el sonido de cierre o Pop de respaldo
++pub fn play_pop_sound() {
++    play_sound_close();
++}
+diff --git a/src/shell/layout/floating/mod.rs b/src/shell/layout/floating/mod.rs
+index d5d0ff49..f2609018 100644
+--- a/src/shell/layout/floating/mod.rs
++++ b/src/shell/layout/floating/mod.rs
+@@ -52,7 +52,7 @@ pub use self::grabs::*;
+ pub const ANIMATION_DURATION: Duration = Duration::from_millis(380);
+ pub const MINIMIZE_ANIMATION_DURATION: Duration = Duration::from_millis(360);
+ pub const OPEN_ANIMATION_DURATION: Duration = Duration::from_millis(380);
+-pub const CLOSE_ANIMATION_DURATION: Duration = Duration::from_millis(300);
++pub const CLOSE_ANIMATION_DURATION: Duration = Duration::from_millis(320);
+ 
+ #[derive(Debug, Default)]
+ pub struct FloatingLayout {
+@@ -138,10 +138,10 @@ impl Animation {
+                     / CLOSE_ANIMATION_DURATION.as_secs_f32();
+                 let fx = crate::config::fx::FxConfig::current();
+                 if fx.close_animation_style == "pop_bubble" || fx.spring_bounce_enabled {
+-                    if p < 0.35 {
++                    if p < 0.38 {
+                         1.0
+                     } else {
+-                        let fade_p = (p - 0.35) / 0.65;
++                        let fade_p = (p - 0.38) / 0.62;
+                         (1.0 - fade_p.powi(2)).clamp(0.0, 1.0)
+                     }
+                 } else {
+@@ -477,6 +477,7 @@ impl FloatingLayout {
+         mapped.moved_since_mapped.store(true, Ordering::SeqCst);
+ 
+         if animate {
++            crate::config::fx::play_sound_maximize();
+             if let Some(existing_anim) = self.animations.get_mut(&mapped) {
+                 match existing_anim {
+                     Animation::Unminimize {
+@@ -727,6 +728,7 @@ impl FloatingLayout {
+                 },
+             );
+         } else {
++            crate::config::fx::play_sound_open();
+             self.animations.insert(
+                 mapped.clone(),
+                 Animation::Open {
+@@ -789,10 +791,7 @@ impl FloatingLayout {
+         let _ = self.animations.remove(window);
+ 
+         if let Some(to) = to {
+-            let fx = crate::config::fx::FxConfig::current();
+-            if fx.pop_sound_enabled && fx.pop_sound_on_minimize {
+-                crate::config::fx::play_pop_sound();
+-            }
++            crate::config::fx::play_sound_minimize();
+             self.animations.insert(
+                 window.clone(),
+                 Animation::Minimize {
+@@ -808,7 +807,7 @@ impl FloatingLayout {
+                 },
+             );
+         } else {
+-            crate::config::fx::play_pop_sound();
++            crate::config::fx::play_sound_close();
+             self.animations.insert(
+                 window.clone(),
+                 Animation::Close {
+@@ -1695,20 +1694,32 @@ impl FloatingLayout {
+                             .as_secs_f64()
+                             / CLOSE_ANIMATION_DURATION.as_secs_f64();
+ 
+-                        let (s, y_sink) = match fx.close_animation_style.as_str() {
++                        let (sx, sy, y_float) = match fx.close_animation_style.as_str() {
+                             "pop_bubble" => {
+                                 if p < 0.18 {
++                                    // Fase 1 (Anticipación / Squat): Compresión vertical acumulando tensión elástica
+                                     let t = p / 0.18;
+-                                    let s = 1.00 - 0.07 * (t * std::f64::consts::FRAC_PI_2).sin();
+-                                    (s, 0)
+-                                } else if p < 0.38 {
+-                                    let t = (p - 0.18) / 0.20;
+-                                    let s = 0.93 + 0.23 * (t * std::f64::consts::FRAC_PI_2).sin();
+-                                    (s, 0)
++                                    let curve = (t * std::f64::consts::FRAC_PI_2).sin();
++                                    let sx = 1.00 - 0.04 * curve;
++                                    let sy = 1.00 - 0.09 * curve;
++                                    let y = (4.0 * curve).round() as i32;
++                                    (sx, sy, y)
++                                } else if p < 0.44 {
++                                    // Fase 2 (Estallido Pop! & Salto Flotante): Apertura explosiva y elevación
++                                    let t = (p - 0.18) / 0.26;
++                                    let curve = (t * std::f64::consts::FRAC_PI_2).sin();
++                                    let sx = 0.96 + 0.22 * curve;
++                                    let sy = 0.91 + 0.33 * curve;
++                                    let y = 4 - (22.0 * curve).round() as i32;
++                                    (sx, sy, y)
+                                 } else {
+-                                    let t = (p - 0.38) / 0.62;
+-                                    let s = 1.16 + 0.09 * (1.0 - (1.0 - t).powi(2));
+-                                    (s, 0)
++                                    // Fase 3 (Dispersión de Onda y Evaporación): Flotación suave mientras se desvanece
++                                    let t = (p - 0.44) / 0.56;
++                                    let curve = 1.0 - (1.0 - t).powi(2);
++                                    let sx = 1.18 + 0.10 * curve;
++                                    let sy = 1.24 + 0.08 * curve;
++                                    let y = -18 - (8.0 * curve).round() as i32;
++                                    (sx, sy, y)
+                                 }
+                             }
+                             "glide" => {
+@@ -1716,39 +1727,49 @@ impl FloatingLayout {
+                                     let pop_t = p / 0.30;
+                                     let pop = (std::f64::consts::PI * pop_t).sin() * 0.09;
+                                     let lift = -(std::f64::consts::PI * pop_t).sin() * 12.0;
+-                                    (1.00 + pop, lift.round() as i32)
++                                    (1.00 + pop, 1.00 + pop, lift.round() as i32)
+                                 } else {
+                                     let collapse_t = (p - 0.30) / 0.70;
+                                     let s = (1.09 * (1.0 - collapse_t.powi(2))).max(0.01);
+                                     let sink = (collapse_t.powi(2) * 42.0).round() as i32;
+-                                    (s, sink)
++                                    (s, s, sink)
+                                 }
+                             }
+                             _ => {
+                                 if fx.spring_bounce_enabled {
+                                     if p < 0.18 {
+                                         let t = p / 0.18;
+-                                        let s = 1.00 - 0.07 * (t * std::f64::consts::FRAC_PI_2).sin();
+-                                        (s, 0)
+-                                    } else if p < 0.38 {
+-                                        let t = (p - 0.18) / 0.20;
+-                                        let s = 0.93 + 0.23 * (t * std::f64::consts::FRAC_PI_2).sin();
+-                                        (s, 0)
++                                        let curve = (t * std::f64::consts::FRAC_PI_2).sin();
++                                        let sx = 1.00 - 0.04 * curve;
++                                        let sy = 1.00 - 0.09 * curve;
++                                        let y = (4.0 * curve).round() as i32;
++                                        (sx, sy, y)
++                                    } else if p < 0.44 {
++                                        let t = (p - 0.18) / 0.26;
++                                        let curve = (t * std::f64::consts::FRAC_PI_2).sin();
++                                        let sx = 0.96 + 0.22 * curve;
++                                        let sy = 0.91 + 0.33 * curve;
++                                        let y = 4 - (22.0 * curve).round() as i32;
++                                        (sx, sy, y)
+                                     } else {
+-                                        let t = (p - 0.38) / 0.62;
+-                                        let s = 1.16 + 0.09 * (1.0 - (1.0 - t).powi(2));
+-                                        (s, 0)
++                                        let t = (p - 0.44) / 0.56;
++                                        let curve = 1.0 - (1.0 - t).powi(2);
++                                        let sx = 1.18 + 0.10 * curve;
++                                        let sy = 1.24 + 0.08 * curve;
++                                        let y = -18 - (8.0 * curve).round() as i32;
++                                        (sx, sy, y)
+                                     }
+                                 } else {
+-                                    (1.0 - 0.15 * p, 0)
++                                    let s = 1.0 - 0.15 * p;
++                                    (s, s, 0)
+                                 }
+                             }
+                         };
+ 
+-                        let offset_x = ((1.0 - s) * 0.5 * win_geo.size.w as f64).round() as i32;
+-                        let offset_y = ((1.0 - s) * 0.5 * win_geo.size.h as f64).round() as i32 + y_sink;
++                        let offset_x = ((1.0 - sx) * 0.5 * win_geo.size.w as f64).round() as i32;
++                        let offset_y = ((1.0 - sy) * 0.5 * win_geo.size.h as f64).round() as i32 + y_float;
+ 
+-                        (Scale { x: s, y: s }, Point::from((offset_x, offset_y)))
++                        (Scale { x: sx, y: sy }, Point::from((offset_x, offset_y)))
+                     }
+                     _ => {
+                         let original_geo = *anim.previous_geometry();
+-- 
+2.43.0
+

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.system76.CosmicFx</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-only</project_license>
+  <project_group>COSMIC</project_group>
+  <developer_name>Fher &amp; Anty</developer_name>
+  <name>Cosmic FX</name>
+  <name xml:lang="es">Cosmic FX (Centro de Físicas y Efectos)</name>
+  <summary>Compiz Physics, Wobbly Windows &amp; 3D Elastic Effects for Pop!_OS COSMIC</summary>
+  <summary xml:lang="es">Físicas estilo Compiz, Ventanas Gelatinosas y Rebote Elástico 3D para COSMIC</summary>
+  <description>
+    <p>
+      Cosmic FX brings classic Compiz and modern macOS-inspired physics to Pop!_OS 24.04 COSMIC Desktop.
+      Enjoy smooth wobbly windows, 3D card lift elevation, spring bounce animations for maximize/restore,
+      open/close transitions, and liquid glass neon focus rings.
+    </p>
+    <p xml:lang="es">
+      Cosmic FX incorpora físicas legendarias estilo Compiz y micro-interacciones modernas a Pop!_OS COSMIC Desktop.
+      Disfruta de ventanas gelatinosas suaves, elevación tridimensional al arrastrar, rebotes elásticos al maximizar,
+      animaciones fluidas de apertura/cierre y bisel de luz neón Liquid Glass.
+    </p>
+  </description>
+  <launchable type="desktop-id">com.system76.CosmicFx.desktop</launchable>
+  <icon type="stock">com.system76.CosmicFx</icon>
+  <categories>
+    <category>Settings</category>
+    <category>DesktopSettings</category>
+    <category>Utility</category>
+  </categories>
+  <provides>
+    <binary>cosmic-fx-gui</binary>
+    <binary>cosmic-fx</binary>
+  </provides>
+</component>

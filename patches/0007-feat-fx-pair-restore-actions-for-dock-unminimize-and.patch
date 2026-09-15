@@ -1,0 +1,63 @@
+From b4ed7af7955e187c396c3b28398b979a0b721ff7 Mon Sep 17 00:00:00 2001
+From: Fher Sanchez <fernanditojosesanchez-source@users.noreply.github.com>
+Date: Mon, 14 Sep 2026 21:43:03 -0600
+Subject: [PATCH 7/7] feat(fx): pair restore actions for dock unminimize and
+ window unmaximize sounds
+
+---
+ src/shell/mod.rs       | 10 ++++++++++
+ src/shell/workspace.rs |  3 +++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/src/shell/mod.rs b/src/shell/mod.rs
+index f1acc722..df274be9 100644
+--- a/src/shell/mod.rs
++++ b/src/shell/mod.rs
+@@ -4415,6 +4415,7 @@ impl Shell {
+                 .map(|i| set.minimized_windows.swap_remove(i))
+                 .map(|window| (set, window))
+         }) {
++            crate::config::fx::play_sound_open();
+             let MinimizedWindow::Floating { window, previous } = window else {
+                 unreachable!("None sticky window in WorkspaceSet minimized_windows");
+             };
+@@ -4438,6 +4439,7 @@ impl Shell {
+                 return;
+             };
+ 
++            crate::config::fx::play_sound_open();
+             if window.mapped().is_some_and(|m| m.is_stack()) {
+                 window.mapped().unwrap().set_active(surface);
+             }
+@@ -4503,6 +4505,14 @@ impl Shell {
+             if let Some(state) = state.take() {
+                 assert_eq!(state.original_layer, ManagedLayer::Sticky);
+ 
++                if !set
++                    .minimized_windows
++                    .iter()
++                    .any(|m| m.mapped().is_some_and(|m| m == mapped))
++                {
++                    crate::config::fx::play_sound_maximize();
++                }
++
+                 if let Some(minimized) = set
+                     .minimized_windows
+                     .iter_mut()
+diff --git a/src/shell/workspace.rs b/src/shell/workspace.rs
+index 84a020ff..35433064 100644
+--- a/src/shell/workspace.rs
++++ b/src/shell/workspace.rs
+@@ -996,6 +996,9 @@ impl Workspace {
+     pub fn unmaximize_request(&mut self, elem: &CosmicMapped) -> Option<Rectangle<i32, Local>> {
+         let mut state = elem.maximized_state.lock().unwrap();
+         if let Some(state) = state.take() {
++            if !self.minimized_windows.iter().any(|m| m == elem) {
++                crate::config::fx::play_sound_maximize();
++            }
+             if let Some(minimized) = self.minimized_windows.iter_mut().find(|m| *m == elem) {
+                 minimized.unmaximize(state.original_geometry, state.original_snapped);
+                 Some(state.original_geometry)
+-- 
+2.43.0
+

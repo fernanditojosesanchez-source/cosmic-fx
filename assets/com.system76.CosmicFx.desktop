@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Cosmic FX
+GenericName=Compiz Physics & Effects
+Comment=Personaliza las físicas gelatinosas Wobbly, rebotes elásticos y efectos 3D de COSMIC
+Comment[es]=Personaliza las físicas gelatinosas Wobbly, rebotes elásticos y efectos 3D de COSMIC
+Exec=cosmic-fx-gui
+Icon=com.system76.CosmicFx
+Terminal=false
+Type=Application
+Categories=Settings;DesktopSettings;Utility;GTK;COSMIC;
+Keywords=COSMIC;wobbly;compiz;physics;effects;animaciones;físicas;ventana;
+StartupNotify=true

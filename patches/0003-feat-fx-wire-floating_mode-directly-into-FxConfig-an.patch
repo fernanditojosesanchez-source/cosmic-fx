@@ -1,0 +1,156 @@
+From 481c6d42d8bc143ca3849d158780824a5bb45dda Mon Sep 17 00:00:00 2001
+From: Fher Sanchez <fernanditojosesanchez-source@users.noreply.github.com>
+Date: Sun, 13 Sep 2026 21:14:20 -0600
+Subject: [PATCH 3/7] feat(fx): wire floating_mode directly into FxConfig and
+ cosmic-comp live tiling engine
+
+---
+ src/config/fx.rs     | 10 ++++++++++
+ src/config/mod.rs    | 17 ++++++++++++++++-
+ src/input/actions.rs | 11 +++++++++--
+ src/shell/mod.rs     | 17 +++++++++++++++++
+ 4 files changed, 52 insertions(+), 3 deletions(-)
+
+diff --git a/src/config/fx.rs b/src/config/fx.rs
+index af506723..b27058a5 100644
+--- a/src/config/fx.rs
++++ b/src/config/fx.rs
+@@ -17,6 +17,12 @@ pub struct FxConfig {
+     pub focus_glow_enabled: bool,
+     pub card_lift_enabled: bool,
+     pub pendulum_tilt_enabled: bool,
++    #[serde(default = "default_floating_mode")]
++    pub floating_mode: bool,
++}
++
++fn default_floating_mode() -> bool {
++    true
+ }
+ 
+ impl Default for FxConfig {
+@@ -43,6 +49,7 @@ impl FxConfig {
+             focus_glow_enabled: true,
+             card_lift_enabled: true,
+             pendulum_tilt_enabled: true,
++            floating_mode: true,
+         }
+     }
+ 
+@@ -55,6 +62,7 @@ impl FxConfig {
+             focus_glow_enabled: true,
+             card_lift_enabled: true,
+             pendulum_tilt_enabled: true,
++            floating_mode: true,
+         }
+     }
+ 
+@@ -67,6 +75,7 @@ impl FxConfig {
+             focus_glow_enabled: true,
+             card_lift_enabled: true,
+             pendulum_tilt_enabled: true,
++            floating_mode: true,
+         }
+     }
+ 
+@@ -79,6 +88,7 @@ impl FxConfig {
+             focus_glow_enabled: false,
+             card_lift_enabled: false,
+             pendulum_tilt_enabled: false,
++            floating_mode: false,
+         }
+     }
+ 
+diff --git a/src/config/mod.rs b/src/config/mod.rs
+index 26a3d73a..b11a5116 100644
+--- a/src/config/mod.rs
++++ b/src/config/mod.rs
+@@ -332,7 +332,22 @@ impl Config {
+         let fx_timer = smithay::reexports::calloop::timer::Timer::from_duration(std::time::Duration::from_millis(500));
+         let _ = loop_handle.insert_source(fx_timer, |_, _, state| {
+             if fx::FxConfig::reload_if_changed() {
+-                tracing::info!("CosmicComp FX config reloaded in real time!");
++                let fx_cfg = fx::FxConfig::current();
++                tracing::info!(floating = fx_cfg.floating_mode, "CosmicComp FX config reloaded in real time!");
++
++                // Sincronizar modo mosaico vs flotante en todos los workspaces activos
++                let want_tiling = !fx_cfg.floating_mode;
++                {
++                    let mut shell = state.common.shell.write();
++                    let shell_ref = &mut *shell;
++                    let seat = shell_ref.seats.last_active().clone();
++                    shell_ref.workspaces.set_all_workspaces_tiling(
++                        want_tiling,
++                        &seat,
++                        &mut state.common.workspace_state.update(),
++                    );
++                }
++
+                 state.common.refresh();
+             }
+             smithay::reexports::calloop::timer::TimeoutAction::ToDuration(std::time::Duration::from_millis(500))
+diff --git a/src/input/actions.rs b/src/input/actions.rs
+index 8639ba62..657e18dc 100644
+--- a/src/input/actions.rs
++++ b/src/input/actions.rs
+@@ -987,7 +987,7 @@ impl State {
+             }
+ 
+             Action::ToggleTiling => {
+-                if matches!(
++                let is_now_tiling = if matches!(
+                     self.common.config.cosmic_conf.autotile_behavior,
+                     TileBehavior::Global
+                 ) {
+@@ -1009,13 +1009,20 @@ impl State {
+                             error!(?err, "Failed to update autotile key");
+                         }
+                     });
++                    autotile
+                 } else {
+                     let output = seat.active_output();
+                     let mut shell = self.common.shell.write();
+                     let workspace = shell.workspaces.active_mut(&output).unwrap();
+                     let mut guard = self.common.workspace_state.update();
+                     workspace.toggle_tiling(seat, &mut guard);
+-                }
++                    workspace.tiling_enabled
++                };
++
++                let mut fx_cfg = crate::config::fx::FxConfig::current();
++                fx_cfg.floating_mode = !is_now_tiling;
++                crate::config::fx::FxConfig::set_current(fx_cfg.clone());
++                let _ = fx_cfg.save();
+             }
+ 
+             Action::ToggleWindowFloating => {
+diff --git a/src/shell/mod.rs b/src/shell/mod.rs
+index 47d78851..f1acc722 100644
+--- a/src/shell/mod.rs
++++ b/src/shell/mod.rs
+@@ -1498,6 +1498,23 @@ impl Workspaces {
+         self.apply_tile_change(guard, seats);
+     }
+ 
++    pub fn set_all_workspaces_tiling(
++        &mut self,
++        tiling: bool,
++        seat: &Seat<State>,
++        guard: &mut WorkspaceUpdateGuard<'_, State>,
++    ) {
++        self.autotile = tiling;
++        for (_, set) in &mut self.sets {
++            set.tiling_enabled = tiling;
++            for w in &mut set.workspaces {
++                if w.tiling_enabled != tiling {
++                    w.set_tiling(tiling, seat, guard);
++                }
++            }
++        }
++    }
++
+     pub fn persist(&self, config: &Config) {
+         let pinned_workspaces: Vec<PinnedWorkspace> = self
+             .sets
+-- 
+2.43.0
+

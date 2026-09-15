@@ -1,0 +1,980 @@
+From 9fe38bd57ae24630a531fe0ab2dfbcedf1563099 Mon Sep 17 00:00:00 2001
+From: Fher Sanchez <fernanditojosesanchez-source@users.noreply.github.com>
+Date: Sun, 13 Sep 2026 20:21:23 -0600
+Subject: [PATCH 1/7] feat(fx): complete wobbly physics, 3d lift, spring bounce
+ and live cosmic-fx engine
+
+---
+ src/backend/mod.rs                     |   6 +-
+ src/backend/render/mod.rs              |   2 +-
+ src/backend/render/shaders/shadow.frag |   4 +-
+ src/backend/render/shadow.rs           |   8 +-
+ src/backend/winit.rs                   |   6 +-
+ src/config/fx.rs                       | 143 ++++++++++++
+ src/config/mod.rs                      |  11 +
+ src/shell/element/mod.rs               |  24 +-
+ src/shell/grabs/moving.rs              |  90 ++++++--
+ src/shell/layout/floating/mod.rs       | 298 ++++++++++++++++++++-----
+ 10 files changed, 491 insertions(+), 101 deletions(-)
+ create mode 100644 src/config/fx.rs
+
+diff --git a/src/backend/mod.rs b/src/backend/mod.rs
+index b9586b5a..916ed37a 100644
+--- a/src/backend/mod.rs
++++ b/src/backend/mod.rs
+@@ -28,9 +28,9 @@ pub fn init_backend_auto(
+         Ok(x) if x == "kms" => kms::init_backend(dh, event_loop, state),
+         Ok(_) => unimplemented!("There is no backend with this identifier"),
+         Err(_) => {
+-            if std::env::var_os("DISPLAY").is_some()
+-                || std::env::var_os("WAYLAND_DISPLAY").is_some()
+-            {
++            if std::env::var_os("WAYLAND_DISPLAY").is_some() {
++                winit::init_backend(dh, event_loop, state)
++            } else if std::env::var_os("DISPLAY").is_some() {
+                 match x11::init_backend(dh, event_loop, state) {
+                     Ok(_) => Ok(()),
+                     Err(err) => {
+diff --git a/src/backend/render/mod.rs b/src/backend/render/mod.rs
+index 9ad61588..b551632f 100644
+--- a/src/backend/render/mod.rs
++++ b/src/backend/render/mod.rs
+@@ -125,7 +125,7 @@ impl AsMut<GlowRenderer> for RendererRef<'_> {
+     }
+ }
+ 
+-pub static CLEAR_COLOR: Color32F = Color32F::new(0.153, 0.161, 0.165, 1.0);
++pub static CLEAR_COLOR: Color32F = Color32F::new(0.24, 0.28, 0.36, 1.0);
+ pub static OUTLINE_SHADER: &str = include_str!("./shaders/rounded_outline.frag");
+ pub static RECTANGLE_SHADER: &str = include_str!("./shaders/rounded_rectangle.frag");
+ pub static POSTPROCESS_SHADER: &str = include_str!("./shaders/offscreen.frag");
+diff --git a/src/backend/render/shaders/shadow.frag b/src/backend/render/shaders/shadow.frag
+index fb72349e..e99a7bc3 100644
+--- a/src/backend/render/shaders/shadow.frag
++++ b/src/backend/render/shaders/shadow.frag
+@@ -59,10 +59,10 @@ float roundedBoxShadow(vec2 lower, vec2 upper, vec2 point, float sigma, float co
+     float end = clamp(3.0 * sigma, low, high);
+ 
+     // Accumulate samples (we can get away with surprisingly few samples)
+-    float step = (end - start) / 4.0;
++    float step = (end - start) / 16.0;
+     float y = start + step * 0.5;
+     float value = 0.0;
+-    for (int i = 0; i < 4; i++) {
++    for (int i = 0; i < 16; i++) {
+         value += roundedBoxShadowX(point.x, point.y - y, sigma, corner, halfSize) * gaussian(y, sigma) * step;
+         y += step;
+     }
+diff --git a/src/backend/render/shadow.rs b/src/backend/render/shadow.rs
+index 87fdd2e3..1eba0040 100644
+--- a/src/backend/render/shadow.rs
++++ b/src/backend/render/shadow.rs
+@@ -81,10 +81,10 @@ impl ShadowShader {
+         {
+             let shader = Self::get(renderer);
+ 
+-            let softness = 25.;
+-            let spread = 5.;
+-            let offset = [0., 5.];
+-            let color = [0., 0., 0., if dark_mode { 0.45 } else { 0.35 }];
++            let softness = 32.;
++            let spread = 4.;
++            let offset = [0., 12.];
++            let color = [0., 0., 0., if dark_mode { 0.65 } else { 0.40 }];
+             let radius = radius.map(|r| ceil(r as f64));
+ 
+             let width = softness;
+diff --git a/src/backend/winit.rs b/src/backend/winit.rs
+index 8f3d14c5..9c8b9ed1 100644
+--- a/src/backend/winit.rs
++++ b/src/backend/winit.rs
+@@ -49,7 +49,9 @@ pub struct WinitState {
+ impl WinitState {
+     #[profiling::function]
+     pub fn render_output(&mut self, state: &mut Common) -> Result<()> {
+-        let age = self.backend.buffer_age().unwrap_or(0);
++        // In nested Winit mode, force age to 0 to prevent partial damage misses
++        // and eliminate any buffer age sync artifacts or black checkerboards.
++        let age = 0;
+         let (renderer, mut fb) = self
+             .backend
+             .bind()
+@@ -70,7 +72,7 @@ impl WinitState {
+             Ok(RenderOutputResult { damage, states, .. }) => {
+                 std::mem::drop(fb);
+                 self.backend
+-                    .submit(damage.map(|x| x.as_slice()))
++                    .submit(None)
+                     .with_context(|| "Failed to submit buffer for display")?;
+                 state.send_frames(&self.output, None);
+                 state.update_primary_output(&self.output, &states);
+diff --git a/src/config/fx.rs b/src/config/fx.rs
+new file mode 100644
+index 00000000..af506723
+--- /dev/null
++++ b/src/config/fx.rs
+@@ -0,0 +1,143 @@
++// SPDX-License-Identifier: GPL-3.0-only
++
++use serde::{Deserialize, Serialize};
++use std::path::PathBuf;
++use std::sync::{LazyLock, RwLock};
++
++static CURRENT_FX: LazyLock<RwLock<FxConfig>> = LazyLock::new(|| {
++    RwLock::new(FxConfig::load_or_default_from_disk())
++});
++
++#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
++pub struct FxConfig {
++    pub preset: String,
++    pub wobbly_enabled: bool,
++    pub wobbly_intensity: f64,
++    pub spring_bounce_enabled: bool,
++    pub focus_glow_enabled: bool,
++    pub card_lift_enabled: bool,
++    pub pendulum_tilt_enabled: bool,
++}
++
++impl Default for FxConfig {
++    fn default() -> Self {
++        Self::preset_snappy()
++    }
++}
++
++impl FxConfig {
++    pub fn current() -> Self {
++        CURRENT_FX.read().unwrap().clone()
++    }
++
++    pub fn set_current(new_cfg: Self) {
++        *CURRENT_FX.write().unwrap() = new_cfg;
++    }
++
++    pub fn preset_snappy() -> Self {
++        Self {
++            preset: "snappy".to_string(),
++            wobbly_enabled: true,
++            wobbly_intensity: 1.0,
++            spring_bounce_enabled: true,
++            focus_glow_enabled: true,
++            card_lift_enabled: true,
++            pendulum_tilt_enabled: true,
++        }
++    }
++
++    pub fn preset_intense() -> Self {
++        Self {
++            preset: "intense".to_string(),
++            wobbly_enabled: true,
++            wobbly_intensity: 2.2,
++            spring_bounce_enabled: true,
++            focus_glow_enabled: true,
++            card_lift_enabled: true,
++            pendulum_tilt_enabled: true,
++        }
++    }
++
++    pub fn preset_subtle() -> Self {
++        Self {
++            preset: "subtle".to_string(),
++            wobbly_enabled: true,
++            wobbly_intensity: 0.5,
++            spring_bounce_enabled: true,
++            focus_glow_enabled: true,
++            card_lift_enabled: true,
++            pendulum_tilt_enabled: true,
++        }
++    }
++
++    pub fn preset_off() -> Self {
++        Self {
++            preset: "off".to_string(),
++            wobbly_enabled: false,
++            wobbly_intensity: 0.0,
++            spring_bounce_enabled: false,
++            focus_glow_enabled: false,
++            card_lift_enabled: false,
++            pendulum_tilt_enabled: false,
++        }
++    }
++
++    pub fn apply_preset(&mut self, preset_name: &str) {
++        match preset_name.to_lowercase().as_str() {
++            "intense" | "boom" => *self = Self::preset_intense(),
++            "subtle" | "smooth" => *self = Self::preset_subtle(),
++            "off" | "disabled" | "none" => *self = Self::preset_off(),
++            _ => *self = Self::preset_snappy(),
++        }
++    }
++
++    pub fn config_path() -> PathBuf {
++        if let Ok(sandbox) = std::env::var("XDG_CONFIG_HOME") {
++            let p = PathBuf::from(&sandbox).join("cosmic-comp-fx.json");
++            if p.exists() || PathBuf::from(&sandbox).exists() {
++                return p;
++            }
++        }
++        if let Ok(home) = std::env::var("HOME") {
++            PathBuf::from(home).join(".config/cosmic/cosmic-comp-fx.json")
++        } else {
++            PathBuf::from("/tmp/cosmic-comp-fx.json")
++        }
++    }
++
++    pub fn load_or_default_from_disk() -> Self {
++        let path = Self::config_path();
++        if let Ok(content) = std::fs::read_to_string(&path) {
++            if let Ok(cfg) = serde_json::from_str::<FxConfig>(&content) {
++                return cfg;
++            }
++        }
++        let default_cfg = Self::default();
++        let _ = default_cfg.save();
++        default_cfg
++    }
++
++    pub fn reload_if_changed() -> bool {
++        let path = Self::config_path();
++        if let Ok(content) = std::fs::read_to_string(&path) {
++            if let Ok(cfg) = serde_json::from_str::<FxConfig>(&content) {
++                let current = Self::current();
++                if cfg != current {
++                    Self::set_current(cfg);
++                    return true;
++                }
++            }
++        }
++        false
++    }
++
++    pub fn save(&self) -> std::io::Result<()> {
++        let path = Self::config_path();
++        if let Some(parent) = path.parent() {
++            let _ = std::fs::create_dir_all(parent);
++        }
++        let json = serde_json::to_string_pretty(self)
++            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
++        std::fs::write(path, json)
++    }
++}
+diff --git a/src/config/mod.rs b/src/config/mod.rs
+index 4d2fad9b..26a3d73a 100644
+--- a/src/config/mod.rs
++++ b/src/config/mod.rs
+@@ -45,6 +45,7 @@ use tracing::{error, warn};
+ mod input_config;
+ pub mod key_bindings;
+ mod types;
++pub mod fx;
+ 
+ use cosmic::config::CosmicTk;
+ pub use cosmic_comp_config::EdidProduct;
+@@ -327,6 +328,16 @@ impl Config {
+                 .set_screen_filter(filter_conf.color_filter);
+         });
+ 
++        // Watch experimental FX config for real-time live reload (500ms check)
++        let fx_timer = smithay::reexports::calloop::timer::Timer::from_duration(std::time::Duration::from_millis(500));
++        let _ = loop_handle.insert_source(fx_timer, |_, _, state| {
++            if fx::FxConfig::reload_if_changed() {
++                tracing::info!("CosmicComp FX config reloaded in real time!");
++                state.common.refresh();
++            }
++            smithay::reexports::calloop::timer::TimeoutAction::ToDuration(std::time::Duration::from_millis(500))
++        });
++
+         Config {
+             dynamic_conf: Self::load_dynamic(&xdg),
+             cosmic_conf: cosmic_comp_config,
+diff --git a/src/shell/element/mod.rs b/src/shell/element/mod.rs
+index d4743b7f..b9178934 100644
+--- a/src/shell/element/mod.rs
++++ b/src/shell/element/mod.rs
+@@ -1280,15 +1280,15 @@ where
+ 
+     fn opaque_regions(&self, scale: Scale<f64>) -> OpaqueRegions<i32, Physical> {
+         match self {
+-            CosmicMappedRenderElement::Stack(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::Window(elem) => elem.opaque_regions(scale),
++            CosmicMappedRenderElement::Stack(_) => OpaqueRegions::default(),
++            CosmicMappedRenderElement::Window(_) => OpaqueRegions::default(),
+             CosmicMappedRenderElement::TiledStack(elem) => elem.opaque_regions(scale),
+             CosmicMappedRenderElement::TiledWindow(elem) => elem.opaque_regions(scale),
+             CosmicMappedRenderElement::TiledOverlay(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::MovingStack(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::MovingWindow(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::GrabbedStack(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::GrabbedWindow(elem) => elem.opaque_regions(scale),
++            CosmicMappedRenderElement::MovingStack(_) => OpaqueRegions::default(),
++            CosmicMappedRenderElement::MovingWindow(_) => OpaqueRegions::default(),
++            CosmicMappedRenderElement::GrabbedStack(_) => OpaqueRegions::default(),
++            CosmicMappedRenderElement::GrabbedWindow(_) => OpaqueRegions::default(),
+             CosmicMappedRenderElement::FocusIndicator(elem) => elem.opaque_regions(scale),
+             CosmicMappedRenderElement::Overlay(elem) => elem.opaque_regions(scale),
+             CosmicMappedRenderElement::StackHoverIndicator(elem) => elem.opaque_regions(scale),
+@@ -1318,15 +1318,15 @@ where
+ 
+     fn kind(&self) -> Kind {
+         match self {
+-            CosmicMappedRenderElement::Stack(elem) => elem.kind(),
+-            CosmicMappedRenderElement::Window(elem) => elem.kind(),
++            CosmicMappedRenderElement::Stack(_) => Kind::Unspecified,
++            CosmicMappedRenderElement::Window(_) => Kind::Unspecified,
+             CosmicMappedRenderElement::TiledStack(elem) => elem.kind(),
+             CosmicMappedRenderElement::TiledWindow(elem) => elem.kind(),
+             CosmicMappedRenderElement::TiledOverlay(elem) => elem.kind(),
+-            CosmicMappedRenderElement::MovingStack(elem) => elem.kind(),
+-            CosmicMappedRenderElement::MovingWindow(elem) => elem.kind(),
+-            CosmicMappedRenderElement::GrabbedStack(elem) => elem.kind(),
+-            CosmicMappedRenderElement::GrabbedWindow(elem) => elem.kind(),
++            CosmicMappedRenderElement::MovingStack(_) => Kind::Unspecified,
++            CosmicMappedRenderElement::MovingWindow(_) => Kind::Unspecified,
++            CosmicMappedRenderElement::GrabbedStack(_) => Kind::Unspecified,
++            CosmicMappedRenderElement::GrabbedWindow(_) => Kind::Unspecified,
+             CosmicMappedRenderElement::FocusIndicator(elem) => elem.kind(),
+             CosmicMappedRenderElement::Overlay(elem) => elem.kind(),
+             CosmicMappedRenderElement::StackHoverIndicator(elem) => elem.kind(),
+diff --git a/src/shell/grabs/moving.rs b/src/shell/grabs/moving.rs
+index f1fbfa8a..4fca11f1 100644
+--- a/src/shell/grabs/moving.rs
++++ b/src/shell/grabs/moving.rs
+@@ -78,6 +78,10 @@ pub struct MoveGrabState {
+     stacking_indicator: Option<(StackHover, Point<i32, Logical>)>,
+     location: Point<f64, Logical>,
+     cursor_output: Output,
++    // Compiz Wobbly Windows elastic physics
++    last_location: Point<f64, Logical>,
++    last_update: Instant,
++    velocity: Point<f64, Logical>,
+ }
+ 
+ impl MoveGrabState {
+@@ -120,12 +124,51 @@ impl MoveGrabState {
+             return;
+         }
+ 
++        // Read dynamic FX configuration in memory (zero syscalls)
++        let fx = crate::config::fx::FxConfig::current();
++
++        let (lag_x, lag_y, render_scale) = if fx.wobbly_enabled {
++            let intensity = fx.wobbly_intensity.max(0.0);
++            let elapsed_idle = Instant::now().duration_since(self.last_update).as_secs_f64();
++            let decay = (-elapsed_idle * 8.5).exp();
++            let wobble = (elapsed_idle * 20.0).cos();
++            let spring_factor = decay * wobble;
++            let active_vx = (self.velocity.x * spring_factor).clamp(-2200.0, 2200.0);
++            let active_vy = (self.velocity.y * spring_factor).clamp(-2200.0, 2200.0);
++
++            // Snappy pointer adherence scaled by intensity
++            let mut lx = -(active_vx * 0.012 * intensity).round() as i32;
++            let ly = -(active_vy * 0.012 * intensity).round() as i32;
++
++            if fx.pendulum_tilt_enabled {
++                // Compiz Pendulum Tilt: additional organic pendulum drag
++                let pendulum_sway = -(active_vx * 0.005 * intensity).round() as i32;
++                lx += pendulum_sway;
++            }
++
++            let stretch_x = (active_vx.abs() * 0.00005 * intensity).min(0.05 * intensity);
++            let stretch_y = (active_vy.abs() * 0.00005 * intensity).min(0.05 * intensity);
++
++            let elevation = if fx.card_lift_enabled {
++                1.030 + ((active_vx.abs() + active_vy.abs()) * 0.00001).min(0.015)
++            } else {
++                1.0
++            };
++
++            let wobble_scale_x = scale * elevation * (1.0 + stretch_x - stretch_y * 0.40);
++            let wobble_scale_y = scale * elevation * (1.0 + stretch_y - stretch_x * 0.40);
++            (lx, ly, Scale { x: wobble_scale_x, y: wobble_scale_y })
++        } else {
++            (0, 0, Scale { x: scale, y: scale })
++        };
++
+         let output_scale: Scale<f64> = output.current_scale().fractional_scale().into();
+         let scaling_offset =
+-            self.window_offset - self.window_offset.to_f64().upscale(scale).to_i32_round();
++            self.window_offset - self.window_offset.to_f64().upscale(render_scale).to_i32_round();
+         let render_location = self.location.to_i32_round() - output.geometry().loc.as_logical()
+             + self.window_offset
+-            - scaling_offset;
++            - scaling_offset
++            + Point::from((lag_x, lag_y));
+ 
+         for (indicator, location) in self.stacking_indicator.iter() {
+             indicator.push_render_elements(
+@@ -148,11 +191,17 @@ impl MoveGrabState {
+         );
+ 
+         let active_window_hint = crate::theme::active_window_hint(theme);
++        let accent = theme.accent_color();
++        let thickness = if fx.focus_glow_enabled {
++            self.indicator_thickness.max(3)
++        } else {
++            self.indicator_thickness
++        };
+         let radius = self
+             .element()
+-            .corner_radius(window_geo.size, self.indicator_thickness);
++            .corner_radius(window_geo.size, thickness);
+ 
+-        if self.indicator_thickness > 0 {
++        if thickness > 0 {
+             push(
+                 IndicatorShader::focus_element(
+                     renderer,
+@@ -163,22 +212,18 @@ impl MoveGrabState {
+                             .geometry()
+                             .size
+                             .to_f64()
+-                            .upscale(scale)
++                            .upscale(render_scale)
+                             .to_i32_round(),
+                     )
+                     .as_local(),
+-                    self.indicator_thickness,
++                    thickness,
+                     radius,
+-                    alpha,
++                    alpha * 0.95,
+                     output_scale.x,
+-                    [
+-                        active_window_hint.red,
+-                        active_window_hint.green,
+-                        active_window_hint.blue,
+-                    ],
++                    [accent.red, accent.green, accent.blue],
+                 )
+                 .into(),
+-            )
++            );
+         }
+ 
+         let map_window_element = |elem| match elem {
+@@ -187,7 +232,7 @@ impl MoveGrabState {
+                     stack,
+                     render_location
+                         .to_physical_precise_round(output.current_scale().fractional_scale()),
+-                    scale,
++                    render_scale,
+                 ))
+             }
+             CosmicMappedRenderElement::Window(window) => {
+@@ -195,7 +240,7 @@ impl MoveGrabState {
+                     window,
+                     render_location
+                         .to_physical_precise_round(output.current_scale().fractional_scale()),
+-                    scale,
++                    render_scale,
+                 ))
+             }
+             x => x,
+@@ -218,7 +263,7 @@ impl MoveGrabState {
+             (render_location - self.window.geometry().loc).to_physical_precise_round(output_scale),
+             None,
+             output_scale,
+-            scale,
++            render_scale.x.max(render_scale.y),
+             alpha,
+         ) {
+             push(shadow_element);
+@@ -414,6 +459,16 @@ impl MoveGrab {
+             .get::<SeatMoveGrabState>()
+             .map(|s| s.lock().unwrap());
+         if let Some(grab_state) = borrow.as_mut().and_then(|s| s.as_mut()) {
++            let now = Instant::now();
++            let dt = (now - grab_state.last_update).as_secs_f64().max(0.001);
++            let dx = location.x - grab_state.last_location.x;
++            let dy = location.y - grab_state.last_location.y;
++            let instant_vx = dx / dt;
++            let instant_vy = dy / dt;
++            grab_state.velocity.x = grab_state.velocity.x * 0.55 + instant_vx * 0.45;
++            grab_state.velocity.y = grab_state.velocity.y * 0.55 + instant_vy * 0.45;
++            grab_state.last_location = location;
++            grab_state.last_update = now;
+             grab_state.location = location;
+             grab_state.cursor_output = self.cursor_output.clone();
+ 
+@@ -854,6 +909,9 @@ impl MoveGrab {
+             previous: previous_layer,
+             location: start_data.location(),
+             cursor_output: cursor_output.clone(),
++            last_location: start_data.location(),
++            last_update: Instant::now(),
++            velocity: Point::from((0.0, 0.0)),
+         };
+ 
+         *seat
+diff --git a/src/shell/layout/floating/mod.rs b/src/shell/layout/floating/mod.rs
+index 95d7264d..6d4766d2 100644
+--- a/src/shell/layout/floating/mod.rs
++++ b/src/shell/layout/floating/mod.rs
+@@ -49,8 +49,10 @@ use crate::{
+ mod grabs;
+ pub use self::grabs::*;
+ 
+-pub const ANIMATION_DURATION: Duration = Duration::from_millis(200);
++pub const ANIMATION_DURATION: Duration = Duration::from_millis(380);
+ pub const MINIMIZE_ANIMATION_DURATION: Duration = Duration::from_millis(320);
++pub const OPEN_ANIMATION_DURATION: Duration = Duration::from_millis(380);
++pub const CLOSE_ANIMATION_DURATION: Duration = Duration::from_millis(220);
+ 
+ #[derive(Debug, Default)]
+ pub struct FloatingLayout {
+@@ -80,6 +82,14 @@ enum Animation {
+         previous_geometry: Rectangle<i32, Local>,
+         target_geometry: Rectangle<i32, Local>,
+     },
++    Open {
++        start: Instant,
++        geometry: Rectangle<i32, Local>,
++    },
++    Close {
++        start: Instant,
++        previous_geometry: Rectangle<i32, Local>,
++    },
+ }
+ 
+ impl Animation {
+@@ -88,6 +98,8 @@ impl Animation {
+             Animation::Tiled { start, .. } => start,
+             Animation::Minimize { start, .. } => start,
+             Animation::Unminimize { start, .. } => start,
++            Animation::Open { start, .. } => start,
++            Animation::Close { start, .. } => start,
+         }
+     }
+ 
+@@ -110,6 +122,22 @@ impl Animation {
+                     / MINIMIZE_ANIMATION_DURATION.as_secs_f32();
+                 (percentage * 2.0).min(1.0)
+             }
++            Animation::Open { start, .. } => {
++                let p = Instant::now()
++                    .duration_since(*start)
++                    .min(OPEN_ANIMATION_DURATION)
++                    .as_secs_f32()
++                    / OPEN_ANIMATION_DURATION.as_secs_f32();
++                (p * 4.0).min(1.0)
++            }
++            Animation::Close { start, .. } => {
++                let p = Instant::now()
++                    .duration_since(*start)
++                    .min(CLOSE_ANIMATION_DURATION)
++                    .as_secs_f32()
++                    / CLOSE_ANIMATION_DURATION.as_secs_f32();
++                (1.0 - p.powf(1.8)).max(0.0)
++            }
+         }
+     }
+ 
+@@ -124,6 +152,10 @@ impl Animation {
+             Animation::Unminimize {
+                 previous_geometry, ..
+             } => previous_geometry,
++            Animation::Close {
++                previous_geometry, ..
++            } => previous_geometry,
++            Animation::Open { geometry, .. } => geometry,
+         }
+     }
+ 
+@@ -135,13 +167,41 @@ impl Animation {
+         gaps: (i32, i32),
+     ) -> Rectangle<i32, Local> {
+         let (duration, target_rect) = match self {
+-            Animation::Minimize {
+-                target_geometry, ..
++            Animation::Unminimize { target_geometry, .. } => {
++                let fx = crate::config::fx::FxConfig::current();
++                let previous_rect = *self.previous_geometry();
++                let start = *self.start();
++                let now = Instant::now();
++                let p = now.duration_since(start).min(MINIMIZE_ANIMATION_DURATION).as_secs_f64()
++                    / MINIMIZE_ANIMATION_DURATION.as_secs_f64();
++
++                let spring_p = if !fx.spring_bounce_enabled {
++                    ease(EaseInOutCubic, 0.0, 1.0, p)
++                } else if p >= 1.0 {
++                    1.0
++                } else {
++                    let env = (-4.0 * p).exp();
++                    let osc = (7.0 * p).cos();
++                    1.0 - env * osc
++                };
++
++                let x = previous_rect.loc.x as f64 + (target_geometry.loc.x - previous_rect.loc.x) as f64 * spring_p;
++                let y = previous_rect.loc.y as f64 + (target_geometry.loc.y - previous_rect.loc.y) as f64 * spring_p;
++                let w = previous_rect.size.w as f64 + (target_geometry.size.w - previous_rect.size.w) as f64 * spring_p;
++                let h = previous_rect.size.h as f64 + (target_geometry.size.h - previous_rect.size.h) as f64 * spring_p;
++
++                return Rectangle::new(
++                    Point::from((x.round() as i32, y.round() as i32)),
++                    Size::from((w.round().max(20.0) as i32, h.round().max(20.0) as i32)),
++                );
+             }
+-            | Animation::Unminimize {
++            Animation::Minimize {
+                 target_geometry, ..
+             } => (MINIMIZE_ANIMATION_DURATION, *target_geometry),
++            Animation::Open { geometry, .. } => return *geometry,
++            Animation::Close { previous_geometry, .. } => return *previous_geometry,
+             Animation::Tiled { .. } => {
++                let fx = crate::config::fx::FxConfig::current();
+                 let target_geometry = if let Some(target_rect) =
+                     tiled_state.map(|state| state.relative_geometry(output_geometry, gaps))
+                 {
+@@ -149,7 +209,32 @@ impl Animation {
+                 } else {
+                     current_geometry
+                 };
+-                (ANIMATION_DURATION, target_geometry)
++
++                let previous_rect = *self.previous_geometry();
++                let start = *self.start();
++                let now = Instant::now();
++                let p = now.duration_since(start).min(ANIMATION_DURATION).as_secs_f64()
++                    / ANIMATION_DURATION.as_secs_f64();
++
++                let spring_p = if !fx.spring_bounce_enabled {
++                    ease(EaseInOutCubic, 0.0, 1.0, p)
++                } else if p >= 1.0 {
++                    1.0
++                } else {
++                    let env = (-3.8 * p).exp();
++                    let osc = (6.8 * p).cos();
++                    1.0 - env * osc
++                };
++
++                let x = previous_rect.loc.x as f64 + (target_geometry.loc.x - previous_rect.loc.x) as f64 * spring_p;
++                let y = previous_rect.loc.y as f64 + (target_geometry.loc.y - previous_rect.loc.y) as f64 * spring_p;
++                let w = previous_rect.size.w as f64 + (target_geometry.size.w - previous_rect.size.w) as f64 * spring_p;
++                let h = previous_rect.size.h as f64 + (target_geometry.size.h - previous_rect.size.h) as f64 * spring_p;
++
++                return Rectangle::new(
++                    Point::from((x.round() as i32, y.round() as i32)),
++                    Size::from((w.round().max(20.0) as i32, h.round().max(20.0) as i32)),
++                );
+             }
+         };
+         let previous_rect = *self.previous_geometry();
+@@ -379,7 +464,12 @@ impl FloatingLayout {
+                     } => {
+                         *target_geometry = geometry;
+                     }
+-                    Animation::Minimize { .. } | Animation::Tiled { .. } => {}
++                    Animation::Open {
++                        geometry: open_geom, ..
++                    } => {
++                        *open_geom = geometry;
++                    }
++                    Animation::Minimize { .. } | Animation::Tiled { .. } | Animation::Close { .. } => {}
+                 }
+             } else {
+                 self.animations.insert(
+@@ -616,6 +706,14 @@ impl FloatingLayout {
+                     previous_geometry,
+                 },
+             );
++        } else {
++            self.animations.insert(
++                mapped.clone(),
++                Animation::Open {
++                    start: Instant::now(),
++                    geometry: Rectangle::new(position, win_geo.size),
++                },
++            );
+         }
+         self.space.map_element(mapped, position.as_logical(), false);
+         self.space.refresh();
+@@ -685,6 +783,20 @@ impl FloatingLayout {
+                     target_geometry: to,
+                 },
+             );
++        } else {
++            self.animations.insert(
++                window.clone(),
++                Animation::Close {
++                    start: Instant::now(),
++                    previous_geometry: if window.is_maximized(false) {
++                        let output = self.space.outputs().next().unwrap();
++                        let layers = layer_map_for_output(output);
++                        layers.non_exclusive_zone().as_local()
++                    } else {
++                        mapped_geometry
++                    },
++                },
++            );
+         }
+ 
+         if window.floating_tiled.lock().unwrap().take().is_some() {
+@@ -1417,6 +1529,8 @@ impl FloatingLayout {
+         self.animations.retain(|_, anim| {
+             let duration = match anim {
+                 Animation::Tiled { .. } => ANIMATION_DURATION,
++                Animation::Open { .. } => OPEN_ANIMATION_DURATION,
++                Animation::Close { .. } => CLOSE_ANIMATION_DURATION,
+                 _ => MINIMIZE_ANIMATION_DURATION,
+             };
+             Instant::now().duration_since(*anim.start()) < duration
+@@ -1458,7 +1572,7 @@ impl FloatingLayout {
+         for elem in self
+             .animations
+             .iter()
+-            .filter(|(_, anim)| matches!(anim, Animation::Minimize { .. }))
++            .filter(|(_, anim)| matches!(anim, Animation::Minimize { .. } | Animation::Close { .. }))
+             .map(|(elem, _)| elem)
+             .chain(self.space.elements().rev())
+         {
+@@ -1491,7 +1605,7 @@ impl FloatingLayout {
+         indicator_thickness: u8,
+         alpha: f32,
+         theme: &cosmic::theme::CosmicTheme,
+-        scanout_node: Option<DrmNode>,
++        _scanout_node: Option<DrmNode>,
+         push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+     ) where
+         R: AsGlowRenderer,
+@@ -1511,7 +1625,7 @@ impl FloatingLayout {
+         for elem in self
+             .animations
+             .iter()
+-            .filter(|(_, anim)| matches!(anim, Animation::Minimize { .. }))
++            .filter(|(_, anim)| matches!(anim, Animation::Minimize { .. } | Animation::Close { .. }))
+             .map(|(elem, _)| elem)
+             .chain(self.space.elements().rev())
+         {
+@@ -1523,21 +1637,72 @@ impl FloatingLayout {
+             let render_location = geometry.loc - elem.geometry().loc.as_local();
+ 
+             let maybe_map = if let Some(anim) = self.animations.get(elem) {
+-                let original_geo = anim.previous_geometry();
+-                geometry = anim.geometry(
+-                    output_geometry,
+-                    self.space
+-                        .element_geometry(elem)
+-                        .map(RectExt::as_local)
+-                        .unwrap_or(geometry),
+-                    elem.floating_tiled.lock().unwrap().as_ref(),
+-                    self.gaps(),
+-                );
++                let fx = crate::config::fx::FxConfig::current();
++                let (scale, offset) = match anim {
++                    Animation::Open { start, geometry: win_geo } => {
++                        let p = Instant::now()
++                            .duration_since(*start)
++                            .min(OPEN_ANIMATION_DURATION)
++                            .as_secs_f64()
++                            / OPEN_ANIMATION_DURATION.as_secs_f64();
++
++                        let (s, y_glide) = if fx.spring_bounce_enabled {
++                            let env = (-4.2 * p).exp();
++                            let osc = (7.5 * p).cos();
++                            let progress = 1.0 - env * osc;
++                            let s = 0.50 + 0.50 * progress;
++                            let y_glide = ((1.0 - progress) * 48.0).round() as i32;
++                            (s, y_glide)
++                        } else {
++                            let s = 0.85 + 0.15 * ease(EaseInOutCubic, 0.0, 1.0, p);
++                            (s, 0)
++                        };
++
++                        let offset_x = ((1.0 - s) * 0.5 * win_geo.size.w as f64).round() as i32;
++                        let offset_y = ((1.0 - s) * 0.5 * win_geo.size.h as f64).round() as i32 + y_glide;
++
++                        (Scale { x: s, y: s }, Point::from((offset_x, offset_y)))
++                    }
++                    Animation::Close { start, previous_geometry: win_geo } => {
++                        let p = Instant::now()
++                            .duration_since(*start)
++                            .min(CLOSE_ANIMATION_DURATION)
++                            .as_secs_f64()
++                            / CLOSE_ANIMATION_DURATION.as_secs_f64();
++
++                        let (s, y_sink) = if fx.spring_bounce_enabled {
++                            let pop = (std::f64::consts::PI * (p * 2.0).min(1.0)).sin() * (1.0 - p) * 0.05;
++                            let s = (1.00 + pop - 0.60 * p.powi(2)).max(0.01);
++                            let y_sink = (p.powi(2) * 32.0).round() as i32;
++                            (s, y_sink)
++                        } else {
++                            (1.0 - 0.15 * p, 0)
++                        };
+ 
+-                let buffer_size = elem.geometry().size;
+-                let scale = Scale {
+-                    x: geometry.size.w as f64 / buffer_size.w as f64,
+-                    y: geometry.size.h as f64 / buffer_size.h as f64,
++                        let offset_x = ((1.0 - s) * 0.5 * win_geo.size.w as f64).round() as i32;
++                        let offset_y = ((1.0 - s) * 0.5 * win_geo.size.h as f64).round() as i32 + y_sink;
++
++                        (Scale { x: s, y: s }, Point::from((offset_x, offset_y)))
++                    }
++                    _ => {
++                        let original_geo = *anim.previous_geometry();
++                        geometry = anim.geometry(
++                            output_geometry,
++                            self.space
++                                .element_geometry(elem)
++                                .map(RectExt::as_local)
++                                .unwrap_or(geometry),
++                            elem.floating_tiled.lock().unwrap().as_ref(),
++                            self.gaps(),
++                        );
++
++                        let buffer_size = elem.geometry().size;
++                        let scale = Scale {
++                            x: if buffer_size.w > 0 { geometry.size.w as f64 / buffer_size.w as f64 } else { 1.0 },
++                            y: if buffer_size.h > 0 { geometry.size.h as f64 / buffer_size.h as f64 } else { 1.0 },
++                        };
++                        (scale, geometry.loc - original_geo.loc)
++                    }
+                 };
+ 
+                 Some(move |element| match element {
+@@ -1545,8 +1710,7 @@ impl FloatingLayout {
+                         CosmicMappedRenderElement::MovingStack({
+                             let rescaled = RescaleRenderElement::from_element(
+                                 elem,
+-                                original_geo
+-                                    .loc
++                                render_location
+                                     .as_logical()
+                                     .to_physical_precise_round(output_scale),
+                                 scale,
+@@ -1554,7 +1718,7 @@ impl FloatingLayout {
+ 
+                             RelocateRenderElement::from_element(
+                                 rescaled,
+-                                (geometry.loc - original_geo.loc)
++                                offset
+                                     .as_logical()
+                                     .to_physical_precise_round(output_scale),
+                                 Relocate::Relative,
+@@ -1565,8 +1729,7 @@ impl FloatingLayout {
+                         CosmicMappedRenderElement::MovingWindow({
+                             let rescaled = RescaleRenderElement::from_element(
+                                 elem,
+-                                original_geo
+-                                    .loc
++                                render_location
+                                     .as_logical()
+                                     .to_physical_precise_round(output_scale),
+                                 scale,
+@@ -1574,7 +1737,7 @@ impl FloatingLayout {
+ 
+                             RelocateRenderElement::from_element(
+                                 rescaled,
+-                                (geometry.loc - original_geo.loc)
++                                offset
+                                     .as_logical()
+                                     .to_physical_precise_round(output_scale),
+                                 Relocate::Relative,
+@@ -1587,44 +1750,52 @@ impl FloatingLayout {
+                 None
+             };
+ 
+-            if focused == Some(elem) && !elem.is_maximized(false) {
+-                let active_window_hint = crate::theme::active_window_hint(theme);
+-                let radius = elem.corner_radius(geometry.size.as_logical(), indicator_thickness);
+-
+-                if let Some((mode, resize)) = resize_indicator.as_mut() {
+-                    let mut resize_geometry = geometry;
+-                    resize_geometry.loc -= (18, 18).into();
+-                    resize_geometry.size += (36, 36).into();
++            let is_focused = focused == Some(elem) || (focused.is_none() && self.space.elements().count() == 1);
++            if is_focused && !elem.is_maximized(false) {
++                let fx = crate::config::fx::FxConfig::current();
++                let thickness = if fx.focus_glow_enabled {
++                    indicator_thickness.max(3)
++                } else {
++                    indicator_thickness
++                };
+ 
+-                    resize.resize(resize_geometry.size.as_logical());
+-                    resize.output_enter(output);
+-                    resize.push_render_elements(
+-                        renderer,
+-                        resize_geometry
+-                            .loc
+-                            .as_logical()
+-                            .to_physical_precise_round(output_scale),
+-                        output_scale.into(),
+-                        alpha * mode.alpha().unwrap_or(1.0),
+-                        &mut |elem| push(CosmicMappedRenderElement::Window(elem.into())),
+-                        None,
+-                    );
+-                }
++                if thickness > 0 {
++                    let accent = if fx.focus_glow_enabled {
++                        theme.accent_color()
++                    } else {
++                        crate::theme::active_window_hint(theme)
++                    };
++                    let radius = elem.corner_radius(geometry.size.as_logical(), thickness);
++
++                    if let Some((mode, resize)) = resize_indicator.as_mut() {
++                        let mut resize_geometry = geometry;
++                        resize_geometry.loc -= (18, 18).into();
++                        resize_geometry.size += (36, 36).into();
++
++                        resize.resize(resize_geometry.size.as_logical());
++                        resize.output_enter(output);
++                        resize.push_render_elements(
++                            renderer,
++                            resize_geometry
++                                .loc
++                                .as_logical()
++                                .to_physical_precise_round(output_scale),
++                            output_scale.into(),
++                            alpha * mode.alpha().unwrap_or(1.0),
++                            &mut |elem| push(CosmicMappedRenderElement::Window(elem.into())),
++                            None,
++                        );
++                    }
+ 
+-                if indicator_thickness > 0 {
+                     let element = IndicatorShader::focus_element(
+                         renderer,
+                         Key::Window(Usage::FocusIndicator, elem.key()),
+                         geometry,
+-                        indicator_thickness,
++                        thickness,
+                         radius,
+-                        alpha,
++                        alpha * 0.95,
+                         output_scale,
+-                        [
+-                            active_window_hint.red,
+-                            active_window_hint.green,
+-                            active_window_hint.blue,
+-                        ],
++                        [accent.red, accent.green, accent.blue],
+                     );
+                     push(element.into());
+                 }
+@@ -1638,6 +1809,11 @@ impl FloatingLayout {
+                 }
+             };
+ 
++            // Floating windows have rounded corners and gaussian drop shadows:
++            // Always compose via OpenGL (disable direct scanout) to eliminate rectangular tearing/black corners.
++            let scanout_override = Some(false);
++            let effective_scanout = None;
++
+             elem.push_render_elements(
+                 renderer,
+                 render_location
+@@ -1646,8 +1822,8 @@ impl FloatingLayout {
+                 None,
+                 output_scale.into(),
+                 alpha,
+-                None,
+-                scanout_node,
++                scanout_override,
++                effective_scanout,
+                 &mut |elem| push(map_anim(elem)),
+                 &mut |elem| lower_elements.push(map_anim(elem)),
+             );
+-- 
+2.43.0
+

@@ -1,0 +1,2509 @@
+diff --git a/Cargo.lock b/Cargo.lock
+index 93ad9171..d0a95294 100644
+--- a/Cargo.lock
++++ b/Cargo.lock
+@@ -74,7 +74,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "ef6978589202a00cd7e118380c448a08b6ed394c3a8df3a430d0898e3a42d046"
+ dependencies = [
+  "android-properties",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "cc",
+  "cesu8",
+  "jni",
+@@ -390,9 +390,9 @@ checksum = "bef38d45163c2f1dde094a7dfd33ccf595c92905c8f8f4fdc18d06fb1037718a"
+ 
+ [[package]]
+ name = "bitflags"
+-version = "2.13.2"
++version = "2.11.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+-checksum = "3ded4057c258ba199e2d26386d3af3780957ecaee6c4ef4041c6b4b8b97c0b06"
++checksum = "843867be96c8daad0d758b57df9392b6d8d271134fce549de6ce169ff98a92af"
+ dependencies = [
+  "serde_core",
+ ]
+@@ -514,7 +514,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "4dbf9978365bac10f54d1d4b04f7ce4427e51f71d61f2fe15e3fed5166474df7"
+ dependencies = [
+  "async-task",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "futures-core",
+  "polling",
+  "rustix 1.1.4",
+@@ -765,7 +765,7 @@ name = "cosmic-comp"
+ version = "1.0.0"
+ dependencies = [
+  "anyhow",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "calloop",
+  "clap_lex",
+  "cosmic-comp-config",
+@@ -883,9 +883,9 @@ dependencies = [
+ [[package]]
+ name = "cosmic-protocols"
+ version = "0.2.0"
+-source = "git+https://github.com/pop-os//cosmic-protocols?branch=main#c0cff4db14c37ed954983158e4055aa94c7741d9"
++source = "git+https://github.com/pop-os//cosmic-protocols?branch=main#32283d76a8d0342da74c4cc022a533c52dcf378f"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "wayland-backend",
+  "wayland-protocols",
+  "wayland-protocols-wlr",
+@@ -940,7 +940,7 @@ version = "0.19.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "be17b688510d934ce13f48a2beba700e11583e281e0fda99c22bb256a14eda73"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "fontdb",
+  "harfrust",
+  "linebender_resource_handle",
+@@ -1170,7 +1170,7 @@ dependencies = [
+  "libc",
+  "option-ext",
+  "redox_users",
+- "windows-sys 0.59.0",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+@@ -1179,7 +1179,7 @@ version = "0.3.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "1e0e367e4e7da84520dedcac1901e4da967309406d1e51017ae1abfb97adbd38"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "objc2",
+ ]
+ 
+@@ -1208,7 +1208,7 @@ name = "dnd"
+ version = "0.1.0"
+ source = "git+https://github.com/pop-os/window_clipboard.git?tag=sctk-0.20#f68595ee0e62fbd6589f4709b5aaa5c3c7ea5f6c"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "mime 0.1.0",
+  "raw-window-handle",
+  "smithay-client-toolkit",
+@@ -1242,7 +1242,7 @@ version = "0.11.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "a0f8a69e60d75ae7dab4ef26a59ca99f2a89d4c142089b537775ae0c198bdcde"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "drm-ffi 0.7.1",
+  "drm-fourcc",
+@@ -1255,7 +1255,7 @@ version = "0.14.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "80bc8c5c6c2941f70a55c15f8d9f00f9710ebda3ffda98075f996a0e6c92756f"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "drm-ffi 0.9.1",
+  "drm-fourcc",
+@@ -1332,7 +1332,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "25dd34cec49ab55d85ebf70139cb1ccd29c977ef6b6ba4fe85489d6877ee9ef3"
+ dependencies = [
+  "ahash",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "emath",
+  "epaint",
+  "nohash-hasher",
+@@ -1484,7 +1484,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
+ dependencies = [
+  "libc",
+- "windows-sys 0.52.0",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+@@ -1856,7 +1856,7 @@ version = "0.18.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "ce852e998d3ca5e4a97014fb31c940dc5ef344ec7d364984525fd11e8a547e6a"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "drm 0.14.1",
+  "drm-fourcc",
+  "gbm-sys",
+@@ -2029,7 +2029,7 @@ version = "0.5.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "4f9f40651a03bc0f7316bd75267ff5767e93017ef3cfffe76c6aa7252cc5a31c"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "core_maths",
+  "read-fonts 0.37.0",
+@@ -2240,7 +2240,7 @@ name = "iced_core"
+ version = "0.14.0"
+ source = "git+https://github.com/pop-os/libcosmic#d922ac380134c00208d2acf93947d44fb217eec5"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytes",
+  "dnd",
+  "glam 0.25.0",
+@@ -2287,7 +2287,7 @@ name = "iced_graphics"
+ version = "0.14.0"
+ source = "git+https://github.com/pop-os/libcosmic#d922ac380134c00208d2acf93947d44fb217eec5"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "cosmic-text",
+  "half",
+@@ -2361,7 +2361,7 @@ version = "0.14.0"
+ source = "git+https://github.com/pop-os/libcosmic#d922ac380134c00208d2acf93947d44fb217eec5"
+ dependencies = [
+  "as-raw-xcb-connection",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "cryoglyph",
+  "futures",
+@@ -2590,7 +2590,7 @@ version = "0.11.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "f37dccff2791ab604f9babef0ba14fbe0be30bd368dc541e2b08d07c8aa908f3"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "inotify-sys",
+  "libc",
+ ]
+@@ -2610,7 +2610,7 @@ version = "0.10.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "f9793345a65d71317763a33066b5d8351f8760dde8d4930fe9e39b5f14a7959d"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "input-sys",
+  "libc",
+  "log",
+@@ -2671,7 +2671,7 @@ dependencies = [
+  "portable-atomic",
+  "portable-atomic-util",
+  "serde_core",
+- "windows-sys 0.52.0",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+@@ -2768,7 +2768,7 @@ version = "0.8.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "0fbe853b403ae61a04233030ae8a79d94975281ed9770a1f9e246732b534b28d"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "serde",
+ ]
+ 
+@@ -2794,7 +2794,7 @@ version = "1.4.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "7a1886916523694cd6ea3d175f03a1e5010699a2a4cc13696d83d7bea1d80638"
+ dependencies = [
+- "windows-sys 0.59.0",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+@@ -2912,7 +2912,7 @@ version = "0.3.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "59fd96dbb2381ff31f314f07accbdf8550febdcc5cd8761ecaf7c1763361c359"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "libc",
+  "libdisplay-info-derive",
+  "libdisplay-info-sys",
+@@ -2962,7 +2962,7 @@ version = "0.1.12"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "3d0b95e02c851351f877147b7deea7b1afb1df71b63aa5f8270716e0c5720616"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "libc",
+  "redox_syscall 0.7.2",
+ ]
+@@ -3302,7 +3302,7 @@ checksum = "618f667225063219ddfc61251087db8a9aec3c3f0950c916b614e403486f1135"
+ dependencies = [
+  "arrayvec",
+  "bit-set",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "cfg-if",
+  "cfg_aliases",
+  "codespan-reporting",
+@@ -3325,7 +3325,7 @@ version = "0.9.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "c3f42e7bbe13d351b6bead8286a43aac9534b82bd3cc43e47037f012ebfd62d4"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "jni-sys",
+  "log",
+  "ndk-sys",
+@@ -3355,7 +3355,7 @@ version = "0.29.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "71e2746dc3a24dd78b3cfcb7be93368c6de9963d30f43a6a73998a9cf4b17b46"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "cfg-if",
+  "cfg_aliases",
+  "libc",
+@@ -3383,7 +3383,7 @@ version = "8.2.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "4d3d07927151ff8575b7087f245456e549fea62edf0ec4e565a5ee50c8402bc3"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "fsevent-sys",
+  "inotify",
+  "kqueue",
+@@ -3401,7 +3401,7 @@ version = "2.1.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "42b8cfee0e339a0337359f3c88165702ac6e600dc01c0cc9579a92d62b08477a"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+ ]
+ 
+ [[package]]
+@@ -3410,7 +3410,7 @@ version = "0.50.3"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
+ dependencies = [
+- "windows-sys 0.59.0",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+@@ -3550,7 +3550,7 @@ version = "0.3.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "d49e936b501e5c5bf01fda3a9452ff86dc3ea98ad5f283e1455153142d97518c"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "objc2",
+  "objc2-core-foundation",
+  "objc2-foundation",
+@@ -3562,7 +3562,7 @@ version = "0.3.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "2a180dd8642fa45cdb7dd721cd4c11b1cadd4929ce112ebd8b9f5803cc79d536"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "block2",
+  "dispatch2",
+  "objc2",
+@@ -3574,7 +3574,7 @@ version = "0.3.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "e022c9d066895efa1345f8e33e584b9f958da2fd4cd116792e15e07e4720a807"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "libc",
+  "objc2-core-foundation",
+ ]
+@@ -3585,7 +3585,7 @@ version = "0.3.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "d425caf1df73233f29fd8a5c3e5edbc30d2d4307870f802d18f00d83dc5141a6"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "objc2-core-foundation",
+  "objc2-core-graphics",
+ ]
+@@ -3602,7 +3602,7 @@ version = "0.3.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "e3e0adef53c21f888deb4fa59fc59f7eb17404926ee8a6f59f5df0fd7f9f3272"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "block2",
+  "objc2",
+  "objc2-core-foundation",
+@@ -3614,7 +3614,7 @@ version = "0.3.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "d87d638e33c06f577498cbcc50491496a3ed4246998a7fbba7ccb98b1e7eab22"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "objc2",
+  "objc2-core-foundation",
+  "objc2-foundation",
+@@ -3959,7 +3959,7 @@ version = "0.18.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "60769b8b31b2a9f263dae2776c37b1b28ae246943cf719eb6946a1db05128a61"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "crc32fast",
+  "fdeflate",
+  "flate2",
+@@ -4233,7 +4233,7 @@ version = "0.5.18"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "ed2bf2547551a7053d6fdfafda3f938979645c44812fbfcda098faae3f1a362d"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+ ]
+ 
+ [[package]]
+@@ -4242,7 +4242,7 @@ version = "0.7.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "6d94dd2f7cd932d4dc02cc8b2b50dfd38bd079a4e5d79198b99743d7fcf9a4b4"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+ ]
+ 
+ [[package]]
+@@ -4370,7 +4370,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "db09040cc89e461f1a265139777a2bde7f8d8c67c4936f700c63ce3e2904d468"
+ dependencies = [
+  "base64 0.22.1",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "serde",
+  "serde_derive",
+  "unicode-ident",
+@@ -4382,7 +4382,7 @@ version = "0.12.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "fd490c5b18261893f14449cbd28cb9c0b637aebf161cd77900bfdedaff21ec32"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "once_cell",
+  "serde",
+  "serde_derive",
+@@ -4460,7 +4460,7 @@ version = "0.38.44"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "fdb5bc1ae2baa591800df16c9ca78619bf65c0488b41b96ccec5d11220d8c154"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "errno",
+  "libc",
+  "linux-raw-sys 0.4.15",
+@@ -4473,11 +4473,11 @@ version = "1.1.4"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "b6fe4565b9518b83ef4f91bb47ce29620ca828bd32cb7e408f0062e9930ba190"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "errno",
+  "libc",
+  "linux-raw-sys 0.12.1",
+- "windows-sys 0.52.0",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+@@ -4492,7 +4492,7 @@ version = "0.20.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "fd3c7c96f8a08ee34eff8857b11b49b07d71d1c3f4e88f8a88d4c9e9f90b1702"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "core_maths",
+  "log",
+@@ -4777,7 +4777,7 @@ dependencies = [
+  "aliasable",
+  "appendlist",
+  "ash",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "calloop",
+  "cc",
+  "cursor-icon",
+@@ -4830,7 +4830,7 @@ version = "0.20.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "0512da38f5e2b31201a93524adb8d3136276fa4fe4aafab4e1f727a82b534cc0"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "calloop",
+  "calloop-wayland-source",
+  "cursor-icon",
+@@ -5064,7 +5064,7 @@ dependencies = [
+  "getrandom 0.4.1",
+  "once_cell",
+  "rustix 1.1.4",
+- "windows-sys 0.52.0",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+@@ -5758,7 +5758,7 @@ version = "0.244.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "47b807c72e1bac69382b3a6fb3dbe8ea4c0ed87ff5629b8685ae6b9a611028fe"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "hashbrown 0.15.5",
+  "indexmap 2.13.0",
+  "semver",
+@@ -5798,7 +5798,7 @@ version = "0.31.14"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "645c7c96bb74690c3189b5c9cb4ca1627062bb23693a4fad9d8c3de958260144"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "rustix 1.1.4",
+  "wayland-backend",
+  "wayland-scanner",
+@@ -5810,7 +5810,7 @@ version = "0.3.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "625c5029dbd43d25e6aa9615e88b829a5cad13b2819c4ae129fdbb7c31ab4c7e"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "cursor-icon",
+  "wayland-backend",
+ ]
+@@ -5842,7 +5842,7 @@ version = "0.32.13"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "23d0c813de3daa2ed6520af85a3bd49b0e722a3078506899aa9686fea58dc4b6"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "wayland-backend",
+  "wayland-client",
+  "wayland-scanner",
+@@ -5855,7 +5855,7 @@ version = "20250721.0.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "40a1f863128dcaaec790d7b4b396cc9b9a7a079e878e18c47e6c2d2c5a8dcbb1"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "wayland-backend",
+  "wayland-client",
+  "wayland-protocols",
+@@ -5868,7 +5868,7 @@ version = "0.3.12"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "6e9567599ef23e09b8dad6e429e5738d4509dfc46b3b21f32841a304d16b29c8"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "wayland-backend",
+  "wayland-client",
+  "wayland-protocols",
+@@ -5882,7 +5882,7 @@ version = "0.3.10"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "aa98634619300a535a9a97f338aed9a5ff1e01a461943e8346ff4ae26007306b"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "wayland-backend",
+  "wayland-client",
+  "wayland-protocols",
+@@ -5895,7 +5895,7 @@ version = "0.3.12"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "eb04e52f7836d7c7976c78ca0250d61e33873c34156a2a1fc9474828ec268234"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "wayland-backend",
+  "wayland-client",
+  "wayland-protocols",
+@@ -5920,7 +5920,7 @@ version = "0.31.13"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "cc1846eb04c49182e04f4a099e2a830a2b745610bbc1d61246e206f29c7000a0"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "downcast-rs",
+  "rustix 1.1.4",
+  "wayland-backend",
+@@ -5972,7 +5972,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "f9cb534d5ffd109c7d1135f34cdae29e60eab94855a625dcfe1705f8bc7ad79f"
+ dependencies = [
+  "arrayvec",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "cfg-if",
+  "cfg_aliases",
+@@ -5998,7 +5998,7 @@ dependencies = [
+  "arrayvec",
+  "bit-set",
+  "bit-vec",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "cfg_aliases",
+  "document-features",
+@@ -6034,7 +6034,7 @@ version = "28.0.1"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "44d6cb474beb218824dcc9e1ce679d973f719262789bfb27407da560cac20eeb"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "cfg-if",
+  "cfg_aliases",
+  "libloading",
+@@ -6054,7 +6054,7 @@ version = "28.0.0"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "e18308757e594ed2cd27dddbb16a139c42a683819d32a2e0b1b0167552f5840c"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "js-sys",
+  "log",
+@@ -6083,7 +6083,7 @@ version = "0.1.11"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
+ dependencies = [
+- "windows-sys 0.48.0",
++ "windows-sys 0.61.2",
+ ]
+ 
+ [[package]]
+@@ -6469,7 +6469,7 @@ version = "0.31.0-beta.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "2879d2854d1a43e48f67322d4bd097afcb6eb8f8f775c8de0260a71aea1df1aa"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "cfg_aliases",
+  "cursor-icon",
+  "dpi",
+@@ -6497,7 +6497,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "51d9c0d2cd93efec3a9f9ad819cfaf0834782403af7c0d248c784ec0c61761df"
+ dependencies = [
+  "android-activity",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "dpi",
+  "ndk",
+  "raw-window-handle",
+@@ -6512,7 +6512,7 @@ version = "0.31.0-beta.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "21310ca07851a49c348e0c2cc768e36b52ca65afda2c2354d78ed4b90074d8aa"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "block2",
+  "dispatch2",
+  "dpi",
+@@ -6551,7 +6551,7 @@ version = "0.31.0-beta.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "e4f0ccd7abb43740e2c6124ac7cae7d865ecec74eec63783e8922577ac232583"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "cursor-icon",
+  "dpi",
+  "keyboard-types",
+@@ -6566,7 +6566,7 @@ version = "0.31.0-beta.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "51ea1fb262e7209f265f12bd0cc792c399b14355675e65531e9c8a87db287d46"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "dpi",
+  "orbclient",
+  "raw-window-handle",
+@@ -6582,7 +6582,7 @@ version = "0.31.0-beta.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "680a356e798837d8eb274d4556e83bceaf81698194e31aafc5cfb8a9f2fab643"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "block2",
+  "dispatch2",
+  "dpi",
+@@ -6604,7 +6604,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "8ce5afb2ba07da603f84b722c95f9f9396d2cedae3944fb6c0cda4a6f88de545"
+ dependencies = [
+  "ahash",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "calloop",
+  "cursor-icon",
+  "dpi",
+@@ -6630,7 +6630,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "8c2490a953fb776fbbd5e295d54f1c3847f4f15b6c3929ec53c09acda6487a92"
+ dependencies = [
+  "atomic-waker",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "concurrent-queue",
+  "cursor-icon",
+  "dpi",
+@@ -6652,7 +6652,7 @@ version = "0.31.0-beta.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "644ea78af0e858aa3b092e5d1c67c41995a98220c81813f1353b28bc8bb91eaa"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "cursor-icon",
+  "dpi",
+  "raw-window-handle",
+@@ -6669,7 +6669,7 @@ version = "0.31.0-beta.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "aa5b600756534c7041aa93cd0d244d44b09fca1b89e202bd1cd80dd9f3636c46"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "bytemuck",
+  "calloop",
+  "cursor-icon",
+@@ -6772,7 +6772,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "9d66ea20e9553b30172b5e831994e35fbde2d165325bec84fc43dbf6f4eb9cb2"
+ dependencies = [
+  "anyhow",
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "indexmap 2.13.0",
+  "log",
+  "serde",
+@@ -6891,7 +6891,7 @@ version = "0.4.2"
+ source = "registry+https://github.com/rust-lang/crates.io-index"
+ checksum = "d039de8032a9a8856a6be89cea3e5d12fdd82306ab7c94d74e6deab2460651c5"
+ dependencies = [
+- "bitflags 2.13.2",
++ "bitflags 2.11.0",
+  "dlib",
+  "log",
+  "once_cell",
+diff --git a/src/backend/mod.rs b/src/backend/mod.rs
+index b9586b5a..916ed37a 100644
+--- a/src/backend/mod.rs
++++ b/src/backend/mod.rs
+@@ -28,9 +28,9 @@ pub fn init_backend_auto(
+         Ok(x) if x == "kms" => kms::init_backend(dh, event_loop, state),
+         Ok(_) => unimplemented!("There is no backend with this identifier"),
+         Err(_) => {
+-            if std::env::var_os("DISPLAY").is_some()
+-                || std::env::var_os("WAYLAND_DISPLAY").is_some()
+-            {
++            if std::env::var_os("WAYLAND_DISPLAY").is_some() {
++                winit::init_backend(dh, event_loop, state)
++            } else if std::env::var_os("DISPLAY").is_some() {
+                 match x11::init_backend(dh, event_loop, state) {
+                     Ok(_) => Ok(()),
+                     Err(err) => {
+diff --git a/src/backend/render/mod.rs b/src/backend/render/mod.rs
+index 9ad61588..b551632f 100644
+--- a/src/backend/render/mod.rs
++++ b/src/backend/render/mod.rs
+@@ -125,7 +125,7 @@ impl AsMut<GlowRenderer> for RendererRef<'_> {
+     }
+ }
+ 
+-pub static CLEAR_COLOR: Color32F = Color32F::new(0.153, 0.161, 0.165, 1.0);
++pub static CLEAR_COLOR: Color32F = Color32F::new(0.24, 0.28, 0.36, 1.0);
+ pub static OUTLINE_SHADER: &str = include_str!("./shaders/rounded_outline.frag");
+ pub static RECTANGLE_SHADER: &str = include_str!("./shaders/rounded_rectangle.frag");
+ pub static POSTPROCESS_SHADER: &str = include_str!("./shaders/offscreen.frag");
+diff --git a/src/backend/render/shaders/shadow.frag b/src/backend/render/shaders/shadow.frag
+index fb72349e..e99a7bc3 100644
+--- a/src/backend/render/shaders/shadow.frag
++++ b/src/backend/render/shaders/shadow.frag
+@@ -59,10 +59,10 @@ float roundedBoxShadow(vec2 lower, vec2 upper, vec2 point, float sigma, float co
+     float end = clamp(3.0 * sigma, low, high);
+ 
+     // Accumulate samples (we can get away with surprisingly few samples)
+-    float step = (end - start) / 4.0;
++    float step = (end - start) / 16.0;
+     float y = start + step * 0.5;
+     float value = 0.0;
+-    for (int i = 0; i < 4; i++) {
++    for (int i = 0; i < 16; i++) {
+         value += roundedBoxShadowX(point.x, point.y - y, sigma, corner, halfSize) * gaussian(y, sigma) * step;
+         y += step;
+     }
+diff --git a/src/backend/render/shadow.rs b/src/backend/render/shadow.rs
+index 87fdd2e3..1eba0040 100644
+--- a/src/backend/render/shadow.rs
++++ b/src/backend/render/shadow.rs
+@@ -81,10 +81,10 @@ impl ShadowShader {
+         {
+             let shader = Self::get(renderer);
+ 
+-            let softness = 25.;
+-            let spread = 5.;
+-            let offset = [0., 5.];
+-            let color = [0., 0., 0., if dark_mode { 0.45 } else { 0.35 }];
++            let softness = 32.;
++            let spread = 4.;
++            let offset = [0., 12.];
++            let color = [0., 0., 0., if dark_mode { 0.65 } else { 0.40 }];
+             let radius = radius.map(|r| ceil(r as f64));
+ 
+             let width = softness;
+diff --git a/src/backend/winit.rs b/src/backend/winit.rs
+index 8f3d14c5..9c8b9ed1 100644
+--- a/src/backend/winit.rs
++++ b/src/backend/winit.rs
+@@ -49,7 +49,9 @@ pub struct WinitState {
+ impl WinitState {
+     #[profiling::function]
+     pub fn render_output(&mut self, state: &mut Common) -> Result<()> {
+-        let age = self.backend.buffer_age().unwrap_or(0);
++        // In nested Winit mode, force age to 0 to prevent partial damage misses
++        // and eliminate any buffer age sync artifacts or black checkerboards.
++        let age = 0;
+         let (renderer, mut fb) = self
+             .backend
+             .bind()
+@@ -70,7 +72,7 @@ impl WinitState {
+             Ok(RenderOutputResult { damage, states, .. }) => {
+                 std::mem::drop(fb);
+                 self.backend
+-                    .submit(damage.map(|x| x.as_slice()))
++                    .submit(None)
+                     .with_context(|| "Failed to submit buffer for display")?;
+                 state.send_frames(&self.output, None);
+                 state.update_primary_output(&self.output, &states);
+diff --git a/src/config/fx.rs b/src/config/fx.rs
+new file mode 100644
+index 00000000..336cf768
+--- /dev/null
++++ b/src/config/fx.rs
+@@ -0,0 +1,323 @@
++// SPDX-License-Identifier: GPL-3.0-only
++
++use serde::{Deserialize, Serialize};
++use std::path::PathBuf;
++use std::sync::{LazyLock, RwLock};
++
++static CURRENT_FX: LazyLock<RwLock<FxConfig>> = LazyLock::new(|| {
++    RwLock::new(FxConfig::load_or_default_from_disk())
++});
++
++#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
++pub struct FxConfig {
++    pub preset: String,
++    pub wobbly_enabled: bool,
++    pub wobbly_intensity: f64,
++    pub spring_bounce_enabled: bool,
++    pub focus_glow_enabled: bool,
++    pub card_lift_enabled: bool,
++    pub pendulum_tilt_enabled: bool,
++    #[serde(default = "default_true")]
++    pub floating_mode: bool,
++    #[serde(default = "default_true")]
++    pub pop_sound_enabled: bool,
++    #[serde(default = "default_close_style")]
++    pub close_animation_style: String,
++    #[serde(default = "default_sound_effect")]
++    pub pop_sound_effect: String,
++    #[serde(default = "default_true")]
++    pub pop_sound_on_close: bool,
++    #[serde(default = "default_true")]
++    pub pop_sound_on_open: bool,
++    #[serde(default = "default_true")]
++    pub pop_sound_on_maximize: bool,
++    #[serde(default = "default_false")]
++    pub pop_sound_on_minimize: bool,
++    #[serde(default = "default_sound_close")]
++    pub sound_close_effect: String,
++    #[serde(default = "default_sound_open")]
++    pub sound_open_effect: String,
++    #[serde(default = "default_sound_maximize")]
++    pub sound_maximize_effect: String,
++    #[serde(default = "default_sound_minimize")]
++    pub sound_minimize_effect: String,
++}
++
++fn default_true() -> bool {
++    true
++}
++
++fn default_false() -> bool {
++    false
++}
++
++fn default_close_style() -> String {
++    "pop_bubble".to_string()
++}
++
++fn default_sound_effect() -> String {
++    "volume_bubble".to_string()
++}
++
++fn default_sound_close() -> String {
++    "volume_bubble".to_string()
++}
++
++fn default_sound_open() -> String {
++    "volume_bubble".to_string()
++}
++
++fn default_sound_maximize() -> String {
++    "swing".to_string()
++}
++
++fn default_sound_minimize() -> String {
++    "click".to_string()
++}
++
++impl Default for FxConfig {
++    fn default() -> Self {
++        Self::preset_snappy()
++    }
++}
++
++impl FxConfig {
++    pub fn current() -> Self {
++        CURRENT_FX.read().unwrap().clone()
++    }
++
++    pub fn set_current(new_cfg: Self) {
++        *CURRENT_FX.write().unwrap() = new_cfg;
++    }
++
++    pub fn preset_snappy() -> Self {
++        Self {
++            preset: "snappy".to_string(),
++            wobbly_enabled: true,
++            wobbly_intensity: 1.0,
++            spring_bounce_enabled: true,
++            focus_glow_enabled: true,
++            card_lift_enabled: true,
++            pendulum_tilt_enabled: true,
++            floating_mode: true,
++            pop_sound_enabled: true,
++            close_animation_style: "pop_bubble".to_string(),
++            pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_close: true,
++            pop_sound_on_open: true,
++            pop_sound_on_maximize: true,
++            pop_sound_on_minimize: false,
++            sound_close_effect: "volume_bubble".to_string(),
++            sound_open_effect: "volume_bubble".to_string(),
++            sound_maximize_effect: "swing".to_string(),
++            sound_minimize_effect: "click".to_string(),
++        }
++    }
++
++    pub fn preset_intense() -> Self {
++        Self {
++            preset: "intense".to_string(),
++            wobbly_enabled: true,
++            wobbly_intensity: 2.2,
++            spring_bounce_enabled: true,
++            focus_glow_enabled: true,
++            card_lift_enabled: true,
++            pendulum_tilt_enabled: true,
++            floating_mode: true,
++            pop_sound_enabled: true,
++            close_animation_style: "pop_bubble".to_string(),
++            pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_close: true,
++            pop_sound_on_open: true,
++            pop_sound_on_maximize: true,
++            pop_sound_on_minimize: false,
++            sound_close_effect: "volume_bubble".to_string(),
++            sound_open_effect: "volume_bubble".to_string(),
++            sound_maximize_effect: "swing".to_string(),
++            sound_minimize_effect: "click".to_string(),
++        }
++    }
++
++    pub fn preset_subtle() -> Self {
++        Self {
++            preset: "subtle".to_string(),
++            wobbly_enabled: true,
++            wobbly_intensity: 0.5,
++            spring_bounce_enabled: true,
++            focus_glow_enabled: true,
++            card_lift_enabled: true,
++            pendulum_tilt_enabled: true,
++            floating_mode: true,
++            pop_sound_enabled: true,
++            close_animation_style: "pop_bubble".to_string(),
++            pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_close: true,
++            pop_sound_on_open: true,
++            pop_sound_on_maximize: true,
++            pop_sound_on_minimize: false,
++            sound_close_effect: "click".to_string(),
++            sound_open_effect: "click".to_string(),
++            sound_maximize_effect: "swing".to_string(),
++            sound_minimize_effect: "click".to_string(),
++        }
++    }
++
++    pub fn preset_off() -> Self {
++        Self {
++            preset: "off".to_string(),
++            wobbly_enabled: false,
++            wobbly_intensity: 0.0,
++            spring_bounce_enabled: false,
++            focus_glow_enabled: false,
++            card_lift_enabled: false,
++            pendulum_tilt_enabled: false,
++            floating_mode: false,
++            pop_sound_enabled: false,
++            close_animation_style: "classic".to_string(),
++            pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_close: false,
++            pop_sound_on_open: false,
++            pop_sound_on_maximize: false,
++            pop_sound_on_minimize: false,
++            sound_close_effect: "volume_bubble".to_string(),
++            sound_open_effect: "volume_bubble".to_string(),
++            sound_maximize_effect: "swing".to_string(),
++            sound_minimize_effect: "click".to_string(),
++        }
++    }
++
++    pub fn apply_preset(&mut self, preset_name: &str) {
++        match preset_name.to_lowercase().as_str() {
++            "intense" | "boom" => *self = Self::preset_intense(),
++            "subtle" | "smooth" => *self = Self::preset_subtle(),
++            "off" | "disabled" | "none" => *self = Self::preset_off(),
++            _ => *self = Self::preset_snappy(),
++        }
++    }
++
++    pub fn config_path() -> PathBuf {
++        if let Ok(sandbox) = std::env::var("XDG_CONFIG_HOME") {
++            let p = PathBuf::from(&sandbox).join("cosmic-comp-fx.json");
++            if p.exists() || PathBuf::from(&sandbox).exists() {
++                return p;
++            }
++        }
++        if let Ok(home) = std::env::var("HOME") {
++            PathBuf::from(home).join(".config/cosmic/cosmic-comp-fx.json")
++        } else {
++            PathBuf::from("/tmp/cosmic-comp-fx.json")
++        }
++    }
++
++    pub fn load_or_default_from_disk() -> Self {
++        let path = Self::config_path();
++        if let Ok(content) = std::fs::read_to_string(&path) {
++            if let Ok(cfg) = serde_json::from_str::<FxConfig>(&content) {
++                return cfg;
++            }
++        }
++        let default_cfg = Self::default();
++        let _ = default_cfg.save();
++        default_cfg
++    }
++
++    pub fn reload_if_changed() -> bool {
++        let path = Self::config_path();
++        if let Ok(content) = std::fs::read_to_string(&path) {
++            if let Ok(cfg) = serde_json::from_str::<FxConfig>(&content) {
++                let current = Self::current();
++                if cfg != current {
++                    Self::set_current(cfg);
++                    return true;
++                }
++            }
++        }
++        false
++    }
++
++    pub fn save(&self) -> std::io::Result<()> {
++        let path = Self::config_path();
++        if let Some(parent) = path.parent() {
++            let _ = std::fs::create_dir_all(parent);
++        }
++        let json = serde_json::to_string_pretty(self)
++            .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;
++        std::fs::write(path, json)
++    }
++}
++
++pub fn resolve_sound_path(effect_name: &str) -> &'static str {
++    match effect_name {
++        "pin" => "/usr/share/sounds/Pop/stereo/action/audio-volume-change.oga",
++        "click" => "/usr/share/sounds/gnome/default/alerts/click.ogg",
++        "swing" => "/usr/share/sounds/gnome/default/alerts/swing.ogg",
++        "camera_focus" => "/usr/share/sounds/Pop/stereo/action/camera-focus.oga",
++        "theme_demo" => "/usr/share/sounds/Pop/stereo/notification/theme-demo.oga",
++        "device_added" => "/usr/share/sounds/Pop/stereo/notification/device-added.oga",
++        "device_removed" => "/usr/share/sounds/Pop/stereo/notification/device-removed.oga",
++        _ => "/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga",
++    }
++}
++
++pub fn play_sound_effect(effect_name: &str) {
++    let cfg = FxConfig::current();
++    if !cfg.pop_sound_enabled {
++        return;
++    }
++    let sound_path = resolve_sound_path(effect_name);
++    if !std::path::Path::new(sound_path).exists() {
++        return;
++    }
++    let sound_path = sound_path.to_string();
++    std::thread::spawn(move || {
++        let played = std::process::Command::new("pw-play")
++            .arg(&sound_path)
++            .stdout(std::process::Stdio::null())
++            .stderr(std::process::Stdio::null())
++            .spawn()
++            .and_then(|mut child| child.wait())
++            .is_ok();
++
++        if !played {
++            let _ = std::process::Command::new("paplay")
++                .arg(&sound_path)
++                .stdout(std::process::Stdio::null())
++                .stderr(std::process::Stdio::null())
++                .spawn()
++                .and_then(|mut child| child.wait());
++        }
++    });
++}
++
++pub fn play_sound_close() {
++    let cfg = FxConfig::current();
++    if cfg.pop_sound_enabled && cfg.pop_sound_on_close {
++        play_sound_effect(&cfg.sound_close_effect);
++    }
++}
++
++pub fn play_sound_open() {
++    let cfg = FxConfig::current();
++    if cfg.pop_sound_enabled && cfg.pop_sound_on_open {
++        play_sound_effect(&cfg.sound_open_effect);
++    }
++}
++
++pub fn play_sound_maximize() {
++    let cfg = FxConfig::current();
++    if cfg.pop_sound_enabled && cfg.pop_sound_on_maximize {
++        play_sound_effect(&cfg.sound_maximize_effect);
++    }
++}
++
++pub fn play_sound_minimize() {
++    let cfg = FxConfig::current();
++    if cfg.pop_sound_enabled && cfg.pop_sound_on_minimize {
++        play_sound_effect(&cfg.sound_minimize_effect);
++    }
++}
++
++/// Reproduce el sonido de cierre o Pop de respaldo
++pub fn play_pop_sound() {
++    play_sound_close();
++}
+diff --git a/src/config/mod.rs b/src/config/mod.rs
+index 4d2fad9b..b11a5116 100644
+--- a/src/config/mod.rs
++++ b/src/config/mod.rs
+@@ -45,6 +45,7 @@ use tracing::{error, warn};
+ mod input_config;
+ pub mod key_bindings;
+ mod types;
++pub mod fx;
+ 
+ use cosmic::config::CosmicTk;
+ pub use cosmic_comp_config::EdidProduct;
+@@ -327,6 +328,31 @@ impl Config {
+                 .set_screen_filter(filter_conf.color_filter);
+         });
+ 
++        // Watch experimental FX config for real-time live reload (500ms check)
++        let fx_timer = smithay::reexports::calloop::timer::Timer::from_duration(std::time::Duration::from_millis(500));
++        let _ = loop_handle.insert_source(fx_timer, |_, _, state| {
++            if fx::FxConfig::reload_if_changed() {
++                let fx_cfg = fx::FxConfig::current();
++                tracing::info!(floating = fx_cfg.floating_mode, "CosmicComp FX config reloaded in real time!");
++
++                // Sincronizar modo mosaico vs flotante en todos los workspaces activos
++                let want_tiling = !fx_cfg.floating_mode;
++                {
++                    let mut shell = state.common.shell.write();
++                    let shell_ref = &mut *shell;
++                    let seat = shell_ref.seats.last_active().clone();
++                    shell_ref.workspaces.set_all_workspaces_tiling(
++                        want_tiling,
++                        &seat,
++                        &mut state.common.workspace_state.update(),
++                    );
++                }
++
++                state.common.refresh();
++            }
++            smithay::reexports::calloop::timer::TimeoutAction::ToDuration(std::time::Duration::from_millis(500))
++        });
++
+         Config {
+             dynamic_conf: Self::load_dynamic(&xdg),
+             cosmic_conf: cosmic_comp_config,
+diff --git a/src/input/actions.rs b/src/input/actions.rs
+index 8639ba62..657e18dc 100644
+--- a/src/input/actions.rs
++++ b/src/input/actions.rs
+@@ -987,7 +987,7 @@ impl State {
+             }
+ 
+             Action::ToggleTiling => {
+-                if matches!(
++                let is_now_tiling = if matches!(
+                     self.common.config.cosmic_conf.autotile_behavior,
+                     TileBehavior::Global
+                 ) {
+@@ -1009,13 +1009,20 @@ impl State {
+                             error!(?err, "Failed to update autotile key");
+                         }
+                     });
++                    autotile
+                 } else {
+                     let output = seat.active_output();
+                     let mut shell = self.common.shell.write();
+                     let workspace = shell.workspaces.active_mut(&output).unwrap();
+                     let mut guard = self.common.workspace_state.update();
+                     workspace.toggle_tiling(seat, &mut guard);
+-                }
++                    workspace.tiling_enabled
++                };
++
++                let mut fx_cfg = crate::config::fx::FxConfig::current();
++                fx_cfg.floating_mode = !is_now_tiling;
++                crate::config::fx::FxConfig::set_current(fx_cfg.clone());
++                let _ = fx_cfg.save();
+             }
+ 
+             Action::ToggleWindowFloating => {
+diff --git a/src/shell/element/mod.rs b/src/shell/element/mod.rs
+index d4743b7f..b9178934 100644
+--- a/src/shell/element/mod.rs
++++ b/src/shell/element/mod.rs
+@@ -1280,15 +1280,15 @@ where
+ 
+     fn opaque_regions(&self, scale: Scale<f64>) -> OpaqueRegions<i32, Physical> {
+         match self {
+-            CosmicMappedRenderElement::Stack(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::Window(elem) => elem.opaque_regions(scale),
++            CosmicMappedRenderElement::Stack(_) => OpaqueRegions::default(),
++            CosmicMappedRenderElement::Window(_) => OpaqueRegions::default(),
+             CosmicMappedRenderElement::TiledStack(elem) => elem.opaque_regions(scale),
+             CosmicMappedRenderElement::TiledWindow(elem) => elem.opaque_regions(scale),
+             CosmicMappedRenderElement::TiledOverlay(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::MovingStack(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::MovingWindow(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::GrabbedStack(elem) => elem.opaque_regions(scale),
+-            CosmicMappedRenderElement::GrabbedWindow(elem) => elem.opaque_regions(scale),
++            CosmicMappedRenderElement::MovingStack(_) => OpaqueRegions::default(),
++            CosmicMappedRenderElement::MovingWindow(_) => OpaqueRegions::default(),
++            CosmicMappedRenderElement::GrabbedStack(_) => OpaqueRegions::default(),
++            CosmicMappedRenderElement::GrabbedWindow(_) => OpaqueRegions::default(),
+             CosmicMappedRenderElement::FocusIndicator(elem) => elem.opaque_regions(scale),
+             CosmicMappedRenderElement::Overlay(elem) => elem.opaque_regions(scale),
+             CosmicMappedRenderElement::StackHoverIndicator(elem) => elem.opaque_regions(scale),
+@@ -1318,15 +1318,15 @@ where
+ 
+     fn kind(&self) -> Kind {
+         match self {
+-            CosmicMappedRenderElement::Stack(elem) => elem.kind(),
+-            CosmicMappedRenderElement::Window(elem) => elem.kind(),
++            CosmicMappedRenderElement::Stack(_) => Kind::Unspecified,
++            CosmicMappedRenderElement::Window(_) => Kind::Unspecified,
+             CosmicMappedRenderElement::TiledStack(elem) => elem.kind(),
+             CosmicMappedRenderElement::TiledWindow(elem) => elem.kind(),
+             CosmicMappedRenderElement::TiledOverlay(elem) => elem.kind(),
+-            CosmicMappedRenderElement::MovingStack(elem) => elem.kind(),
+-            CosmicMappedRenderElement::MovingWindow(elem) => elem.kind(),
+-            CosmicMappedRenderElement::GrabbedStack(elem) => elem.kind(),
+-            CosmicMappedRenderElement::GrabbedWindow(elem) => elem.kind(),
++            CosmicMappedRenderElement::MovingStack(_) => Kind::Unspecified,
++            CosmicMappedRenderElement::MovingWindow(_) => Kind::Unspecified,
++            CosmicMappedRenderElement::GrabbedStack(_) => Kind::Unspecified,
++            CosmicMappedRenderElement::GrabbedWindow(_) => Kind::Unspecified,
+             CosmicMappedRenderElement::FocusIndicator(elem) => elem.kind(),
+             CosmicMappedRenderElement::Overlay(elem) => elem.kind(),
+             CosmicMappedRenderElement::StackHoverIndicator(elem) => elem.kind(),
+diff --git a/src/shell/focus/mod.rs b/src/shell/focus/mod.rs
+index fe8f772a..f631372e 100644
+--- a/src/shell/focus/mod.rs
++++ b/src/shell/focus/mod.rs
+@@ -2,15 +2,12 @@ use crate::{
+     shell::{CosmicSurface, MinimizedWindow, Shell, Trigger, element::CosmicMapped},
+     state::{Common, State},
+     utils::prelude::*,
+-    wayland::{
+-        handlers::{xdg_shell::PopupGrabData, xwayland_keyboard_grab::XWaylandGrabSeatData},
+-        protocols::session_lock_layer::layer_show_on_lock,
+-    },
++    wayland::handlers::{xdg_shell::PopupGrabData, xwayland_keyboard_grab::XWaylandGrabSeatData},
+ };
+ use indexmap::IndexSet;
+ use smithay::{
+     backend::input::InputTime,
+-    desktop::{PopupUngrabStrategy, find_popup_root_surface, layer_map_for_output},
++    desktop::{PopupUngrabStrategy, layer_map_for_output},
+     input::{Seat, pointer::MotionEvent},
+     output::Output,
+     reexports::wayland_server::{Resource, protocol::wl_surface::WlSurface},
+@@ -630,15 +627,8 @@ fn focus_target_is_valid(
+     output: &Output,
+     target: KeyboardFocusTarget,
+ ) -> bool {
+-    // If a session lock is active, only lock surfaces and lock layers can be focused
++    // If a session lock is active, only lock surfaces can be focused
+     if shell.session_lock.is_some() {
+-        if let KeyboardFocusTarget::LayerSurface(layer) = &target {
+-            return layer_show_on_lock(layer.wl_surface());
+-        } else if let KeyboardFocusTarget::Popup(popup) = &target
+-            && let Ok(root) = find_popup_root_surface(popup)
+-        {
+-            return layer_show_on_lock(&root);
+-        }
+         return matches!(target, KeyboardFocusTarget::LockSurface(_));
+     }
+ 
+diff --git a/src/shell/focus/order.rs b/src/shell/focus/order.rs
+index 937fa311..fb904c01 100644
+--- a/src/shell/focus/order.rs
++++ b/src/shell/focus/order.rs
+@@ -22,7 +22,7 @@ use crate::{
+         prelude::OutputExt,
+         quirks::{WORKSPACE_OVERVIEW_NAMESPACE, workspace_overview_is_open},
+     },
+-    wayland::protocols::{session_lock_layer::layer_show_on_lock, workspace::WorkspaceHandle},
++    wayland::protocols::workspace::WorkspaceHandle,
+ };
+ 
+ pub enum Stage<'a> {
+@@ -77,8 +77,6 @@ fn render_input_order_internal<R: 'static>(
+     element_filter: ElementFilter,
+     mut callback: impl FnMut(Stage) -> ControlFlow<Result<R, OutputNoMode>, ()>,
+ ) -> ControlFlow<Result<R, OutputNoMode>, ()> {
+-    // NOTE: Keep in sync with other surface iteration functions
+-
+     if shell
+         .zoom_state
+         .as_ref()
+@@ -89,92 +87,7 @@ fn render_input_order_internal<R: 'static>(
+ 
+     // Session Lock
+     if let Some(session_lock) = &shell.session_lock {
+-        for (layer, popup, location) in layer_popups(output, Layer::Overlay, element_filter) {
+-            if !layer_show_on_lock(layer.wl_surface()) {
+-                continue;
+-            }
+-            callback(Stage::LayerPopup {
+-                layer,
+-                popup: &popup,
+-                location,
+-                workspace_idx: current.1,
+-            })?;
+-        }
+-        for (layer, location) in layer_surfaces(output, Layer::Overlay, element_filter) {
+-            if !layer_show_on_lock(layer.wl_surface()) {
+-                continue;
+-            }
+-            callback(Stage::LayerSurface {
+-                layer,
+-                location,
+-                workspace_idx: current.1,
+-            })?;
+-        }
+-        for (layer, popup, location) in layer_popups(output, Layer::Top, element_filter) {
+-            if !layer_show_on_lock(layer.wl_surface()) {
+-                continue;
+-            }
+-            callback(Stage::LayerPopup {
+-                layer,
+-                popup: &popup,
+-                location,
+-                workspace_idx: current.1,
+-            })?;
+-        }
+-        for (layer, location) in layer_surfaces(output, Layer::Top, element_filter) {
+-            if !layer_show_on_lock(layer.wl_surface()) {
+-                continue;
+-            }
+-            callback(Stage::LayerSurface {
+-                layer,
+-                location,
+-                workspace_idx: current.1,
+-            })?;
+-        }
+-        callback(Stage::SessionLock(session_lock.surfaces.get(output)))?;
+-        for (layer, popup, location) in layer_popups(output, Layer::Bottom, element_filter) {
+-            if !layer_show_on_lock(layer.wl_surface()) {
+-                continue;
+-            }
+-            callback(Stage::LayerPopup {
+-                layer,
+-                popup: &popup,
+-                location,
+-                workspace_idx: current.1,
+-            })?;
+-        }
+-        for (layer, popup, location) in layer_popups(output, Layer::Background, element_filter) {
+-            if !layer_show_on_lock(layer.wl_surface()) {
+-                continue;
+-            }
+-            callback(Stage::LayerPopup {
+-                layer,
+-                popup: &popup,
+-                location,
+-                workspace_idx: current.1,
+-            })?;
+-        }
+-        for (layer, location) in layer_surfaces(output, Layer::Bottom, element_filter) {
+-            if !layer_show_on_lock(layer.wl_surface()) {
+-                continue;
+-            }
+-            callback(Stage::LayerSurface {
+-                layer,
+-                location,
+-                workspace_idx: current.1,
+-            })?;
+-        }
+-        for (layer, location) in layer_surfaces(output, Layer::Background, element_filter) {
+-            if !layer_show_on_lock(layer.wl_surface()) {
+-                continue;
+-            }
+-            callback(Stage::LayerSurface {
+-                layer,
+-                location,
+-                workspace_idx: current.1,
+-            })?;
+-        }
+-        return ControlFlow::Continue(());
++        return callback(Stage::SessionLock(session_lock.surfaces.get(output)));
+     }
+ 
+     // Overlay-level layer shell
+diff --git a/src/shell/grabs/moving.rs b/src/shell/grabs/moving.rs
+index f1fbfa8a..4fca11f1 100644
+--- a/src/shell/grabs/moving.rs
++++ b/src/shell/grabs/moving.rs
+@@ -78,6 +78,10 @@ pub struct MoveGrabState {
+     stacking_indicator: Option<(StackHover, Point<i32, Logical>)>,
+     location: Point<f64, Logical>,
+     cursor_output: Output,
++    // Compiz Wobbly Windows elastic physics
++    last_location: Point<f64, Logical>,
++    last_update: Instant,
++    velocity: Point<f64, Logical>,
+ }
+ 
+ impl MoveGrabState {
+@@ -120,12 +124,51 @@ impl MoveGrabState {
+             return;
+         }
+ 
++        // Read dynamic FX configuration in memory (zero syscalls)
++        let fx = crate::config::fx::FxConfig::current();
++
++        let (lag_x, lag_y, render_scale) = if fx.wobbly_enabled {
++            let intensity = fx.wobbly_intensity.max(0.0);
++            let elapsed_idle = Instant::now().duration_since(self.last_update).as_secs_f64();
++            let decay = (-elapsed_idle * 8.5).exp();
++            let wobble = (elapsed_idle * 20.0).cos();
++            let spring_factor = decay * wobble;
++            let active_vx = (self.velocity.x * spring_factor).clamp(-2200.0, 2200.0);
++            let active_vy = (self.velocity.y * spring_factor).clamp(-2200.0, 2200.0);
++
++            // Snappy pointer adherence scaled by intensity
++            let mut lx = -(active_vx * 0.012 * intensity).round() as i32;
++            let ly = -(active_vy * 0.012 * intensity).round() as i32;
++
++            if fx.pendulum_tilt_enabled {
++                // Compiz Pendulum Tilt: additional organic pendulum drag
++                let pendulum_sway = -(active_vx * 0.005 * intensity).round() as i32;
++                lx += pendulum_sway;
++            }
++
++            let stretch_x = (active_vx.abs() * 0.00005 * intensity).min(0.05 * intensity);
++            let stretch_y = (active_vy.abs() * 0.00005 * intensity).min(0.05 * intensity);
++
++            let elevation = if fx.card_lift_enabled {
++                1.030 + ((active_vx.abs() + active_vy.abs()) * 0.00001).min(0.015)
++            } else {
++                1.0
++            };
++
++            let wobble_scale_x = scale * elevation * (1.0 + stretch_x - stretch_y * 0.40);
++            let wobble_scale_y = scale * elevation * (1.0 + stretch_y - stretch_x * 0.40);
++            (lx, ly, Scale { x: wobble_scale_x, y: wobble_scale_y })
++        } else {
++            (0, 0, Scale { x: scale, y: scale })
++        };
++
+         let output_scale: Scale<f64> = output.current_scale().fractional_scale().into();
+         let scaling_offset =
+-            self.window_offset - self.window_offset.to_f64().upscale(scale).to_i32_round();
++            self.window_offset - self.window_offset.to_f64().upscale(render_scale).to_i32_round();
+         let render_location = self.location.to_i32_round() - output.geometry().loc.as_logical()
+             + self.window_offset
+-            - scaling_offset;
++            - scaling_offset
++            + Point::from((lag_x, lag_y));
+ 
+         for (indicator, location) in self.stacking_indicator.iter() {
+             indicator.push_render_elements(
+@@ -148,11 +191,17 @@ impl MoveGrabState {
+         );
+ 
+         let active_window_hint = crate::theme::active_window_hint(theme);
++        let accent = theme.accent_color();
++        let thickness = if fx.focus_glow_enabled {
++            self.indicator_thickness.max(3)
++        } else {
++            self.indicator_thickness
++        };
+         let radius = self
+             .element()
+-            .corner_radius(window_geo.size, self.indicator_thickness);
++            .corner_radius(window_geo.size, thickness);
+ 
+-        if self.indicator_thickness > 0 {
++        if thickness > 0 {
+             push(
+                 IndicatorShader::focus_element(
+                     renderer,
+@@ -163,22 +212,18 @@ impl MoveGrabState {
+                             .geometry()
+                             .size
+                             .to_f64()
+-                            .upscale(scale)
++                            .upscale(render_scale)
+                             .to_i32_round(),
+                     )
+                     .as_local(),
+-                    self.indicator_thickness,
++                    thickness,
+                     radius,
+-                    alpha,
++                    alpha * 0.95,
+                     output_scale.x,
+-                    [
+-                        active_window_hint.red,
+-                        active_window_hint.green,
+-                        active_window_hint.blue,
+-                    ],
++                    [accent.red, accent.green, accent.blue],
+                 )
+                 .into(),
+-            )
++            );
+         }
+ 
+         let map_window_element = |elem| match elem {
+@@ -187,7 +232,7 @@ impl MoveGrabState {
+                     stack,
+                     render_location
+                         .to_physical_precise_round(output.current_scale().fractional_scale()),
+-                    scale,
++                    render_scale,
+                 ))
+             }
+             CosmicMappedRenderElement::Window(window) => {
+@@ -195,7 +240,7 @@ impl MoveGrabState {
+                     window,
+                     render_location
+                         .to_physical_precise_round(output.current_scale().fractional_scale()),
+-                    scale,
++                    render_scale,
+                 ))
+             }
+             x => x,
+@@ -218,7 +263,7 @@ impl MoveGrabState {
+             (render_location - self.window.geometry().loc).to_physical_precise_round(output_scale),
+             None,
+             output_scale,
+-            scale,
++            render_scale.x.max(render_scale.y),
+             alpha,
+         ) {
+             push(shadow_element);
+@@ -414,6 +459,16 @@ impl MoveGrab {
+             .get::<SeatMoveGrabState>()
+             .map(|s| s.lock().unwrap());
+         if let Some(grab_state) = borrow.as_mut().and_then(|s| s.as_mut()) {
++            let now = Instant::now();
++            let dt = (now - grab_state.last_update).as_secs_f64().max(0.001);
++            let dx = location.x - grab_state.last_location.x;
++            let dy = location.y - grab_state.last_location.y;
++            let instant_vx = dx / dt;
++            let instant_vy = dy / dt;
++            grab_state.velocity.x = grab_state.velocity.x * 0.55 + instant_vx * 0.45;
++            grab_state.velocity.y = grab_state.velocity.y * 0.55 + instant_vy * 0.45;
++            grab_state.last_location = location;
++            grab_state.last_update = now;
+             grab_state.location = location;
+             grab_state.cursor_output = self.cursor_output.clone();
+ 
+@@ -854,6 +909,9 @@ impl MoveGrab {
+             previous: previous_layer,
+             location: start_data.location(),
+             cursor_output: cursor_output.clone(),
++            last_location: start_data.location(),
++            last_update: Instant::now(),
++            velocity: Point::from((0.0, 0.0)),
+         };
+ 
+         *seat
+diff --git a/src/shell/layout/floating/mod.rs b/src/shell/layout/floating/mod.rs
+index 95d7264d..f2609018 100644
+--- a/src/shell/layout/floating/mod.rs
++++ b/src/shell/layout/floating/mod.rs
+@@ -42,15 +42,17 @@ use crate::{
+         grabs::{GrabStartData, ReleaseMode, ResizeEdge},
+     },
+     state::State,
+-    utils::{prelude::*, tween::EaseRectangle},
++    utils::prelude::*,
+     wayland::handlers::xdg_shell::popup::get_popup_toplevel,
+ };
+ 
+ mod grabs;
+ pub use self::grabs::*;
+ 
+-pub const ANIMATION_DURATION: Duration = Duration::from_millis(200);
+-pub const MINIMIZE_ANIMATION_DURATION: Duration = Duration::from_millis(320);
++pub const ANIMATION_DURATION: Duration = Duration::from_millis(380);
++pub const MINIMIZE_ANIMATION_DURATION: Duration = Duration::from_millis(360);
++pub const OPEN_ANIMATION_DURATION: Duration = Duration::from_millis(380);
++pub const CLOSE_ANIMATION_DURATION: Duration = Duration::from_millis(320);
+ 
+ #[derive(Debug, Default)]
+ pub struct FloatingLayout {
+@@ -80,6 +82,14 @@ enum Animation {
+         previous_geometry: Rectangle<i32, Local>,
+         target_geometry: Rectangle<i32, Local>,
+     },
++    Open {
++        start: Instant,
++        geometry: Rectangle<i32, Local>,
++    },
++    Close {
++        start: Instant,
++        previous_geometry: Rectangle<i32, Local>,
++    },
+ }
+ 
+ impl Animation {
+@@ -88,6 +98,8 @@ impl Animation {
+             Animation::Tiled { start, .. } => start,
+             Animation::Minimize { start, .. } => start,
+             Animation::Unminimize { start, .. } => start,
++            Animation::Open { start, .. } => start,
++            Animation::Close { start, .. } => start,
+         }
+     }
+ 
+@@ -100,7 +112,7 @@ impl Animation {
+                     .min(MINIMIZE_ANIMATION_DURATION)
+                     .as_secs_f32()
+                     / MINIMIZE_ANIMATION_DURATION.as_secs_f32();
+-                1.0 - ((percentage - 0.5).max(0.0) * 2.0)
++                (1.0 - ((percentage - 0.70).max(0.0) * 3.33)).clamp(0.0, 1.0)
+             }
+             Animation::Unminimize { start, .. } => {
+                 let percentage = Instant::now()
+@@ -110,6 +122,32 @@ impl Animation {
+                     / MINIMIZE_ANIMATION_DURATION.as_secs_f32();
+                 (percentage * 2.0).min(1.0)
+             }
++            Animation::Open { start, .. } => {
++                let p = Instant::now()
++                    .duration_since(*start)
++                    .min(OPEN_ANIMATION_DURATION)
++                    .as_secs_f32()
++                    / OPEN_ANIMATION_DURATION.as_secs_f32();
++                (p * 4.0).min(1.0)
++            }
++            Animation::Close { start, .. } => {
++                let p = Instant::now()
++                    .duration_since(*start)
++                    .min(CLOSE_ANIMATION_DURATION)
++                    .as_secs_f32()
++                    / CLOSE_ANIMATION_DURATION.as_secs_f32();
++                let fx = crate::config::fx::FxConfig::current();
++                if fx.close_animation_style == "pop_bubble" || fx.spring_bounce_enabled {
++                    if p < 0.38 {
++                        1.0
++                    } else {
++                        let fade_p = (p - 0.38) / 0.62;
++                        (1.0 - fade_p.powi(2)).clamp(0.0, 1.0)
++                    }
++                } else {
++                    (1.0 - p).clamp(0.0, 1.0)
++                }
++            }
+         }
+     }
+ 
+@@ -124,6 +162,10 @@ impl Animation {
+             Animation::Unminimize {
+                 previous_geometry, ..
+             } => previous_geometry,
++            Animation::Close {
++                previous_geometry, ..
++            } => previous_geometry,
++            Animation::Open { geometry, .. } => geometry,
+         }
+     }
+ 
+@@ -134,14 +176,65 @@ impl Animation {
+         tiled_state: Option<&TiledCorners>,
+         gaps: (i32, i32),
+     ) -> Rectangle<i32, Local> {
+-        let (duration, target_rect) = match self {
+-            Animation::Minimize {
+-                target_geometry, ..
++        match self {
++            Animation::Unminimize { target_geometry, .. } => {
++                let fx = crate::config::fx::FxConfig::current();
++                let previous_rect = *self.previous_geometry();
++                let start = *self.start();
++                let now = Instant::now();
++                let p = now.duration_since(start).min(MINIMIZE_ANIMATION_DURATION).as_secs_f64()
++                    / MINIMIZE_ANIMATION_DURATION.as_secs_f64();
++
++                let spring_p = if !fx.spring_bounce_enabled {
++                    ease(EaseInOutCubic, 0.0, 1.0, p)
++                } else if p >= 1.0 {
++                    1.0
++                } else {
++                    let env = (-4.0 * p).exp();
++                    let osc = (7.0 * p).cos();
++                    1.0 - env * osc
++                };
++
++                let x = previous_rect.loc.x as f64 + (target_geometry.loc.x - previous_rect.loc.x) as f64 * spring_p;
++                let y = previous_rect.loc.y as f64 + (target_geometry.loc.y - previous_rect.loc.y) as f64 * spring_p;
++                let w = previous_rect.size.w as f64 + (target_geometry.size.w - previous_rect.size.w) as f64 * spring_p;
++                let h = previous_rect.size.h as f64 + (target_geometry.size.h - previous_rect.size.h) as f64 * spring_p;
++
++                return Rectangle::new(
++                    Point::from((x.round() as i32, y.round() as i32)),
++                    Size::from((w.round().max(20.0) as i32, h.round().max(20.0) as i32)),
++                );
+             }
+-            | Animation::Unminimize {
+-                target_geometry, ..
+-            } => (MINIMIZE_ANIMATION_DURATION, *target_geometry),
++            Animation::Minimize { target_geometry, .. } => {
++                let fx = crate::config::fx::FxConfig::current();
++                let previous_rect = *self.previous_geometry();
++                let start = *self.start();
++                let now = Instant::now();
++                let p = now.duration_since(start).min(MINIMIZE_ANIMATION_DURATION).as_secs_f64()
++                    / MINIMIZE_ANIMATION_DURATION.as_secs_f64();
++
++                let (glide_p, lateral_squash) = if !fx.spring_bounce_enabled {
++                    (ease(EaseInOutCubic, 0.0, 1.0, p), 1.0)
++                } else {
++                    let glide = p.powf(1.6);
++                    let squash = 1.0 - (std::f64::consts::PI * p).sin() * 0.12;
++                    (glide, squash)
++                };
++
++                let x = previous_rect.loc.x as f64 + (target_geometry.loc.x - previous_rect.loc.x) as f64 * glide_p;
++                let y = previous_rect.loc.y as f64 + (target_geometry.loc.y - previous_rect.loc.y) as f64 * glide_p;
++                let w = (previous_rect.size.w as f64 + (target_geometry.size.w - previous_rect.size.w) as f64 * glide_p) * lateral_squash;
++                let h = previous_rect.size.h as f64 + (target_geometry.size.h - previous_rect.size.h) as f64 * glide_p;
++
++                return Rectangle::new(
++                    Point::from((x.round() as i32, y.round() as i32)),
++                    Size::from((w.round().max(20.0) as i32, h.round().max(20.0) as i32)),
++                );
++            }
++            Animation::Open { geometry, .. } => return *geometry,
++            Animation::Close { previous_geometry, .. } => return *previous_geometry,
+             Animation::Tiled { .. } => {
++                let fx = crate::config::fx::FxConfig::current();
+                 let target_geometry = if let Some(target_rect) =
+                     tiled_state.map(|state| state.relative_geometry(output_geometry, gaps))
+                 {
+@@ -149,22 +242,34 @@ impl Animation {
+                 } else {
+                     current_geometry
+                 };
+-                (ANIMATION_DURATION, target_geometry)
++
++                let previous_rect = *self.previous_geometry();
++                let start = *self.start();
++                let now = Instant::now();
++                let p = now.duration_since(start).min(ANIMATION_DURATION).as_secs_f64()
++                    / ANIMATION_DURATION.as_secs_f64();
++
++                let spring_p = if !fx.spring_bounce_enabled {
++                    ease(EaseInOutCubic, 0.0, 1.0, p)
++                } else if p >= 1.0 {
++                    1.0
++                } else {
++                    let env = (-3.8 * p).exp();
++                    let osc = (6.8 * p).cos();
++                    1.0 - env * osc
++                };
++
++                let x = previous_rect.loc.x as f64 + (target_geometry.loc.x - previous_rect.loc.x) as f64 * spring_p;
++                let y = previous_rect.loc.y as f64 + (target_geometry.loc.y - previous_rect.loc.y) as f64 * spring_p;
++                let w = previous_rect.size.w as f64 + (target_geometry.size.w - previous_rect.size.w) as f64 * spring_p;
++                let h = previous_rect.size.h as f64 + (target_geometry.size.h - previous_rect.size.h) as f64 * spring_p;
++
++                return Rectangle::new(
++                    Point::from((x.round() as i32, y.round() as i32)),
++                    Size::from((w.round().max(20.0) as i32, h.round().max(20.0) as i32)),
++                );
+             }
+-        };
+-        let previous_rect = *self.previous_geometry();
+-        let start = *self.start();
+-        let now = Instant::now();
+-        let progress =
+-            now.duration_since(start).min(duration).as_secs_f64() / duration.as_secs_f64();
+-
+-        ease(
+-            EaseInOutCubic,
+-            EaseRectangle(previous_rect),
+-            EaseRectangle(target_rect),
+-            progress,
+-        )
+-        .unwrap()
++        }
+     }
+ }
+ 
+@@ -372,6 +477,7 @@ impl FloatingLayout {
+         mapped.moved_since_mapped.store(true, Ordering::SeqCst);
+ 
+         if animate {
++            crate::config::fx::play_sound_maximize();
+             if let Some(existing_anim) = self.animations.get_mut(&mapped) {
+                 match existing_anim {
+                     Animation::Unminimize {
+@@ -379,7 +485,12 @@ impl FloatingLayout {
+                     } => {
+                         *target_geometry = geometry;
+                     }
+-                    Animation::Minimize { .. } | Animation::Tiled { .. } => {}
++                    Animation::Open {
++                        geometry: open_geom, ..
++                    } => {
++                        *open_geom = geometry;
++                    }
++                    Animation::Minimize { .. } | Animation::Tiled { .. } | Animation::Close { .. } => {}
+                 }
+             } else {
+                 self.animations.insert(
+@@ -616,6 +727,15 @@ impl FloatingLayout {
+                     previous_geometry,
+                 },
+             );
++        } else {
++            crate::config::fx::play_sound_open();
++            self.animations.insert(
++                mapped.clone(),
++                Animation::Open {
++                    start: Instant::now(),
++                    geometry: Rectangle::new(position, win_geo.size),
++                },
++            );
+         }
+         self.space.map_element(mapped, position.as_logical(), false);
+         self.space.refresh();
+@@ -671,6 +791,7 @@ impl FloatingLayout {
+         let _ = self.animations.remove(window);
+ 
+         if let Some(to) = to {
++            crate::config::fx::play_sound_minimize();
+             self.animations.insert(
+                 window.clone(),
+                 Animation::Minimize {
+@@ -685,6 +806,21 @@ impl FloatingLayout {
+                     target_geometry: to,
+                 },
+             );
++        } else {
++            crate::config::fx::play_sound_close();
++            self.animations.insert(
++                window.clone(),
++                Animation::Close {
++                    start: Instant::now(),
++                    previous_geometry: if window.is_maximized(false) {
++                        let output = self.space.outputs().next().unwrap();
++                        let layers = layer_map_for_output(output);
++                        layers.non_exclusive_zone().as_local()
++                    } else {
++                        mapped_geometry
++                    },
++                },
++            );
+         }
+ 
+         if window.floating_tiled.lock().unwrap().take().is_some() {
+@@ -1417,6 +1553,8 @@ impl FloatingLayout {
+         self.animations.retain(|_, anim| {
+             let duration = match anim {
+                 Animation::Tiled { .. } => ANIMATION_DURATION,
++                Animation::Open { .. } => OPEN_ANIMATION_DURATION,
++                Animation::Close { .. } => CLOSE_ANIMATION_DURATION,
+                 _ => MINIMIZE_ANIMATION_DURATION,
+             };
+             Instant::now().duration_since(*anim.start()) < duration
+@@ -1458,7 +1596,7 @@ impl FloatingLayout {
+         for elem in self
+             .animations
+             .iter()
+-            .filter(|(_, anim)| matches!(anim, Animation::Minimize { .. }))
++            .filter(|(_, anim)| matches!(anim, Animation::Minimize { .. } | Animation::Close { .. }))
+             .map(|(elem, _)| elem)
+             .chain(self.space.elements().rev())
+         {
+@@ -1491,7 +1629,7 @@ impl FloatingLayout {
+         indicator_thickness: u8,
+         alpha: f32,
+         theme: &cosmic::theme::CosmicTheme,
+-        scanout_node: Option<DrmNode>,
++        _scanout_node: Option<DrmNode>,
+         push: &mut dyn FnMut(CosmicMappedRenderElement<R>),
+     ) where
+         R: AsGlowRenderer,
+@@ -1511,7 +1649,7 @@ impl FloatingLayout {
+         for elem in self
+             .animations
+             .iter()
+-            .filter(|(_, anim)| matches!(anim, Animation::Minimize { .. }))
++            .filter(|(_, anim)| matches!(anim, Animation::Minimize { .. } | Animation::Close { .. }))
+             .map(|(elem, _)| elem)
+             .chain(self.space.elements().rev())
+         {
+@@ -1523,21 +1661,135 @@ impl FloatingLayout {
+             let render_location = geometry.loc - elem.geometry().loc.as_local();
+ 
+             let maybe_map = if let Some(anim) = self.animations.get(elem) {
+-                let original_geo = anim.previous_geometry();
+-                geometry = anim.geometry(
+-                    output_geometry,
+-                    self.space
+-                        .element_geometry(elem)
+-                        .map(RectExt::as_local)
+-                        .unwrap_or(geometry),
+-                    elem.floating_tiled.lock().unwrap().as_ref(),
+-                    self.gaps(),
+-                );
++                let fx = crate::config::fx::FxConfig::current();
++                let (scale, offset) = match anim {
++                    Animation::Open { start, geometry: win_geo } => {
++                        let p = Instant::now()
++                            .duration_since(*start)
++                            .min(OPEN_ANIMATION_DURATION)
++                            .as_secs_f64()
++                            / OPEN_ANIMATION_DURATION.as_secs_f64();
++
++                        let (s, y_glide) = if fx.spring_bounce_enabled {
++                            let env = (-4.2 * p).exp();
++                            let osc = (7.5 * p).cos();
++                            let progress = 1.0 - env * osc;
++                            let s = 0.50 + 0.50 * progress;
++                            let y_glide = ((1.0 - progress) * 48.0).round() as i32;
++                            (s, y_glide)
++                        } else {
++                            let s = 0.85 + 0.15 * ease(EaseInOutCubic, 0.0, 1.0, p);
++                            (s, 0)
++                        };
++
++                        let offset_x = ((1.0 - s) * 0.5 * win_geo.size.w as f64).round() as i32;
++                        let offset_y = ((1.0 - s) * 0.5 * win_geo.size.h as f64).round() as i32 + y_glide;
++
++                        (Scale { x: s, y: s }, Point::from((offset_x, offset_y)))
++                    }
++                    Animation::Close { start, previous_geometry: win_geo } => {
++                        let p = Instant::now()
++                            .duration_since(*start)
++                            .min(CLOSE_ANIMATION_DURATION)
++                            .as_secs_f64()
++                            / CLOSE_ANIMATION_DURATION.as_secs_f64();
++
++                        let (sx, sy, y_float) = match fx.close_animation_style.as_str() {
++                            "pop_bubble" => {
++                                if p < 0.18 {
++                                    // Fase 1 (Anticipación / Squat): Compresión vertical acumulando tensión elástica
++                                    let t = p / 0.18;
++                                    let curve = (t * std::f64::consts::FRAC_PI_2).sin();
++                                    let sx = 1.00 - 0.04 * curve;
++                                    let sy = 1.00 - 0.09 * curve;
++                                    let y = (4.0 * curve).round() as i32;
++                                    (sx, sy, y)
++                                } else if p < 0.44 {
++                                    // Fase 2 (Estallido Pop! & Salto Flotante): Apertura explosiva y elevación
++                                    let t = (p - 0.18) / 0.26;
++                                    let curve = (t * std::f64::consts::FRAC_PI_2).sin();
++                                    let sx = 0.96 + 0.22 * curve;
++                                    let sy = 0.91 + 0.33 * curve;
++                                    let y = 4 - (22.0 * curve).round() as i32;
++                                    (sx, sy, y)
++                                } else {
++                                    // Fase 3 (Dispersión de Onda y Evaporación): Flotación suave mientras se desvanece
++                                    let t = (p - 0.44) / 0.56;
++                                    let curve = 1.0 - (1.0 - t).powi(2);
++                                    let sx = 1.18 + 0.10 * curve;
++                                    let sy = 1.24 + 0.08 * curve;
++                                    let y = -18 - (8.0 * curve).round() as i32;
++                                    (sx, sy, y)
++                                }
++                            }
++                            "glide" => {
++                                if p < 0.30 {
++                                    let pop_t = p / 0.30;
++                                    let pop = (std::f64::consts::PI * pop_t).sin() * 0.09;
++                                    let lift = -(std::f64::consts::PI * pop_t).sin() * 12.0;
++                                    (1.00 + pop, 1.00 + pop, lift.round() as i32)
++                                } else {
++                                    let collapse_t = (p - 0.30) / 0.70;
++                                    let s = (1.09 * (1.0 - collapse_t.powi(2))).max(0.01);
++                                    let sink = (collapse_t.powi(2) * 42.0).round() as i32;
++                                    (s, s, sink)
++                                }
++                            }
++                            _ => {
++                                if fx.spring_bounce_enabled {
++                                    if p < 0.18 {
++                                        let t = p / 0.18;
++                                        let curve = (t * std::f64::consts::FRAC_PI_2).sin();
++                                        let sx = 1.00 - 0.04 * curve;
++                                        let sy = 1.00 - 0.09 * curve;
++                                        let y = (4.0 * curve).round() as i32;
++                                        (sx, sy, y)
++                                    } else if p < 0.44 {
++                                        let t = (p - 0.18) / 0.26;
++                                        let curve = (t * std::f64::consts::FRAC_PI_2).sin();
++                                        let sx = 0.96 + 0.22 * curve;
++                                        let sy = 0.91 + 0.33 * curve;
++                                        let y = 4 - (22.0 * curve).round() as i32;
++                                        (sx, sy, y)
++                                    } else {
++                                        let t = (p - 0.44) / 0.56;
++                                        let curve = 1.0 - (1.0 - t).powi(2);
++                                        let sx = 1.18 + 0.10 * curve;
++                                        let sy = 1.24 + 0.08 * curve;
++                                        let y = -18 - (8.0 * curve).round() as i32;
++                                        (sx, sy, y)
++                                    }
++                                } else {
++                                    let s = 1.0 - 0.15 * p;
++                                    (s, s, 0)
++                                }
++                            }
++                        };
++
++                        let offset_x = ((1.0 - sx) * 0.5 * win_geo.size.w as f64).round() as i32;
++                        let offset_y = ((1.0 - sy) * 0.5 * win_geo.size.h as f64).round() as i32 + y_float;
++
++                        (Scale { x: sx, y: sy }, Point::from((offset_x, offset_y)))
++                    }
++                    _ => {
++                        let original_geo = *anim.previous_geometry();
++                        geometry = anim.geometry(
++                            output_geometry,
++                            self.space
++                                .element_geometry(elem)
++                                .map(RectExt::as_local)
++                                .unwrap_or(geometry),
++                            elem.floating_tiled.lock().unwrap().as_ref(),
++                            self.gaps(),
++                        );
+ 
+-                let buffer_size = elem.geometry().size;
+-                let scale = Scale {
+-                    x: geometry.size.w as f64 / buffer_size.w as f64,
+-                    y: geometry.size.h as f64 / buffer_size.h as f64,
++                        let buffer_size = elem.geometry().size;
++                        let scale = Scale {
++                            x: if buffer_size.w > 0 { geometry.size.w as f64 / buffer_size.w as f64 } else { 1.0 },
++                            y: if buffer_size.h > 0 { geometry.size.h as f64 / buffer_size.h as f64 } else { 1.0 },
++                        };
++                        (scale, geometry.loc - original_geo.loc)
++                    }
+                 };
+ 
+                 Some(move |element| match element {
+@@ -1545,8 +1797,7 @@ impl FloatingLayout {
+                         CosmicMappedRenderElement::MovingStack({
+                             let rescaled = RescaleRenderElement::from_element(
+                                 elem,
+-                                original_geo
+-                                    .loc
++                                render_location
+                                     .as_logical()
+                                     .to_physical_precise_round(output_scale),
+                                 scale,
+@@ -1554,7 +1805,7 @@ impl FloatingLayout {
+ 
+                             RelocateRenderElement::from_element(
+                                 rescaled,
+-                                (geometry.loc - original_geo.loc)
++                                offset
+                                     .as_logical()
+                                     .to_physical_precise_round(output_scale),
+                                 Relocate::Relative,
+@@ -1565,8 +1816,7 @@ impl FloatingLayout {
+                         CosmicMappedRenderElement::MovingWindow({
+                             let rescaled = RescaleRenderElement::from_element(
+                                 elem,
+-                                original_geo
+-                                    .loc
++                                render_location
+                                     .as_logical()
+                                     .to_physical_precise_round(output_scale),
+                                 scale,
+@@ -1574,7 +1824,7 @@ impl FloatingLayout {
+ 
+                             RelocateRenderElement::from_element(
+                                 rescaled,
+-                                (geometry.loc - original_geo.loc)
++                                offset
+                                     .as_logical()
+                                     .to_physical_precise_round(output_scale),
+                                 Relocate::Relative,
+@@ -1587,44 +1837,52 @@ impl FloatingLayout {
+                 None
+             };
+ 
+-            if focused == Some(elem) && !elem.is_maximized(false) {
+-                let active_window_hint = crate::theme::active_window_hint(theme);
+-                let radius = elem.corner_radius(geometry.size.as_logical(), indicator_thickness);
+-
+-                if let Some((mode, resize)) = resize_indicator.as_mut() {
+-                    let mut resize_geometry = geometry;
+-                    resize_geometry.loc -= (18, 18).into();
+-                    resize_geometry.size += (36, 36).into();
++            let is_focused = focused == Some(elem) || (focused.is_none() && self.space.elements().count() == 1);
++            if is_focused && !elem.is_maximized(false) {
++                let fx = crate::config::fx::FxConfig::current();
++                let thickness = if fx.focus_glow_enabled {
++                    indicator_thickness.max(3)
++                } else {
++                    indicator_thickness
++                };
+ 
+-                    resize.resize(resize_geometry.size.as_logical());
+-                    resize.output_enter(output);
+-                    resize.push_render_elements(
+-                        renderer,
+-                        resize_geometry
+-                            .loc
+-                            .as_logical()
+-                            .to_physical_precise_round(output_scale),
+-                        output_scale.into(),
+-                        alpha * mode.alpha().unwrap_or(1.0),
+-                        &mut |elem| push(CosmicMappedRenderElement::Window(elem.into())),
+-                        None,
+-                    );
+-                }
++                if thickness > 0 {
++                    let accent = if fx.focus_glow_enabled {
++                        theme.accent_color()
++                    } else {
++                        crate::theme::active_window_hint(theme)
++                    };
++                    let radius = elem.corner_radius(geometry.size.as_logical(), thickness);
++
++                    if let Some((mode, resize)) = resize_indicator.as_mut() {
++                        let mut resize_geometry = geometry;
++                        resize_geometry.loc -= (18, 18).into();
++                        resize_geometry.size += (36, 36).into();
++
++                        resize.resize(resize_geometry.size.as_logical());
++                        resize.output_enter(output);
++                        resize.push_render_elements(
++                            renderer,
++                            resize_geometry
++                                .loc
++                                .as_logical()
++                                .to_physical_precise_round(output_scale),
++                            output_scale.into(),
++                            alpha * mode.alpha().unwrap_or(1.0),
++                            &mut |elem| push(CosmicMappedRenderElement::Window(elem.into())),
++                            None,
++                        );
++                    }
+ 
+-                if indicator_thickness > 0 {
+                     let element = IndicatorShader::focus_element(
+                         renderer,
+                         Key::Window(Usage::FocusIndicator, elem.key()),
+                         geometry,
+-                        indicator_thickness,
++                        thickness,
+                         radius,
+-                        alpha,
++                        alpha * 0.95,
+                         output_scale,
+-                        [
+-                            active_window_hint.red,
+-                            active_window_hint.green,
+-                            active_window_hint.blue,
+-                        ],
++                        [accent.red, accent.green, accent.blue],
+                     );
+                     push(element.into());
+                 }
+@@ -1638,6 +1896,11 @@ impl FloatingLayout {
+                 }
+             };
+ 
++            // Floating windows have rounded corners and gaussian drop shadows:
++            // Always compose via OpenGL (disable direct scanout) to eliminate rectangular tearing/black corners.
++            let scanout_override = Some(false);
++            let effective_scanout = None;
++
+             elem.push_render_elements(
+                 renderer,
+                 render_location
+@@ -1646,8 +1909,8 @@ impl FloatingLayout {
+                 None,
+                 output_scale.into(),
+                 alpha,
+-                None,
+-                scanout_node,
++                scanout_override,
++                effective_scanout,
+                 &mut |elem| push(map_anim(elem)),
+                 &mut |elem| lower_elements.push(map_anim(elem)),
+             );
+diff --git a/src/shell/mod.rs b/src/shell/mod.rs
+index 8439b13f..df274be9 100644
+--- a/src/shell/mod.rs
++++ b/src/shell/mod.rs
+@@ -19,10 +19,7 @@ use crate::{
+     utils,
+     wayland::{
+         handlers::data_device::{self, get_dnd_icon},
+-        protocols::{
+-            session_lock_layer::layer_show_on_lock,
+-            workspace::{State as WState, WorkspaceCapabilities},
+-        },
++        protocols::workspace::{State as WState, WorkspaceCapabilities},
+     },
+ };
+ use cosmic_comp_config::{
+@@ -1501,6 +1498,23 @@ impl Workspaces {
+         self.apply_tile_change(guard, seats);
+     }
+ 
++    pub fn set_all_workspaces_tiling(
++        &mut self,
++        tiling: bool,
++        seat: &Seat<State>,
++        guard: &mut WorkspaceUpdateGuard<'_, State>,
++    ) {
++        self.autotile = tiling;
++        for (_, set) in &mut self.sets {
++            set.tiling_enabled = tiling;
++            for w in &mut set.workspaces {
++                if w.tiling_enabled != tiling {
++                    w.set_tiling(tiling, seat, guard);
++                }
++            }
++        }
++    }
++
+     pub fn persist(&self, config: &Config) {
+         let pinned_workspaces: Vec<PinnedWorkspace> = self
+             .sets
+@@ -2049,27 +2063,12 @@ impl Shell {
+     }
+ 
+     pub fn visible_output_for_surface(&self, surface: &WlSurface) -> Option<&Output> {
+-        // NOTE: Keep in sync with surface iteration in `render_input_order_internal`
+-
+         if let Some(session_lock) = &self.session_lock {
+-            if let Some((output, _)) = session_lock
++            return session_lock
+                 .surfaces
+                 .iter()
+                 .find(|(_, v)| v.wl_surface() == surface)
+-            {
+-                return Some(output);
+-            }
+-            for o in self.outputs() {
+-                let map = layer_map_for_output(o);
+-                if let Some(layer_surface) = map.layer_for_surface(surface, WindowSurfaceType::ALL)
+-                {
+-                    if layer_show_on_lock(layer_surface.wl_surface()) {
+-                        return Some(o);
+-                    } else {
+-                        return None;
+-                    }
+-                }
+-            }
++                .map(|(k, _)| k);
+         }
+ 
+         self.outputs()
+@@ -4416,6 +4415,7 @@ impl Shell {
+                 .map(|i| set.minimized_windows.swap_remove(i))
+                 .map(|window| (set, window))
+         }) {
++            crate::config::fx::play_sound_open();
+             let MinimizedWindow::Floating { window, previous } = window else {
+                 unreachable!("None sticky window in WorkspaceSet minimized_windows");
+             };
+@@ -4439,6 +4439,7 @@ impl Shell {
+                 return;
+             };
+ 
++            crate::config::fx::play_sound_open();
+             if window.mapped().is_some_and(|m| m.is_stack()) {
+                 window.mapped().unwrap().set_active(surface);
+             }
+@@ -4504,6 +4505,14 @@ impl Shell {
+             if let Some(state) = state.take() {
+                 assert_eq!(state.original_layer, ManagedLayer::Sticky);
+ 
++                if !set
++                    .minimized_windows
++                    .iter()
++                    .any(|m| m.mapped().is_some_and(|m| m == mapped))
++                {
++                    crate::config::fx::play_sound_maximize();
++                }
++
+                 if let Some(minimized) = set
+                     .minimized_windows
+                     .iter_mut()
+diff --git a/src/shell/workspace.rs b/src/shell/workspace.rs
+index 84a020ff..35433064 100644
+--- a/src/shell/workspace.rs
++++ b/src/shell/workspace.rs
+@@ -996,6 +996,9 @@ impl Workspace {
+     pub fn unmaximize_request(&mut self, elem: &CosmicMapped) -> Option<Rectangle<i32, Local>> {
+         let mut state = elem.maximized_state.lock().unwrap();
+         if let Some(state) = state.take() {
++            if !self.minimized_windows.iter().any(|m| m == elem) {
++                crate::config::fx::play_sound_maximize();
++            }
+             if let Some(minimized) = self.minimized_windows.iter_mut().find(|m| *m == elem) {
+                 minimized.unmaximize(state.original_geometry, state.original_snapped);
+                 Some(state.original_geometry)
+diff --git a/src/state.rs b/src/state.rs
+index d605c736..28ed8fd4 100644
+--- a/src/state.rs
++++ b/src/state.rs
+@@ -23,7 +23,6 @@ use crate::{
+             output_configuration::OutputConfigurationState,
+             output_power::OutputPowerState,
+             overlap_notify::OverlapNotifyState,
+-            session_lock_layer::SessionLockLayerState,
+             toplevel_info::ToplevelInfoState,
+             toplevel_management::{ManagementCapabilities, ToplevelManagementState},
+             workspace::{WorkspaceState, WorkspaceUpdateGuard},
+@@ -321,7 +320,6 @@ pub struct Common {
+     pub xwayland_state: Option<XWaylandState>,
+     pub xwayland_shell_state: XWaylandShellState,
+     pub pointer_focus_state: Option<PointerFocusState>,
+-    pub session_lock_layer_state: SessionLockLayerState,
+ 
+     #[cfg(feature = "logind")]
+     pub inhibit_lid_fd: Option<OwnedFd>,
+@@ -765,9 +763,6 @@ impl State {
+ 
+         let dbus_state = DBusState::init(&handle);
+ 
+-        let session_lock_layer_state =
+-            SessionLockLayerState::new::<State, _>(dh, client_not_sandboxed);
+-
+         State {
+             common: Common {
+                 config,
+@@ -835,7 +830,6 @@ impl State {
+                 pointer_focus_state: None,
+                 dbus_state,
+                 keyboard_layout_state,
+-                session_lock_layer_state,
+ 
+                 #[cfg(feature = "logind")]
+                 inhibit_lid_fd: None,
+@@ -974,8 +968,6 @@ impl Common {
+         output: &Output,
+         render_element_states: &RenderElementStates,
+     ) {
+-        // NOTE: Keep in sync with surface iteration in `render_input_order_internal`
+-
+         let shell = self.shell.read();
+         let processor = |namespace: Option<usize>| {
+             move |surface: &WlSurface, states: &SurfaceData| {
+@@ -1082,8 +1074,6 @@ impl Common {
+         render_element_states: &RenderElementStates,
+         mut dmabuf_feedback: impl FnMut(DrmNode) -> Option<SurfaceDmabufFeedback>,
+     ) {
+-        // NOTE: Keep in sync with surface iteration in `render_input_order_internal`
+-
+         let shell = self.shell.read();
+ 
+         if let Some(session_lock) = shell.session_lock.as_ref()
+@@ -1297,8 +1287,6 @@ impl Common {
+ 
+     #[profiling::function]
+     pub fn send_frames(&self, output: &Output, sequence: Option<usize>) {
+-        // NOTE: Keep in sync with surface iteration in `render_input_order_internal`
+-
+         let time = self.clock.now();
+         let should_send = |surface: &WlSurface, states: &SurfaceData| {
+             // Do the standard primary scanout output check. For pointer surfaces it deduplicates
+diff --git a/src/wayland/protocols/mod.rs b/src/wayland/protocols/mod.rs
+index 48aa8337..c6c0234a 100644
+--- a/src/wayland/protocols/mod.rs
++++ b/src/wayland/protocols/mod.rs
+@@ -8,7 +8,6 @@ pub mod keyboard_layout;
+ pub mod output_configuration;
+ pub mod output_power;
+ pub mod overlap_notify;
+-pub mod session_lock_layer;
+ pub mod toplevel_info;
+ pub mod toplevel_management;
+ pub mod workspace;
+diff --git a/src/wayland/protocols/session_lock_layer.rs b/src/wayland/protocols/session_lock_layer.rs
+deleted file mode 100644
+index 85edda50..00000000
+--- a/src/wayland/protocols/session_lock_layer.rs
++++ /dev/null
+@@ -1,136 +0,0 @@
+-use cosmic_protocols::session_lock_layer::v1::server::cosmic_session_lock_layer_manager_v1;
+-use smithay::{
+-    reexports::wayland_server::{
+-        Client, DataInit, Dispatch, DisplayHandle, GlobalDispatch, New, backend::GlobalId,
+-        protocol::wl_surface,
+-    },
+-    wayland::{
+-        Dispatch2, GlobalDispatch2,
+-        compositor::{Cacheable, with_states},
+-        shell::wlr_layer::WlrLayerShellHandler,
+-    },
+-};
+-
+-struct SessionLockLayerData;
+-
+-#[derive(Debug)]
+-pub struct SessionLockLayerState {
+-    global: GlobalId,
+-}
+-
+-impl SessionLockLayerState {
+-    pub fn new<D, F>(dh: &DisplayHandle, client_filter: F) -> Self
+-    where
+-        F: for<'a> Fn(&'a Client) -> bool + Clone + Send + Sync + 'static,
+-        D: GlobalDispatch<
+-                cosmic_session_lock_layer_manager_v1::CosmicSessionLockLayerManagerV1,
+-                SessionLockLayerGlobalData,
+-            > + 'static,
+-    {
+-        let global = dh
+-            .create_global::<D, cosmic_session_lock_layer_manager_v1::CosmicSessionLockLayerManagerV1, _>(
+-                1,
+-                SessionLockLayerGlobalData {
+-                    filter: Box::new(client_filter.clone()),
+-                },
+-            );
+-        Self { global }
+-    }
+-
+-    pub fn global_id(&self) -> GlobalId {
+-        self.global.clone()
+-    }
+-}
+-
+-#[doc(hidden)]
+-pub struct SessionLockLayerGlobalData {
+-    filter: Box<dyn for<'a> Fn(&'a Client) -> bool + Send + Sync>,
+-}
+-
+-impl<D> GlobalDispatch2<cosmic_session_lock_layer_manager_v1::CosmicSessionLockLayerManagerV1, D>
+-    for SessionLockLayerGlobalData
+-where
+-    D: Dispatch<
+-            cosmic_session_lock_layer_manager_v1::CosmicSessionLockLayerManagerV1,
+-            SessionLockLayerData,
+-        >,
+-{
+-    fn bind(
+-        &self,
+-        _state: &mut D,
+-        _handle: &DisplayHandle,
+-        _client: &Client,
+-        resource: New<cosmic_session_lock_layer_manager_v1::CosmicSessionLockLayerManagerV1>,
+-        data_init: &mut DataInit<'_, D>,
+-    ) {
+-        data_init.init(resource, SessionLockLayerData);
+-    }
+-
+-    fn can_view(&self, client: &Client) -> bool {
+-        (self.filter)(client)
+-    }
+-}
+-
+-#[derive(Clone, Copy, Default)]
+-struct SessionLockLayerSurfaceData {
+-    show_on_lock: bool,
+-}
+-
+-impl Cacheable for SessionLockLayerSurfaceData {
+-    fn commit(&mut self, _dh: &DisplayHandle) -> Self {
+-        *self
+-    }
+-
+-    fn merge_into(self, into: &mut Self, _dh: &DisplayHandle) {
+-        *into = self;
+-    }
+-}
+-
+-pub fn layer_show_on_lock(wl_surface: &wl_surface::WlSurface) -> bool {
+-    with_states(wl_surface, |states| {
+-        if states.cached_state.has::<SessionLockLayerSurfaceData>() {
+-            let mut state = states.cached_state.get::<SessionLockLayerSurfaceData>();
+-            state.current().show_on_lock
+-        } else {
+-            false
+-        }
+-    })
+-}
+-
+-impl<D> Dispatch2<cosmic_session_lock_layer_manager_v1::CosmicSessionLockLayerManagerV1, D>
+-    for SessionLockLayerData
+-where
+-    D: WlrLayerShellHandler,
+-{
+-    fn request(
+-        &self,
+-        state: &mut D,
+-        _: &Client,
+-        _: &cosmic_session_lock_layer_manager_v1::CosmicSessionLockLayerManagerV1,
+-        request: cosmic_session_lock_layer_manager_v1::Request,
+-        _: &DisplayHandle,
+-        _: &mut DataInit<'_, D>,
+-    ) {
+-        let (layer, value) = match request {
+-            cosmic_session_lock_layer_manager_v1::Request::SetShowOnLock { layer } => (layer, true),
+-            cosmic_session_lock_layer_manager_v1::Request::UnsetShowOnLock { layer } => {
+-                (layer, false)
+-            }
+-            cosmic_session_lock_layer_manager_v1::Request::Destroy => {
+-                return;
+-            }
+-            _ => unreachable!(),
+-        };
+-
+-        if let Some(layer) = state
+-            .shell_state()
+-            .layer_surfaces()
+-            .find(|surface| surface.shell_surface() == &layer)
+-        {
+-            with_states(layer.wl_surface(), |states| {
+-                let mut state = states.cached_state.get::<SessionLockLayerSurfaceData>();
+-                state.pending().show_on_lock = value;
+-            });
+-        }
+-    }
+-}

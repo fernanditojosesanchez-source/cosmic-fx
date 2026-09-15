@@ -1,0 +1,14 @@
+# Build artifacts
+build/
+dist/
+bin/cosmic-comp
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# OS artifacts
+.DS_Store
+*.swp
+*~

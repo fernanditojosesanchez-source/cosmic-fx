@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+set -e
+
+# Archivos de configuración objetivo (tanto en sesión normal como en sandbox anidado)
+PATHS=(
+    "$HOME/.config/cosmic/cosmic-comp-fx.json"
+    "/tmp/cosmic-lab-config/cosmic-comp-fx.json"
+)
+
+# Asegurar directorios
+for p in "${PATHS[@]}"; do
+    mkdir -p "$(dirname "$p")"
+done
+
+write_config() {
+    local json="$1"
+    for p in "${PATHS[@]}"; do
+        echo "$json" > "$p"
+    done
+}
+
+get_active_file() {
+    if [ -f "/tmp/cosmic-lab-config/cosmic-comp-fx.json" ]; then
+        echo "/tmp/cosmic-lab-config/cosmic-comp-fx.json"
+    else
+        echo "$HOME/.config/cosmic/cosmic-comp-fx.json"
+    fi
+}
+
+CMD="${1:-status}"
+
+case "$CMD" in
+    preset)
+        PRESET="${2:-snappy}"
+        case "$PRESET" in
+            intense|boom)
+                write_config '{
+  "preset": "intense",
+  "wobbly_enabled": true,
+  "wobbly_intensity": 2.2,
+  "spring_bounce_enabled": true,
+  "focus_glow_enabled": true,
+  "card_lift_enabled": true,
+  "pendulum_tilt_enabled": true,
+  "floating_mode": true,
+  "pop_sound_enabled": true,
+  "pop_sound_effect": "volume_bubble",
+  "pop_sound_on_close": true,
+  "pop_sound_on_open": true,
+  "pop_sound_on_maximize": true,
+  "pop_sound_on_minimize": true,
+  "close_animation_style": "pop_bubble"
+}'
+                echo "💥 Perfil INTENSE (Compiz Boom) aplicado con éxito en tiempo real!"
+                ;;
+            subtle|smooth)
+                write_config '{
+  "preset": "subtle",
+  "wobbly_enabled": true,
+  "wobbly_intensity": 0.5,
+  "spring_bounce_enabled": true,
+  "focus_glow_enabled": true,
+  "card_lift_enabled": true,
+  "pendulum_tilt_enabled": true,
+  "floating_mode": true,
+  "pop_sound_enabled": true,
+  "pop_sound_effect": "volume_bubble",
+  "pop_sound_on_close": true,
+  "pop_sound_on_open": true,
+  "pop_sound_on_maximize": true,
+  "pop_sound_on_minimize": false,
+  "close_animation_style": "pop_bubble"
+}'
+                echo "🍃 Perfil SUBTLE (Micro-interacciones suaves) aplicado con éxito en tiempo real!"
+                ;;
+            off|disabled)
+                write_config '{
+  "preset": "off",
+  "wobbly_enabled": false,
+  "wobbly_intensity": 0.0,
+  "spring_bounce_enabled": false,
+  "focus_glow_enabled": false,
+  "card_lift_enabled": false,
+  "pendulum_tilt_enabled": false,
+  "floating_mode": false,
+  "pop_sound_enabled": false,
+  "pop_sound_effect": "volume_bubble",
+  "pop_sound_on_close": false,
+  "pop_sound_on_open": false,
+  "pop_sound_on_maximize": false,
+  "pop_sound_on_minimize": false,
+  "close_animation_style": "classic"
+}'
+                echo "🛑 Perfil OFF (Modo de fábrica rígido) aplicado con éxito en tiempo real!"
+                ;;
+            *)
+                write_config '{
+  "preset": "snappy",
+  "wobbly_enabled": true,
+  "wobbly_intensity": 1.0,
+  "spring_bounce_enabled": true,
+  "focus_glow_enabled": true,
+  "card_lift_enabled": true,
+  "pendulum_tilt_enabled": true,
+  "floating_mode": true,
+  "pop_sound_enabled": true,
+  "pop_sound_effect": "volume_bubble",
+  "pop_sound_on_close": true,
+  "pop_sound_on_open": true,
+  "pop_sound_on_maximize": true,
+  "pop_sound_on_minimize": false,
+  "close_animation_style": "pop_bubble"
+}'
+                echo "✨ Perfil SNAPPY (Equilibrado y reactivo) aplicado con éxito en tiempo real!"
+                ;;
+        esac
+        ;;
+    status)
+        FILE=$(get_active_file)
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "🎛️  ESTADO ACTUAL DE COSMIC COMP FX (Configuración en Vivo)"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        if [ -f "$FILE" ]; then
+            cat "$FILE"
+        else
+            echo "Aún no se ha generado archivo de configuración; se usan valores por defecto (snappy)."
+        fi
+        echo ""
+        echo "Uso rápido:"
+        echo "  ./cosmic-fx preset snappy   -> Equilibrado, inercia ágil (12px), resorte y halo cian"
+        echo "  ./cosmic-fx preset intense  -> Máxima elasticidad Compiz Boom"
+        echo "  ./cosmic-fx preset subtle   -> Físicas ultra suaves y sobrias"
+        echo "  ./cosmic-fx preset off      -> Desactiva todas las físicas (modo estándar fábrica)"
+        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        ;;
+    *)
+        echo "Uso: ./cosmic-fx [preset <snappy|intense|subtle|off> | status]"
+        exit 1
+        ;;
+esac

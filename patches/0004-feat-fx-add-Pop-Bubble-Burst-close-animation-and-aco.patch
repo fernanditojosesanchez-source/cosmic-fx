@@ -1,0 +1,215 @@
+From 516b0c79be82fe4ce64665e5df7f1df42dfebb66 Mon Sep 17 00:00:00 2001
+From: Fher Sanchez <fernanditojosesanchez-source@users.noreply.github.com>
+Date: Mon, 14 Sep 2026 15:23:34 -0600
+Subject: [PATCH 4/7] feat(fx): add Pop! Bubble Burst close animation and
+ acoustic volume pop feedback
+
+---
+ src/config/fx.rs                 | 51 +++++++++++++++++++++-
+ src/shell/layout/floating/mod.rs | 74 ++++++++++++++++++++++++--------
+ 2 files changed, 106 insertions(+), 19 deletions(-)
+
+diff --git a/src/config/fx.rs b/src/config/fx.rs
+index b27058a5..c7e0e6d8 100644
+--- a/src/config/fx.rs
++++ b/src/config/fx.rs
+@@ -17,14 +17,22 @@ pub struct FxConfig {
+     pub focus_glow_enabled: bool,
+     pub card_lift_enabled: bool,
+     pub pendulum_tilt_enabled: bool,
+-    #[serde(default = "default_floating_mode")]
++    #[serde(default = "default_true")]
+     pub floating_mode: bool,
++    #[serde(default = "default_true")]
++    pub pop_sound_enabled: bool,
++    #[serde(default = "default_close_style")]
++    pub close_animation_style: String,
+ }
+ 
+-fn default_floating_mode() -> bool {
++fn default_true() -> bool {
+     true
+ }
+ 
++fn default_close_style() -> String {
++    "pop_bubble".to_string()
++}
++
+ impl Default for FxConfig {
+     fn default() -> Self {
+         Self::preset_snappy()
+@@ -50,6 +58,8 @@ impl FxConfig {
+             card_lift_enabled: true,
+             pendulum_tilt_enabled: true,
+             floating_mode: true,
++            pop_sound_enabled: true,
++            close_animation_style: "pop_bubble".to_string(),
+         }
+     }
+ 
+@@ -63,6 +73,8 @@ impl FxConfig {
+             card_lift_enabled: true,
+             pendulum_tilt_enabled: true,
+             floating_mode: true,
++            pop_sound_enabled: true,
++            close_animation_style: "pop_bubble".to_string(),
+         }
+     }
+ 
+@@ -76,6 +88,8 @@ impl FxConfig {
+             card_lift_enabled: true,
+             pendulum_tilt_enabled: true,
+             floating_mode: true,
++            pop_sound_enabled: true,
++            close_animation_style: "pop_bubble".to_string(),
+         }
+     }
+ 
+@@ -89,6 +103,8 @@ impl FxConfig {
+             card_lift_enabled: false,
+             pendulum_tilt_enabled: false,
+             floating_mode: false,
++            pop_sound_enabled: false,
++            close_animation_style: "classic".to_string(),
+         }
+     }
+ 
+@@ -151,3 +167,34 @@ impl FxConfig {
+         std::fs::write(path, json)
+     }
+ }
++
++/// Reproduce de forma táctil y no bloqueante el icónico sonido de burbuja Pop! de Pop!_OS
++pub fn play_pop_sound() {
++    let cfg = FxConfig::current();
++    if !cfg.pop_sound_enabled {
++        return;
++    }
++    std::thread::spawn(|| {
++        let sound_path = "/usr/share/sounds/Pop/stereo/action/audio-volume-change.oga";
++        if !std::path::Path::new(sound_path).exists() {
++            return;
++        }
++        // Intentar primero con pw-play (PipeWire nativo de bajísima latencia)
++        let played = std::process::Command::new("pw-play")
++            .arg(sound_path)
++            .stdout(std::process::Stdio::null())
++            .stderr(std::process::Stdio::null())
++            .spawn()
++            .and_then(|mut child| child.wait())
++            .is_ok();
++
++        if !played {
++            let _ = std::process::Command::new("paplay")
++                .arg(sound_path)
++                .stdout(std::process::Stdio::null())
++                .stderr(std::process::Stdio::null())
++                .spawn()
++                .and_then(|mut child| child.wait());
++        }
++    });
++}
+diff --git a/src/shell/layout/floating/mod.rs b/src/shell/layout/floating/mod.rs
+index aada2094..aefa2e41 100644
+--- a/src/shell/layout/floating/mod.rs
++++ b/src/shell/layout/floating/mod.rs
+@@ -136,11 +136,16 @@ impl Animation {
+                     .min(CLOSE_ANIMATION_DURATION)
+                     .as_secs_f32()
+                     / CLOSE_ANIMATION_DURATION.as_secs_f32();
+-                if p < 0.30 {
+-                    1.0
++                let fx = crate::config::fx::FxConfig::current();
++                if fx.close_animation_style == "pop_bubble" || fx.spring_bounce_enabled {
++                    if p < 0.35 {
++                        1.0
++                    } else {
++                        let fade_p = (p - 0.35) / 0.65;
++                        (1.0 - fade_p.powi(2)).clamp(0.0, 1.0)
++                    }
+                 } else {
+-                    let fade_p = (p - 0.30) / 0.70;
+-                    (1.0 - fade_p.powi(2)).clamp(0.0, 1.0)
++                    (1.0 - p).clamp(0.0, 1.0)
+                 }
+             }
+         }
+@@ -799,6 +804,7 @@ impl FloatingLayout {
+                 },
+             );
+         } else {
++            crate::config::fx::play_pop_sound();
+             self.animations.insert(
+                 window.clone(),
+                 Animation::Close {
+@@ -1685,20 +1691,54 @@ impl FloatingLayout {
+                             .as_secs_f64()
+                             / CLOSE_ANIMATION_DURATION.as_secs_f64();
+ 
+-                        let (s, y_sink) = if fx.spring_bounce_enabled {
+-                            if p < 0.30 {
+-                                let pop_t = p / 0.30;
+-                                let pop = (std::f64::consts::PI * pop_t).sin() * 0.09;
+-                                let lift = -(std::f64::consts::PI * pop_t).sin() * 12.0;
+-                                (1.00 + pop, lift.round() as i32)
+-                            } else {
+-                                let collapse_t = (p - 0.30) / 0.70;
+-                                let s = (1.09 * (1.0 - collapse_t.powi(2))).max(0.01);
+-                                let sink = (collapse_t.powi(2) * 42.0).round() as i32;
+-                                (s, sink)
++                        let (s, y_sink) = match fx.close_animation_style.as_str() {
++                            "pop_bubble" => {
++                                if p < 0.18 {
++                                    let t = p / 0.18;
++                                    let s = 1.00 - 0.07 * (t * std::f64::consts::FRAC_PI_2).sin();
++                                    (s, 0)
++                                } else if p < 0.38 {
++                                    let t = (p - 0.18) / 0.20;
++                                    let s = 0.93 + 0.23 * (t * std::f64::consts::FRAC_PI_2).sin();
++                                    (s, 0)
++                                } else {
++                                    let t = (p - 0.38) / 0.62;
++                                    let s = 1.16 + 0.09 * (1.0 - (1.0 - t).powi(2));
++                                    (s, 0)
++                                }
++                            }
++                            "glide" => {
++                                if p < 0.30 {
++                                    let pop_t = p / 0.30;
++                                    let pop = (std::f64::consts::PI * pop_t).sin() * 0.09;
++                                    let lift = -(std::f64::consts::PI * pop_t).sin() * 12.0;
++                                    (1.00 + pop, lift.round() as i32)
++                                } else {
++                                    let collapse_t = (p - 0.30) / 0.70;
++                                    let s = (1.09 * (1.0 - collapse_t.powi(2))).max(0.01);
++                                    let sink = (collapse_t.powi(2) * 42.0).round() as i32;
++                                    (s, sink)
++                                }
++                            }
++                            _ => {
++                                if fx.spring_bounce_enabled {
++                                    if p < 0.18 {
++                                        let t = p / 0.18;
++                                        let s = 1.00 - 0.07 * (t * std::f64::consts::FRAC_PI_2).sin();
++                                        (s, 0)
++                                    } else if p < 0.38 {
++                                        let t = (p - 0.18) / 0.20;
++                                        let s = 0.93 + 0.23 * (t * std::f64::consts::FRAC_PI_2).sin();
++                                        (s, 0)
++                                    } else {
++                                        let t = (p - 0.38) / 0.62;
++                                        let s = 1.16 + 0.09 * (1.0 - (1.0 - t).powi(2));
++                                        (s, 0)
++                                    }
++                                } else {
++                                    (1.0 - 0.15 * p, 0)
++                                }
+                             }
+-                        } else {
+-                            (1.0 - 0.15 * p, 0)
+                         };
+ 
+                         let offset_x = ((1.0 - s) * 0.5 * win_geo.size.w as f64).round() as i32;
+-- 
+2.43.0
+

@@ -1,0 +1,121 @@
+From 4bfcc533075aa9f8e4fb4bf4df4610e04c9e8bd2 Mon Sep 17 00:00:00 2001
+From: Fher Sanchez <fernanditojosesanchez-source@users.noreply.github.com>
+Date: Mon, 14 Sep 2026 16:37:27 -0600
+Subject: [PATCH 5/7] feat(audio): default to authentic freedesktop volume
+ bubble pop and add sound effect options
+
+---
+ src/config/fx.rs                 | 31 ++++++++++++++++++++++++++++---
+ src/shell/layout/floating/mod.rs |  4 ++++
+ 2 files changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/src/config/fx.rs b/src/config/fx.rs
+index c7e0e6d8..609b65f5 100644
+--- a/src/config/fx.rs
++++ b/src/config/fx.rs
+@@ -23,16 +23,28 @@ pub struct FxConfig {
+     pub pop_sound_enabled: bool,
+     #[serde(default = "default_close_style")]
+     pub close_animation_style: String,
++    #[serde(default = "default_sound_effect")]
++    pub pop_sound_effect: String,
++    #[serde(default = "default_false")]
++    pub pop_sound_on_minimize: bool,
+ }
+ 
+ fn default_true() -> bool {
+     true
+ }
+ 
++fn default_false() -> bool {
++    false
++}
++
+ fn default_close_style() -> String {
+     "pop_bubble".to_string()
+ }
+ 
++fn default_sound_effect() -> String {
++    "volume_bubble".to_string()
++}
++
+ impl Default for FxConfig {
+     fn default() -> Self {
+         Self::preset_snappy()
+@@ -60,6 +72,8 @@ impl FxConfig {
+             floating_mode: true,
+             pop_sound_enabled: true,
+             close_animation_style: "pop_bubble".to_string(),
++            pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_minimize: false,
+         }
+     }
+ 
+@@ -75,6 +89,8 @@ impl FxConfig {
+             floating_mode: true,
+             pop_sound_enabled: true,
+             close_animation_style: "pop_bubble".to_string(),
++            pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_minimize: false,
+         }
+     }
+ 
+@@ -90,6 +106,8 @@ impl FxConfig {
+             floating_mode: true,
+             pop_sound_enabled: true,
+             close_animation_style: "pop_bubble".to_string(),
++            pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_minimize: false,
+         }
+     }
+ 
+@@ -105,6 +123,8 @@ impl FxConfig {
+             floating_mode: false,
+             pop_sound_enabled: false,
+             close_animation_style: "classic".to_string(),
++            pop_sound_effect: "volume_bubble".to_string(),
++            pop_sound_on_minimize: false,
+         }
+     }
+ 
+@@ -168,14 +188,19 @@ impl FxConfig {
+     }
+ }
+ 
+-/// Reproduce de forma táctil y no bloqueante el icónico sonido de burbuja Pop! de Pop!_OS
++/// Reproduce de forma táctil y no bloqueante el icónico sonido de burbuja Pop! del control de volumen de Pop!_OS
+ pub fn play_pop_sound() {
+     let cfg = FxConfig::current();
+     if !cfg.pop_sound_enabled {
+         return;
+     }
+-    std::thread::spawn(|| {
+-        let sound_path = "/usr/share/sounds/Pop/stereo/action/audio-volume-change.oga";
++    std::thread::spawn(move || {
++        let sound_path = match cfg.pop_sound_effect.as_str() {
++            "pin" => "/usr/share/sounds/Pop/stereo/action/audio-volume-change.oga",
++            "click" => "/usr/share/sounds/gnome/default/alerts/click.ogg",
++            _ => "/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga",
++        };
++
+         if !std::path::Path::new(sound_path).exists() {
+             return;
+         }
+diff --git a/src/shell/layout/floating/mod.rs b/src/shell/layout/floating/mod.rs
+index aefa2e41..d5d0ff49 100644
+--- a/src/shell/layout/floating/mod.rs
++++ b/src/shell/layout/floating/mod.rs
+@@ -789,6 +789,10 @@ impl FloatingLayout {
+         let _ = self.animations.remove(window);
+ 
+         if let Some(to) = to {
++            let fx = crate::config::fx::FxConfig::current();
++            if fx.pop_sound_enabled && fx.pop_sound_on_minimize {
++                crate::config::fx::play_pop_sound();
++            }
+             self.animations.insert(
+                 window.clone(),
+                 Animation::Minimize {
+-- 
+2.43.0
+

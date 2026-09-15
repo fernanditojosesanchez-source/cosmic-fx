@@ -1,0 +1,150 @@
+From 7b916130f5f9a023fca07227cdf9289bae79276d Mon Sep 17 00:00:00 2001
+From: Fher Sanchez <fernanditojosesanchez-source@users.noreply.github.com>
+Date: Sun, 13 Sep 2026 20:54:45 -0600
+Subject: [PATCH 2/7] feat(fx): enhance minimize (glide squash) and close
+ (tactile pop & collapse) window animations
+
+---
+ src/shell/layout/floating/mod.rs | 76 ++++++++++++++++++++------------
+ 1 file changed, 49 insertions(+), 27 deletions(-)
+
+diff --git a/src/shell/layout/floating/mod.rs b/src/shell/layout/floating/mod.rs
+index 6d4766d2..aada2094 100644
+--- a/src/shell/layout/floating/mod.rs
++++ b/src/shell/layout/floating/mod.rs
+@@ -42,7 +42,7 @@ use crate::{
+         grabs::{GrabStartData, ReleaseMode, ResizeEdge},
+     },
+     state::State,
+-    utils::{prelude::*, tween::EaseRectangle},
++    utils::prelude::*,
+     wayland::handlers::xdg_shell::popup::get_popup_toplevel,
+ };
+ 
+@@ -50,9 +50,9 @@ mod grabs;
+ pub use self::grabs::*;
+ 
+ pub const ANIMATION_DURATION: Duration = Duration::from_millis(380);
+-pub const MINIMIZE_ANIMATION_DURATION: Duration = Duration::from_millis(320);
++pub const MINIMIZE_ANIMATION_DURATION: Duration = Duration::from_millis(360);
+ pub const OPEN_ANIMATION_DURATION: Duration = Duration::from_millis(380);
+-pub const CLOSE_ANIMATION_DURATION: Duration = Duration::from_millis(220);
++pub const CLOSE_ANIMATION_DURATION: Duration = Duration::from_millis(300);
+ 
+ #[derive(Debug, Default)]
+ pub struct FloatingLayout {
+@@ -112,7 +112,7 @@ impl Animation {
+                     .min(MINIMIZE_ANIMATION_DURATION)
+                     .as_secs_f32()
+                     / MINIMIZE_ANIMATION_DURATION.as_secs_f32();
+-                1.0 - ((percentage - 0.5).max(0.0) * 2.0)
++                (1.0 - ((percentage - 0.70).max(0.0) * 3.33)).clamp(0.0, 1.0)
+             }
+             Animation::Unminimize { start, .. } => {
+                 let percentage = Instant::now()
+@@ -136,7 +136,12 @@ impl Animation {
+                     .min(CLOSE_ANIMATION_DURATION)
+                     .as_secs_f32()
+                     / CLOSE_ANIMATION_DURATION.as_secs_f32();
+-                (1.0 - p.powf(1.8)).max(0.0)
++                if p < 0.30 {
++                    1.0
++                } else {
++                    let fade_p = (p - 0.30) / 0.70;
++                    (1.0 - fade_p.powi(2)).clamp(0.0, 1.0)
++                }
+             }
+         }
+     }
+@@ -166,7 +171,7 @@ impl Animation {
+         tiled_state: Option<&TiledCorners>,
+         gaps: (i32, i32),
+     ) -> Rectangle<i32, Local> {
+-        let (duration, target_rect) = match self {
++        match self {
+             Animation::Unminimize { target_geometry, .. } => {
+                 let fx = crate::config::fx::FxConfig::current();
+                 let previous_rect = *self.previous_geometry();
+@@ -195,9 +200,32 @@ impl Animation {
+                     Size::from((w.round().max(20.0) as i32, h.round().max(20.0) as i32)),
+                 );
+             }
+-            Animation::Minimize {
+-                target_geometry, ..
+-            } => (MINIMIZE_ANIMATION_DURATION, *target_geometry),
++            Animation::Minimize { target_geometry, .. } => {
++                let fx = crate::config::fx::FxConfig::current();
++                let previous_rect = *self.previous_geometry();
++                let start = *self.start();
++                let now = Instant::now();
++                let p = now.duration_since(start).min(MINIMIZE_ANIMATION_DURATION).as_secs_f64()
++                    / MINIMIZE_ANIMATION_DURATION.as_secs_f64();
++
++                let (glide_p, lateral_squash) = if !fx.spring_bounce_enabled {
++                    (ease(EaseInOutCubic, 0.0, 1.0, p), 1.0)
++                } else {
++                    let glide = p.powf(1.6);
++                    let squash = 1.0 - (std::f64::consts::PI * p).sin() * 0.12;
++                    (glide, squash)
++                };
++
++                let x = previous_rect.loc.x as f64 + (target_geometry.loc.x - previous_rect.loc.x) as f64 * glide_p;
++                let y = previous_rect.loc.y as f64 + (target_geometry.loc.y - previous_rect.loc.y) as f64 * glide_p;
++                let w = (previous_rect.size.w as f64 + (target_geometry.size.w - previous_rect.size.w) as f64 * glide_p) * lateral_squash;
++                let h = previous_rect.size.h as f64 + (target_geometry.size.h - previous_rect.size.h) as f64 * glide_p;
++
++                return Rectangle::new(
++                    Point::from((x.round() as i32, y.round() as i32)),
++                    Size::from((w.round().max(20.0) as i32, h.round().max(20.0) as i32)),
++                );
++            }
+             Animation::Open { geometry, .. } => return *geometry,
+             Animation::Close { previous_geometry, .. } => return *previous_geometry,
+             Animation::Tiled { .. } => {
+@@ -236,20 +264,7 @@ impl Animation {
+                     Size::from((w.round().max(20.0) as i32, h.round().max(20.0) as i32)),
+                 );
+             }
+-        };
+-        let previous_rect = *self.previous_geometry();
+-        let start = *self.start();
+-        let now = Instant::now();
+-        let progress =
+-            now.duration_since(start).min(duration).as_secs_f64() / duration.as_secs_f64();
+-
+-        ease(
+-            EaseInOutCubic,
+-            EaseRectangle(previous_rect),
+-            EaseRectangle(target_rect),
+-            progress,
+-        )
+-        .unwrap()
++        }
+     }
+ }
+ 
+@@ -1671,10 +1686,17 @@ impl FloatingLayout {
+                             / CLOSE_ANIMATION_DURATION.as_secs_f64();
+ 
+                         let (s, y_sink) = if fx.spring_bounce_enabled {
+-                            let pop = (std::f64::consts::PI * (p * 2.0).min(1.0)).sin() * (1.0 - p) * 0.05;
+-                            let s = (1.00 + pop - 0.60 * p.powi(2)).max(0.01);
+-                            let y_sink = (p.powi(2) * 32.0).round() as i32;
+-                            (s, y_sink)
++                            if p < 0.30 {
++                                let pop_t = p / 0.30;
++                                let pop = (std::f64::consts::PI * pop_t).sin() * 0.09;
++                                let lift = -(std::f64::consts::PI * pop_t).sin() * 12.0;
++                                (1.00 + pop, lift.round() as i32)
++                            } else {
++                                let collapse_t = (p - 0.30) / 0.70;
++                                let s = (1.09 * (1.0 - collapse_t.powi(2))).max(0.01);
++                                let sink = (collapse_t.powi(2) * 42.0).round() as i32;
++                                (s, sink)
++                            }
+                         } else {
+                             (1.0 - 0.15 * p, 0)
+                         };
+-- 
+2.43.0
+

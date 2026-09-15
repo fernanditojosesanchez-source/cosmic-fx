@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#082f49" />
+    </linearGradient>
+
+    <!-- Outer Rim Glow -->
+    <linearGradient id="rim-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00c8e6" stop-opacity="0.8" />
+      <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.8" />
+    </linearGradient>
+
+    <!-- Glass Card Gradient -->
+    <linearGradient id="card-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.04" />
+    </linearGradient>
+
+    <!-- Sine Wave / Spring Gradient -->
+    <linearGradient id="wave-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00f5d4" />
+      <stop offset="50%" stop-color="#00c8e6" />
+      <stop offset="100%" stop-color="#7000ff" />
+    </linearGradient>
+
+    <!-- Glow Filter -->
+    <filter id="neon-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <filter id="subtle-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <!-- Base Circle with Subtle Cosmic Glow -->
+  <rect x="8" y="8" width="240" height="240" rx="56" fill="url(#bg-grad)" stroke="url(#rim-grad)" stroke-width="2.5" />
+
+  <!-- Cosmic Grid / Stars (Subtle) -->
+  <circle cx="60" cy="50" r="1.5" fill="#ffffff" opacity="0.6" />
+  <circle cx="200" cy="70" r="2" fill="#00c8e6" opacity="0.7" />
+  <circle cx="180" cy="210" r="1.5" fill="#ffffff" opacity="0.5" />
+  <circle cx="45" cy="190" r="1.5" fill="#10b981" opacity="0.6" />
+  <circle cx="215" cy="150" r="1" fill="#ffffff" opacity="0.4" />
+
+  <!-- Wobbly Ghost Trail (Back Layer showing motion) -->
+  <path d="M 64 88 C 76 72, 196 68, 204 84 C 212 100, 198 174, 186 186 C 174 198, 62 192, 54 176 Z"
+        fill="none" stroke="#00c8e6" stroke-width="1.5" opacity="0.25" stroke-dasharray="4 4" />
+
+  <!-- Main Floating Glass Window Card (Wobbly & Elevated in 3D) -->
+  <g filter="url(#subtle-shadow)">
+    <!-- Skewed / Dynamic Curved Card Shape simulating Wobbly & 3D Tilt -->
+    <path d="M 52 76 Q 128 66 204 80 Q 212 136 196 188 Q 128 196 60 182 Q 44 130 52 76 Z"
+          fill="url(#card-grad)" stroke="#00c8e6" stroke-width="2" filter="url(#neon-glow)" />
+
+    <!-- Window Header Bar Line -->
+    <path d="M 53 104 Q 128 97 202 107" stroke="rgba(255,255,255,0.18)" stroke-width="1.5" fill="none" />
+
+    <!-- 3 Window Control Pills / Dots -->
+    <circle cx="70" cy="91" r="4.5" fill="#ef4444" opacity="0.9" />
+    <circle cx="85" cy="91" r="4.5" fill="#f59e0b" opacity="0.9" />
+    <circle cx="100" cy="91" r="4.5" fill="#10b981" opacity="0.9" />
+
+    <!-- Window Title Placeholder -->
+    <rect x="120" y="88" width="50" height="6" rx="3" fill="rgba(255,255,255,0.3)" />
+
+    <!-- Animated Physical Wave / Spring Pulse inside Card -->
+    <path d="M 68 152 C 86 122, 102 168, 126 136 C 146 110, 164 162, 186 138"
+          fill="none" stroke="url(#wave-grad)" stroke-width="4.5" stroke-linecap="round" filter="url(#neon-glow)" />
+
+    <!-- Kinetic Spring Dots -->
+    <circle cx="126" cy="136" r="4" fill="#00f5d4" filter="url(#neon-glow)" />
+    <circle cx="186" cy="138" r="3.5" fill="#7000ff" />
+  </g>
+
+  <!-- Sparkle Accent at top right of card -->
+  <path d="M 198 64 L 202 54 L 206 64 L 216 68 L 206 72 L 202 82 L 198 72 L 188 68 Z" fill="#00f5d4" opacity="0.95" />
+</svg>

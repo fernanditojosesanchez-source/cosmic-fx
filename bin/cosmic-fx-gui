@@ -1,0 +1,1077 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# SPDX-License-Identifier: GPL-3.0-only
+# Cosmic FX — Centro de Físicas y Efectos Compiz para Pop!_OS COSMIC
+
+import os
+import sys
+import json
+import math
+import subprocess
+import gi
+
+gi.require_version('Gtk', '4.0')
+gi.require_version('Adw', '1')
+from gi.repository import Gtk, Adw, GLib, Gio, Gdk
+
+CONFIG_PATHS = [
+    os.path.expanduser("~/.config/cosmic/cosmic-comp-fx.json"),
+    "/tmp/cosmic-lab-config/cosmic-comp-fx.json"
+]
+
+ORIGINAL_BIN = "/usr/bin/cosmic-comp.original"
+TARGET_BIN = "/usr/bin/cosmic-comp"
+
+# Dynamic project directory discovery
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+CANDIDATE_DIRS = [
+    SCRIPT_DIR,
+    os.path.abspath(os.path.join(SCRIPT_DIR, "..")),
+    os.path.expanduser("~/cosmic-fx"),
+    "/usr/local/share/cosmic-fx"
+]
+LAB_DIR = next((d for d in CANDIDATE_DIRS if os.path.isfile(os.path.join(d, "install.sh")) or os.path.isfile(os.path.join(d, "instalar-sistema.sh"))), SCRIPT_DIR)
+
+SOUND_OPTIONS = [
+    ("volume_bubble", "🫧 Pop! de Burbuja (Volumen Pop!_OS)"),
+    ("swing", "🌪️ Swoosh Expansivo (Swing)"),
+    ("click", "🔘 Click Mecánico Suave"),
+    ("pin", "🔔 Pin Digital Pop!_OS"),
+    ("camera_focus", "📸 Enfoque Táctil (Focus)"),
+    ("theme_demo", "🎶 Acorde Melódico (Theme)"),
+    ("device_added", "🔌 Conexión / Entrada (Device)"),
+    ("device_removed", "⚡ Desconexión / Salida (Device)")
+]
+
+SOUND_MAP = {
+    "volume_bubble": "/usr/share/sounds/freedesktop/stereo/audio-volume-change.oga",
+    "swing": "/usr/share/sounds/gnome/default/alerts/swing.ogg",
+    "click": "/usr/share/sounds/gnome/default/alerts/click.ogg",
+    "pin": "/usr/share/sounds/Pop/stereo/action/audio-volume-change.oga",
+    "camera_focus": "/usr/share/sounds/Pop/stereo/action/camera-focus.oga",
+    "theme_demo": "/usr/share/sounds/Pop/stereo/notification/theme-demo.oga",
+    "device_added": "/usr/share/sounds/Pop/stereo/notification/device-added.oga",
+    "device_removed": "/usr/share/sounds/Pop/stereo/notification/device-removed.oga",
+}
+
+def get_sound_index(key_name):
+    for idx, (val, _) in enumerate(SOUND_OPTIONS):
+        if val == key_name:
+            return idx
+    return 0
+
+def get_sound_value(index):
+    if 0 <= index < len(SOUND_OPTIONS):
+        return SOUND_OPTIONS[index][0]
+    return "volume_bubble"
+
+CSS = """
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Pop!_OS COSMIC Style Tokens & High-Contrast Styling
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+@define-color pop_bg #1a1e24;
+@define-color pop_surface #242933;
+@define-color pop_surface_hover #2c3340;
+@define-color pop_teal #48b9c7;
+@define-color pop_orange #f6a623;
+@define-color pop_green #10b981;
+@define-color pop_text_primary #ffffff;
+@define-color pop_text_secondary #cbd5e1;
+@define-color pop_text_muted #94a3b8;
+@define-color pop_border rgba(255, 255, 255, 0.08);
+
+window.cosmic-fx-window {
+    background-color: #1a1e24;
+    color: #ffffff;
+}
+
+headerbar {
+    background-color: #1a1e24;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+headerbar label.title {
+    color: #ffffff !important;
+    font-weight: 800;
+}
+
+headerbar label.subtitle {
+    color: #48b9c7 !important;
+    font-weight: 600;
+}
+
+/* Forzar que todos los labels sean legibles con alto contraste */
+window.cosmic-fx-window label {
+    color: #ffffff;
+}
+
+/* PreferencesGroup Titles & Subtitles */
+preferencesgroup > box > label.title {
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+preferencesgroup > box > label.subtitle {
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    margin-bottom: 10px;
+}
+
+/* Filas de Preferencias (ActionRow, SwitchRow, ComboRow) */
+row {
+    background-color: #242933;
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    padding: 8px 14px;
+}
+
+row:hover {
+    background-color: #2b313d;
+}
+
+row label.title {
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+row label.subtitle {
+    color: #cbd5e1 !important;
+    font-size: 12.5px;
+}
+
+/* Pop!_OS Status Banner */
+.pop-status-banner {
+    background: linear-gradient(135deg, #242a34 0%, #1c2128 100%);
+    border: 1.5px solid rgba(72, 185, 199, 0.45);
+    border-radius: 14px;
+    padding: 16px 20px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.pop-status-banner label.banner-title {
+    color: #ffffff !important;
+    font-size: 15px;
+    font-weight: 800;
+}
+
+.pop-status-banner label.banner-desc {
+    color: #cbd5e1 !important;
+    font-size: 13px;
+}
+
+/* Tarjetas de Preajuste (Presets) */
+.preset-card {
+    border-radius: 14px;
+    padding: 14px 10px;
+    transition: all 180ms ease;
+    border: 1.5px solid rgba(255, 255, 255, 0.09);
+    background-color: #242933;
+}
+
+.preset-card:hover {
+    background-color: #2c3340;
+    border-color: rgba(72, 185, 199, 0.4);
+}
+
+.preset-card.active {
+    background: linear-gradient(180deg, rgba(72, 185, 199, 0.22) 0%, rgba(36, 42, 52, 0.95) 100%);
+    border: 2px solid #48b9c7;
+    box-shadow: 0 0 16px rgba(72, 185, 199, 0.35);
+}
+
+.preset-card label.card-title {
+    color: #ffffff !important;
+    font-weight: 800;
+    font-size: 14.5px;
+}
+
+.preset-card.active label.card-title {
+    color: #48b9c7 !important;
+    font-weight: 800;
+}
+
+.preset-card label.card-desc {
+    color: #cbd5e1 !important;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.preset-card.active label.card-desc {
+    color: #f1f5f9 !important;
+    font-weight: 700;
+}
+
+.preset-card label.card-sub {
+    color: #94a3b8 !important;
+    font-size: 11px;
+}
+
+.preset-card.active label.card-sub {
+    color: #cbd5e1 !important;
+}
+
+/* Pop Switches */
+switch:checked {
+    background-color: #48b9c7;
+}
+
+/* Área de Laboratorio Interactivo */
+.sandbox-area {
+    background: radial-gradient(circle at center, #262c37 0%, #171b22 100%);
+    border-radius: 16px;
+    border: 1.5px solid rgba(72, 185, 199, 0.25);
+    min-height: 145px;
+}
+
+.mini-window-card {
+    background: linear-gradient(135deg, #2a313d 0%, #1f242c 100%);
+    border: 1.5px solid #48b9c7;
+    border-radius: 12px;
+    padding: 8px 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 0 16px rgba(72, 185, 199, 0.3);
+}
+
+.mini-window-card label {
+    color: #ffffff !important;
+    font-weight: 700;
+}
+
+.dot-red { background-color: #ef4444; border-radius: 9999px; min-width: 10px; min-height: 10px; }
+.dot-yellow { background-color: #f59e0b; border-radius: 9999px; min-width: 10px; min-height: 10px; }
+.dot-green { background-color: #10b981; border-radius: 9999px; min-width: 10px; min-height: 10px; }
+
+/* Botones con estilo Pop!_OS */
+button.suggested-action {
+    background-color: #48b9c7;
+    color: #14171d !important;
+    font-weight: 800;
+    border-radius: 9999px;
+}
+
+button.suggested-action label {
+    color: #14171d !important;
+    font-weight: 800;
+}
+
+button.suggested-action:hover {
+    background-color: #5dd4e3;
+}
+
+button.destructive-action {
+    background-color: rgba(239, 68, 68, 0.15);
+    border: 1.5px solid #ef4444;
+    color: #fca5a5 !important;
+    font-weight: 700;
+    border-radius: 9999px;
+}
+
+button.destructive-action label {
+    color: #fca5a5 !important;
+}
+
+button.destructive-action:hover {
+    background-color: rgba(239, 68, 68, 0.25);
+}
+
+button.preview-btn {
+    background-color: rgba(72, 185, 199, 0.14);
+    border: 1px solid #48b9c7;
+    border-radius: 9999px;
+    padding: 3px 12px;
+}
+
+button.preview-btn label {
+    color: #48b9c7 !important;
+    font-weight: 700;
+    font-size: 12px;
+}
+
+button.preview-btn:hover {
+    background-color: rgba(72, 185, 199, 0.30);
+}
+"""
+
+class CosmicFxApp(Adw.Application):
+    def __init__(self):
+        super().__init__(
+            application_id="com.system76.CosmicFx",
+            flags=Gio.ApplicationFlags.FLAGS_NONE
+        )
+        self.config = {
+            "preset": "snappy",
+            "wobbly_enabled": True,
+            "wobbly_intensity": 1.0,
+            "spring_bounce_enabled": True,
+            "focus_glow_enabled": True,
+            "card_lift_enabled": True,
+            "pendulum_tilt_enabled": True,
+            "floating_mode": True,
+            "pop_sound_enabled": True,
+            "pop_sound_effect": "volume_bubble",
+            "pop_sound_on_close": True,
+            "pop_sound_on_open": True,
+            "pop_sound_on_maximize": True,
+            "pop_sound_on_minimize": False,
+            "sound_close_effect": "volume_bubble",
+            "sound_open_effect": "volume_bubble",
+            "sound_maximize_effect": "swing",
+            "sound_minimize_effect": "click",
+            "close_animation_style": "pop_bubble"
+        }
+        self.spring_timer_id = None
+        self.is_dragging = False
+        self.cur_dx = 0.0
+        self.cur_dy = 0.0
+        self.cur_tilt = 0.0
+        self.cur_scale = 1.0
+        self.card_provider = Gtk.CssProvider()
+        self.load_config()
+
+    def load_config(self):
+        for p in CONFIG_PATHS:
+            if os.path.isfile(p):
+                try:
+                    with open(p, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        self.config.update(data)
+                        return
+                except Exception as e:
+                    print(f"Error reading config: {e}")
+
+    def save_config(self, notify_msg="Configuración actualizada en tiempo real"):
+        for p in CONFIG_PATHS:
+            try:
+                os.makedirs(os.path.dirname(p), exist_ok=True)
+                tmp_p = p + ".tmp"
+                with open(tmp_p, "w", encoding="utf-8") as f:
+                    json.dump(self.config, f, indent=2)
+                os.replace(tmp_p, p)
+            except Exception as e:
+                print(f"Error saving to {p}: {e}")
+
+        if hasattr(self, "toast_overlay") and notify_msg:
+            toast = Adw.Toast.new(notify_msg)
+            toast.set_timeout(2)
+            self.toast_overlay.add_toast(toast)
+
+    def do_activate(self):
+        style_manager = Adw.StyleManager.get_default()
+        style_manager.set_color_scheme(Adw.ColorScheme.FORCE_DARK)
+
+        # Cargar estilos Pop!_OS
+        provider = Gtk.CssProvider()
+        provider.load_from_string(CSS)
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+        )
+        Gtk.StyleContext.add_provider_for_display(
+            Gdk.Display.get_default(),
+            self.card_provider,
+            Gtk.STYLE_PROVIDER_PRIORITY_USER
+        )
+
+        win = Adw.ApplicationWindow(application=self, title="Cosmic FX")
+        win.set_default_size(780, 750)
+        win.add_css_class("cosmic-fx-window")
+
+        self.toast_overlay = Adw.ToastOverlay()
+        win.set_content(self.toast_overlay)
+
+        # Contenedor Principal
+        main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.toast_overlay.set_child(main_box)
+
+        # Header Bar Pop!_OS
+        header = Adw.HeaderBar()
+        title_widget = Adw.WindowTitle(title="Cosmic FX", subtitle="Control de Físicas y Efectos Compiz")
+        header.set_title_widget(title_widget)
+        main_box.append(header)
+
+        # Área de Scroll
+        scrolled = Gtk.ScrolledWindow()
+        scrolled.set_vexpand(True)
+        main_box.append(scrolled)
+
+        clamp = Adw.Clamp()
+        clamp.set_maximum_size(720)
+        clamp.set_tightening_threshold(540)
+        scrolled.set_child(clamp)
+
+        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=24)
+        content_box.set_margin_top(18)
+        content_box.set_margin_bottom(24)
+        content_box.set_margin_start(16)
+        content_box.set_margin_end(16)
+        clamp.set_child(content_box)
+
+        # 1. Banner de Estado
+        content_box.append(self.build_status_banner())
+
+        # 2. Selector de Preajustes
+        content_box.append(self.build_presets_section())
+
+        # 3. Controles Detallados
+        content_box.append(self.build_controls_section())
+
+        # 4. Laboratorio Interactivo
+        content_box.append(self.build_sandbox_section())
+
+        # 5. Herramientas del Sistema
+        content_box.append(self.build_actions_section(win))
+
+        # Conectar evento al enfocar la ventana para refrescar estado silenciosamente
+        controller = Gtk.EventControllerFocus.new()
+        controller.connect("enter", lambda c: self.refresh_system_state())
+        win.add_controller(controller)
+
+        win.present()
+
+    def build_status_banner(self):
+        card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+        card.add_css_class("pop-status-banner")
+
+        self.status_icon = Gtk.Image.new_from_icon_name("emblem-ok-symbolic")
+        self.status_icon.set_pixel_size(36)
+        card.append(self.status_icon)
+
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        self.status_title = Gtk.Label(xalign=0)
+        self.status_title.add_css_class("banner-title")
+        self.status_desc = Gtk.Label(xalign=0)
+        self.status_desc.add_css_class("banner-desc")
+        self.status_desc.set_wrap(True)
+        vbox.append(self.status_title)
+        vbox.append(self.status_desc)
+        card.append(vbox)
+
+        self.update_status_banner_ui()
+        return card
+
+    def update_status_banner_ui(self):
+        is_installed = False
+        if os.path.isfile(TARGET_BIN):
+            try:
+                size = os.path.getsize(TARGET_BIN)
+                is_installed = (size > 30 * 1024 * 1024)
+            except Exception:
+                is_installed = os.path.isfile(ORIGINAL_BIN)
+
+        autotile_path = os.path.expanduser("~/.config/cosmic/com.system76.CosmicComp/v1/autotile")
+        is_floating = self.config.get("floating_mode", True)
+        if os.path.isfile(autotile_path):
+            try:
+                with open(autotile_path, "r") as f:
+                    if f.read().strip() == "false":
+                        is_floating = True
+            except Exception:
+                pass
+
+        if is_installed:
+            mode_badge = "<span foreground='#48b9c7'><b>● Modo Flotante Libre</b></span>" if is_floating else "<span foreground='#f6a623'><b>● Modo Mosaico (Tiling)</b></span>"
+            self.status_title.set_markup(f"<b><span foreground='#ffffff'>🟢 Compositor Cosmic-FX Activo</span></b>   |   {mode_badge}")
+            mode_help = "Físicas Wobbly, 3D y rebotes activos al 100%." if is_floating else "Ventanas bloqueadas en cuadrícula fija. Presiona Super+Y para modo flotante."
+            self.status_desc.set_markup(f"<span foreground='#cbd5e1'>{mode_help}</span>")
+            self.status_icon.set_from_icon_name("emblem-ok-symbolic")
+        else:
+            self.status_title.set_markup("<b><span foreground='#ffffff'>⚪ Compositor de Fábrica Activo</span></b>")
+            self.status_desc.set_markup("<span foreground='#cbd5e1'>Haz clic en 'Instalar en Pop!_OS' abajo para activar las físicas en todo tu escritorio.</span>")
+            self.status_icon.set_from_icon_name("dialog-information-symbolic")
+
+    def refresh_system_state(self):
+        self.load_config()
+        self.update_status_banner_ui()
+        is_floating = self.config.get("floating_mode", True)
+        autotile_path = os.path.expanduser("~/.config/cosmic/com.system76.CosmicComp/v1/autotile")
+        if os.path.isfile(autotile_path):
+            try:
+                with open(autotile_path, "r") as f:
+                    if f.read().strip() == "false":
+                        is_floating = True
+            except Exception:
+                pass
+
+        if hasattr(self, "row_floating"):
+            if self.row_floating.get_active() != is_floating:
+                self.suppress_floating_event = True
+                self.row_floating.set_active(is_floating)
+                self.suppress_floating_event = False
+
+    def build_presets_section(self):
+        group = Adw.PreferencesGroup()
+        group.set_title("Perfiles Preconfigurados")
+        group.set_description("Elige la intensidad que mejor se adapte a tu estilo de trabajo")
+
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        box.set_homogeneous(True)
+
+        presets = [
+            ("snappy", "⚡ Snappy", "Equilibrado", "Ágil y reactivo (1.0x)"),
+            ("intense", "💥 Intense", "Compiz Boom", "Máxima gelatina (2.2x)"),
+            ("subtle", "🍃 Subtle", "Sutil y Sobrio", "Micro-físicas (0.5x)"),
+            ("off", "🛑 Off", "Modo Fábrica", "Físicas rígidas (0.0x)")
+        ]
+
+        self.preset_buttons = {}
+
+        for p_id, p_title, p_desc, p_sub in presets:
+            btn = Gtk.Button()
+            btn.add_css_class("preset-card")
+
+            btn_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+            lbl_title = Gtk.Label()
+            lbl_title.add_css_class("card-title")
+            lbl_title.set_markup(f"<b>{p_title}</b>")
+
+            lbl_desc = Gtk.Label(label=p_desc)
+            lbl_desc.add_css_class("card-desc")
+            lbl_desc.set_justify(Gtk.Justification.CENTER)
+
+            lbl_sub = Gtk.Label(label=p_sub)
+            lbl_sub.add_css_class("card-sub")
+            lbl_sub.set_justify(Gtk.Justification.CENTER)
+
+            btn_box.append(lbl_title)
+            btn_box.append(lbl_desc)
+            btn_box.append(lbl_sub)
+            btn.set_child(btn_box)
+
+            btn.connect("clicked", self.on_preset_clicked, p_id)
+            self.preset_buttons[p_id] = btn
+            box.append(btn)
+
+        self.update_preset_buttons_ui()
+        group.add(box)
+        return group
+
+    def update_preset_buttons_ui(self):
+        current = self.config.get("preset", "snappy")
+        for p_id, btn in self.preset_buttons.items():
+            if p_id == current:
+                btn.add_css_class("active")
+            else:
+                btn.remove_css_class("active")
+
+    def on_preset_clicked(self, btn, preset_id):
+        self.config["preset"] = preset_id
+        if preset_id == "intense":
+            self.config["wobbly_enabled"] = True
+            self.config["wobbly_intensity"] = 2.2
+            self.config["spring_bounce_enabled"] = True
+            self.config["focus_glow_enabled"] = True
+            self.config["card_lift_enabled"] = True
+            self.config["pendulum_tilt_enabled"] = True
+            self.config["pop_sound_enabled"] = True
+            self.config["pop_sound_effect"] = "volume_bubble"
+            self.config["pop_sound_on_close"] = True
+            self.config["pop_sound_on_open"] = True
+            self.config["pop_sound_on_maximize"] = True
+            self.config["pop_sound_on_minimize"] = True
+            self.config["sound_close_effect"] = "volume_bubble"
+            self.config["sound_open_effect"] = "volume_bubble"
+            self.config["sound_maximize_effect"] = "swing"
+            self.config["sound_minimize_effect"] = "click"
+            self.config["close_animation_style"] = "pop_bubble"
+        elif preset_id == "subtle":
+            self.config["wobbly_enabled"] = True
+            self.config["wobbly_intensity"] = 0.5
+            self.config["spring_bounce_enabled"] = True
+            self.config["focus_glow_enabled"] = True
+            self.config["card_lift_enabled"] = True
+            self.config["pendulum_tilt_enabled"] = True
+            self.config["pop_sound_enabled"] = True
+            self.config["pop_sound_effect"] = "volume_bubble"
+            self.config["pop_sound_on_close"] = True
+            self.config["pop_sound_on_open"] = True
+            self.config["pop_sound_on_maximize"] = True
+            self.config["pop_sound_on_minimize"] = False
+            self.config["sound_close_effect"] = "click"
+            self.config["sound_open_effect"] = "click"
+            self.config["sound_maximize_effect"] = "swing"
+            self.config["sound_minimize_effect"] = "click"
+            self.config["close_animation_style"] = "pop_bubble"
+        elif preset_id == "off":
+            self.config["wobbly_enabled"] = False
+            self.config["wobbly_intensity"] = 0.0
+            self.config["spring_bounce_enabled"] = False
+            self.config["focus_glow_enabled"] = False
+            self.config["card_lift_enabled"] = False
+            self.config["pendulum_tilt_enabled"] = False
+            self.config["pop_sound_enabled"] = False
+            self.config["close_animation_style"] = "classic"
+        else: # snappy
+            self.config["wobbly_enabled"] = True
+            self.config["wobbly_intensity"] = 1.0
+            self.config["spring_bounce_enabled"] = True
+            self.config["focus_glow_enabled"] = True
+            self.config["card_lift_enabled"] = True
+            self.config["pendulum_tilt_enabled"] = True
+            self.config["pop_sound_enabled"] = True
+            self.config["pop_sound_effect"] = "volume_bubble"
+            self.config["pop_sound_on_close"] = True
+            self.config["pop_sound_on_open"] = True
+            self.config["pop_sound_on_maximize"] = True
+            self.config["pop_sound_on_minimize"] = False
+            self.config["sound_close_effect"] = "volume_bubble"
+            self.config["sound_open_effect"] = "volume_bubble"
+            self.config["sound_maximize_effect"] = "swing"
+            self.config["sound_minimize_effect"] = "click"
+            self.config["close_animation_style"] = "pop_bubble"
+
+        self.update_preset_buttons_ui()
+        self.sync_controls_from_config()
+        self.save_config(f"Perfil '{preset_id.upper()}' aplicado con éxito!")
+
+    def build_controls_section(self):
+        group = Adw.PreferencesGroup()
+        group.set_title("Ajustes Detallados de Físicas y Sonido")
+        group.set_description("Personaliza cada comportamiento a tu gusto exacto")
+
+        # Modo de Ventanas: Flotante vs Auto-Tile
+        self.row_floating = Adw.SwitchRow()
+        self.row_floating.set_title("Modo de Ventanas Flotantes (Recomendado)")
+        self.row_floating.set_subtitle("Desactiva el mosaico rígido para mover y agitar libremente las ventanas (Atajo: Super + Y)")
+        autotile_path = os.path.expanduser("~/.config/cosmic/com.system76.CosmicComp/v1/autotile")
+        is_floating = True
+        if os.path.isfile(autotile_path):
+            try:
+                with open(autotile_path, "r") as f:
+                    is_floating = (f.read().strip() == "false")
+            except Exception:
+                pass
+        self.row_floating.set_active(is_floating)
+        self.row_floating.connect("notify::active", self.on_floating_toggled)
+        group.add(self.row_floating)
+
+        # Wobbly Switch
+        self.row_wobbly = Adw.SwitchRow()
+        self.row_wobbly.set_title("Ventanas Gelatinosas (Wobbly Windows)")
+        self.row_wobbly.set_subtitle("Oscilación y deformación elástica de las ventanas al ser arrastradas")
+        self.row_wobbly.set_active(self.config.get("wobbly_enabled", True))
+        self.row_wobbly.connect("notify::active", self.on_wobbly_toggled)
+        group.add(self.row_wobbly)
+
+        # Wobbly Intensity Slider
+        self.row_intensity = Adw.ActionRow()
+        self.row_intensity.set_title("Intensidad de Deformación")
+        self.row_intensity.set_subtitle(f"Nivel actual: {self.config.get('wobbly_intensity', 1.0):.1f}x")
+
+        self.scale_intensity = Gtk.Scale.new_with_range(Gtk.Orientation.HORIZONTAL, 0.1, 3.0, 0.1)
+        self.scale_intensity.set_value(self.config.get("wobbly_intensity", 1.0))
+        self.scale_intensity.set_hexpand(True)
+        self.scale_intensity.set_size_request(200, -1)
+        self.scale_intensity.connect("value-changed", self.on_intensity_changed)
+        self.row_intensity.add_suffix(self.scale_intensity)
+        group.add(self.row_intensity)
+
+        # Spring Bounce Switch
+        self.row_spring = Adw.SwitchRow()
+        self.row_spring.set_title("Rebote Elástico de Resorte (Spring Bounce)")
+        self.row_spring.set_subtitle("Rebote amortiguado al maximizar, restaurar y abrir ventanas")
+        self.row_spring.set_active(self.config.get("spring_bounce_enabled", True))
+        self.row_spring.connect("notify::active", lambda row, ps: self.update_bool("spring_bounce_enabled", row.get_active()))
+        group.add(self.row_spring)
+
+        # 3D Card Lift Switch
+        self.row_lift = Adw.SwitchRow()
+        self.row_lift.set_title("Elevación 3D al Arrastrar (Card Lift)")
+        self.row_lift.set_subtitle("Aumenta la escala proyectando profundidad tridimensional")
+        self.row_lift.set_active(self.config.get("card_lift_enabled", True))
+        self.row_lift.connect("notify::active", lambda row, ps: self.update_bool("card_lift_enabled", row.get_active()))
+        group.add(self.row_lift)
+
+        # Neon Focus Glow Switch
+        self.row_glow = Adw.SwitchRow()
+        self.row_glow.set_title("Anillo Neón Pop! Teal (Accent Glow)")
+        self.row_glow.set_subtitle("Bisel perimetral luminoso en cian/teal en la ventana activa")
+        self.row_glow.set_active(self.config.get("focus_glow_enabled", True))
+        self.row_glow.connect("notify::active", lambda row, ps: self.update_bool("focus_glow_enabled", row.get_active()))
+        group.add(self.row_glow)
+
+        # Pendulum Tilt Switch
+        self.row_tilt = Adw.SwitchRow()
+        self.row_tilt.set_title("Inclinación Pendular (Pendulum Tilt)")
+        self.row_tilt.set_subtitle("Balanceo angular natural basado en la velocidad horizontal del ratón")
+        self.row_tilt.set_active(self.config.get("pendulum_tilt_enabled", True))
+        self.row_tilt.connect("notify::active", lambda row, ps: self.update_bool("pendulum_tilt_enabled", row.get_active()))
+        group.add(self.row_tilt)
+
+        # Pop Sound Master Switch + Botón de Vista Previa General
+        self.row_pop_sound = Adw.SwitchRow()
+        self.row_pop_sound.set_title("🔊 Sonidos Hápticos de Pop!_OS")
+        self.row_pop_sound.set_subtitle("Habilitar retroalimentación acústica táctil en ventanas")
+        self.row_pop_sound.set_active(self.config.get("pop_sound_enabled", True))
+        self.row_pop_sound.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_enabled", row.get_active()))
+
+        btn_preview = Gtk.Button(label="▶️ Probar")
+        btn_preview.add_css_class("preview-btn")
+        btn_preview.set_valign(Gtk.Align.CENTER)
+        btn_preview.connect("clicked", lambda b: self.preview_named_sound(self.config.get("sound_close_effect", "volume_bubble")))
+        self.row_pop_sound.add_suffix(btn_preview)
+        group.add(self.row_pop_sound)
+
+        # 1. Al Cerrar Ventana
+        self.row_sound_close = Adw.SwitchRow()
+        self.row_sound_close.set_title("💥 Sonido al Cerrar Ventana")
+        self.row_sound_close.set_subtitle("Reproduce audio al estallar o descartar la ventana")
+        self.row_sound_close.set_active(self.config.get("pop_sound_on_close", True))
+        self.row_sound_close.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_close", row.get_active()))
+        group.add(self.row_sound_close)
+
+        self.row_combo_close = self.create_sound_combo_row("Tono al Cerrar", "Efecto acústico para cierre", "sound_close_effect", "volume_bubble")
+        group.add(self.row_combo_close)
+
+        # 2. Al Abrir o Restaurar desde Panel
+        self.row_sound_open = Adw.SwitchRow()
+        self.row_sound_open.set_title("✨ Sonido al Abrir o Restaurar desde Panel")
+        self.row_sound_open.set_subtitle("Reproduce audio al abrir una ventana o al restaurarla desde el dock / panel")
+        self.row_sound_open.set_active(self.config.get("pop_sound_on_open", True))
+        self.row_sound_open.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_open", row.get_active()))
+        group.add(self.row_sound_open)
+
+        self.row_combo_open = self.create_sound_combo_row("Tono al Abrir / Restaurar Panel", "Efecto acústico para apertura o restauración", "sound_open_effect", "volume_bubble")
+        group.add(self.row_combo_open)
+
+        # 3. Al Maximizar o Restaurar Tamaño
+        self.row_sound_maximize = Adw.SwitchRow()
+        self.row_sound_maximize.set_title("🚀 Sonido al Maximizar o Restaurar Tamaño")
+        self.row_sound_maximize.set_subtitle("Reproduce audio al expandir a pantalla completa o al volver al tamaño flotante")
+        self.row_sound_maximize.set_active(self.config.get("pop_sound_on_maximize", True))
+        self.row_sound_maximize.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_maximize", row.get_active()))
+        group.add(self.row_sound_maximize)
+
+        self.row_combo_maximize = self.create_sound_combo_row("Tono al Maximizar / Restaurar", "Efecto acústico para maximizado o desmaximizado", "sound_maximize_effect", "swing")
+        group.add(self.row_combo_maximize)
+
+        # 4. Al Minimizar Ventana
+        self.row_sound_minimize = Adw.SwitchRow()
+        self.row_sound_minimize.set_title("📥 Sonido al Minimizar Ventana")
+        self.row_sound_minimize.set_subtitle("Reproduce audio cuando la ventana se envía al dock")
+        self.row_sound_minimize.set_active(self.config.get("pop_sound_on_minimize", False))
+        self.row_sound_minimize.connect("notify::active", lambda row, ps: self.update_bool("pop_sound_on_minimize", row.get_active()))
+        group.add(self.row_sound_minimize)
+
+        self.row_combo_minimize = self.create_sound_combo_row("Tono al Minimizar", "Efecto acústico para minimizado", "sound_minimize_effect", "click")
+        group.add(self.row_combo_minimize)
+
+        # Selector de Estilo de Cierre
+        self.row_close_style = Adw.ComboRow()
+        self.row_close_style.set_title("Animación de Cierre de Ventana")
+        self.row_close_style.set_subtitle("Efecto cinemático (estallido de burbuja Pop! o descenso suave)")
+        anim_model = Gtk.StringList.new([
+            "💥 POP! Bubble Burst (Burbuja Pop!_OS)",
+            "🌊 Descenso Suave (Glide)",
+            "✨ Clásico (Fade)"
+        ])
+        self.row_close_style.set_model(anim_model)
+        cur_anim = self.config.get("close_animation_style", "pop_bubble")
+        a_idx = 0 if cur_anim == "pop_bubble" else (1 if cur_anim == "glide" else 2)
+        self.row_close_style.set_selected(a_idx)
+        self.row_close_style.connect("notify::selected", self.on_close_style_changed)
+        group.add(self.row_close_style)
+
+        return group
+
+    def create_sound_combo_row(self, title, subtitle, config_key, default_val):
+        row = Adw.ComboRow()
+        row.set_title(title)
+        row.set_subtitle(subtitle)
+        model = Gtk.StringList.new([label for _, label in SOUND_OPTIONS])
+        row.set_model(model)
+        cur = self.config.get(config_key, default_val)
+        row.set_selected(get_sound_index(cur))
+
+        btn = Gtk.Button(label="▶️ Probar")
+        btn.add_css_class("preview-btn")
+        btn.set_valign(Gtk.Align.CENTER)
+        btn.connect("clicked", lambda b: self.preview_named_sound(self.config.get(config_key, default_val)))
+        row.add_suffix(btn)
+
+        row.connect("notify::selected", lambda r, ps: self.on_action_sound_changed(r, config_key, title))
+        return row
+
+    def preview_named_sound(self, effect):
+        path = SOUND_MAP.get(effect, SOUND_MAP["volume_bubble"])
+        if os.path.isfile(path):
+            subprocess.Popen(["pw-play", path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    def on_action_sound_changed(self, row, config_key, title):
+        idx = row.get_selected()
+        val = get_sound_value(idx)
+        self.config[config_key] = val
+        self.save_config(f"{title}: {SOUND_OPTIONS[idx][1]}")
+        self.preview_named_sound(val)
+
+    def on_close_style_changed(self, row, pspec):
+        idx = row.get_selected()
+        styles = ["pop_bubble", "glide", "classic"]
+        selected_style = styles[idx] if idx < len(styles) else "pop_bubble"
+        self.config["close_animation_style"] = selected_style
+        self.save_config(f"Animación de cierre: {selected_style}")
+
+    def on_floating_toggled(self, row, pspec):
+        if getattr(self, "suppress_floating_event", False):
+            return
+        val = row.get_active()
+        self.config["floating_mode"] = val
+        self.save_config("✨ Modo Flotante Libre activado" if val else "📐 Modo Mosaico (Auto-Tile) activado")
+
+        autotile_path = os.path.expanduser("~/.config/cosmic/com.system76.CosmicComp/v1/autotile")
+        try:
+            os.makedirs(os.path.dirname(autotile_path), exist_ok=True)
+            tmp = autotile_path + ".tmp"
+            with open(tmp, "w") as f:
+                f.write("false" if val else "true")
+            os.replace(tmp, autotile_path)
+        except Exception as e:
+            print(f"Error toggling autotile: {e}")
+        self.update_status_banner_ui()
+
+    def on_wobbly_toggled(self, row, pspec):
+        val = row.get_active()
+        self.config["wobbly_enabled"] = val
+        self.scale_intensity.set_sensitive(val)
+        self.save_config("Efecto Wobbly " + ("activado" if val else "desactivado"))
+
+    def on_intensity_changed(self, scale):
+        val = round(scale.get_value(), 1)
+        self.config["wobbly_intensity"] = val
+        self.row_intensity.set_subtitle(f"Nivel actual: {val:.1f}x")
+        self.save_config(None)
+
+    def update_bool(self, key, val):
+        self.config[key] = val
+        self.save_config(f"{key.replace('_', ' ').capitalize()} actualizado")
+
+    def sync_controls_from_config(self):
+        self.row_wobbly.set_active(self.config.get("wobbly_enabled", True))
+        intensity = self.config.get("wobbly_intensity", 1.0)
+        self.scale_intensity.set_value(intensity)
+        self.row_intensity.set_subtitle(f"Nivel actual: {intensity:.1f}x")
+        self.row_spring.set_active(self.config.get("spring_bounce_enabled", True))
+        self.row_lift.set_active(self.config.get("card_lift_enabled", True))
+        self.row_glow.set_active(self.config.get("focus_glow_enabled", True))
+        self.row_tilt.set_active(self.config.get("pendulum_tilt_enabled", True))
+
+        if hasattr(self, "row_pop_sound"):
+            self.row_pop_sound.set_active(self.config.get("pop_sound_enabled", True))
+        if hasattr(self, "row_sound_close"):
+            self.row_sound_close.set_active(self.config.get("pop_sound_on_close", True))
+        if hasattr(self, "row_combo_close"):
+            self.row_combo_close.set_selected(get_sound_index(self.config.get("sound_close_effect", "volume_bubble")))
+        if hasattr(self, "row_sound_open"):
+            self.row_sound_open.set_active(self.config.get("pop_sound_on_open", True))
+        if hasattr(self, "row_combo_open"):
+            self.row_combo_open.set_selected(get_sound_index(self.config.get("sound_open_effect", "volume_bubble")))
+        if hasattr(self, "row_sound_maximize"):
+            self.row_sound_maximize.set_active(self.config.get("pop_sound_on_maximize", True))
+        if hasattr(self, "row_combo_maximize"):
+            self.row_combo_maximize.set_selected(get_sound_index(self.config.get("sound_maximize_effect", "swing")))
+        if hasattr(self, "row_sound_minimize"):
+            self.row_sound_minimize.set_active(self.config.get("pop_sound_on_minimize", False))
+        if hasattr(self, "row_combo_minimize"):
+            self.row_combo_minimize.set_selected(get_sound_index(self.config.get("sound_minimize_effect", "click")))
+        if hasattr(self, "row_close_style"):
+            cur_anim = self.config.get("close_animation_style", "pop_bubble")
+            a_idx = 0 if cur_anim == "pop_bubble" else (1 if cur_anim == "glide" else 2)
+            self.row_close_style.set_selected(a_idx)
+
+    def update_card_transform(self, dx, dy, tilt_deg, scale):
+        css = f"""
+        .sandbox-interactive-card {{
+            transform: translate({dx:.1f}px, {dy:.1f}px) rotate({tilt_deg:.1f}deg) scale({scale:.3f});
+        }}
+        """
+        self.card_provider.load_from_string(css)
+
+    def on_drag_begin(self, gesture, start_x, start_y):
+        if self.spring_timer_id:
+            GLib.source_remove(self.spring_timer_id)
+            self.spring_timer_id = None
+        self.is_dragging = True
+        scale = 1.05 if self.config.get("card_lift_enabled", True) else 1.0
+        self.update_card_transform(0, 0, 0, scale)
+
+    def on_drag_update(self, gesture, offset_x, offset_y):
+        if not self.is_dragging:
+            return
+        dx = max(-260.0, min(260.0, offset_x))
+        dy = max(-55.0, min(55.0, offset_y))
+
+        intensity = self.config.get("wobbly_intensity", 1.0) if self.config.get("wobbly_enabled", True) else 0.0
+        tilt = 0.0
+        if self.config.get("pendulum_tilt_enabled", True):
+            tilt = max(-16.0, min(16.0, dx * 0.08 * intensity))
+
+        scale = 1.05 if self.config.get("card_lift_enabled", True) else 1.0
+        self.cur_dx = dx
+        self.cur_dy = dy
+        self.cur_tilt = tilt
+        self.cur_scale = scale
+        self.update_card_transform(dx, dy, tilt, scale)
+
+    def on_drag_end(self, gesture, offset_x, offset_y):
+        self.is_dragging = False
+        self.spring_frame = 0
+        self.spring_start_dx = getattr(self, "cur_dx", 0.0)
+        self.spring_start_dy = getattr(self, "cur_dy", 0.0)
+        self.spring_start_tilt = getattr(self, "cur_tilt", 0.0)
+        self.spring_start_scale = getattr(self, "cur_scale", 1.0)
+
+        if self.spring_timer_id:
+            GLib.source_remove(self.spring_timer_id)
+        self.spring_timer_id = GLib.timeout_add(16, self.on_spring_tick)
+
+    def on_spring_tick(self):
+        self.spring_frame += 1
+        t = self.spring_frame / 40.0
+
+        if t >= 1.0:
+            self.update_card_transform(0, 0, 0, 1.0)
+            self.spring_timer_id = None
+            return False
+
+        decay = math.exp(-4.5 * t)
+        bounce = math.cos(t * math.pi * 3.5) * decay
+
+        dx = self.spring_start_dx * bounce
+        dy = self.spring_start_dy * bounce
+        tilt = self.spring_start_tilt * bounce
+        scale = 1.0 + (self.spring_start_scale - 1.0) * bounce
+
+        self.update_card_transform(dx, dy, tilt, scale)
+        return True
+
+    def build_sandbox_section(self):
+        group = Adw.PreferencesGroup()
+        group.set_title("Laboratorio Interactivo de Prueba")
+        group.set_description("Arrastra la tarjeta para sentir la respuesta física en vivo")
+
+        sandbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        sandbox.add_css_class("sandbox-area")
+        sandbox.set_size_request(-1, 150)
+
+        center_box = Gtk.CenterBox()
+        center_box.set_vexpand(True)
+        center_box.set_hexpand(True)
+
+        card = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        card.add_css_class("mini-window-card")
+        card.add_css_class("sandbox-interactive-card")
+
+        dots = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        for c_class in ["dot-red", "dot-yellow", "dot-green"]:
+            dot = Gtk.Box()
+            dot.add_css_class(c_class)
+            dots.append(dot)
+
+        card.append(dots)
+        card_lbl = Gtk.Label(label="✨ ¡Arrástrame! Suéltame y verás el rebote")
+        card.append(card_lbl)
+
+        # Drag gesture en la tarjeta simulada
+        drag = Gtk.GestureDrag()
+        drag.connect("drag-begin", self.on_drag_begin)
+        drag.connect("drag-update", self.on_drag_update)
+        drag.connect("drag-end", self.on_drag_end)
+        card.add_controller(drag)
+
+        center_box.set_center_widget(card)
+        sandbox.append(center_box)
+
+        group.add(sandbox)
+        return group
+
+    def build_actions_section(self, parent_win):
+        group = Adw.PreferencesGroup()
+        group.set_title("Herramientas del Sistema")
+
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
+        box.set_homogeneous(True)
+
+        # Probar en Ventana Segura
+        btn_test = Gtk.Button(label="🚀 Probar en Ventana Segura")
+        btn_test.add_css_class("pill")
+        btn_test.connect("clicked", self.on_launch_test)
+        box.append(btn_test)
+
+        # Botones de Instalación / Restauración
+        is_installed = os.path.isfile(ORIGINAL_BIN)
+        if is_installed:
+            btn_update = Gtk.Button(label="🔄 Actualizar Físicas")
+            btn_update.add_css_class("pill")
+            btn_update.add_css_class("suggested-action")
+            btn_update.connect("clicked", lambda b: self.on_run_script("instalar-sistema.sh", parent_win))
+            box.append(btn_update)
+
+            btn_restore = Gtk.Button(label="🛡️ Restaurar Fábrica")
+            btn_restore.add_css_class("pill")
+            btn_restore.add_css_class("destructive-action")
+            btn_restore.connect("clicked", lambda b: self.on_run_script("restaurar-original.sh", parent_win))
+            box.append(btn_restore)
+        else:
+            btn_install = Gtk.Button(label="📦 Instalar en Pop!_OS")
+            btn_install.add_css_class("pill")
+            btn_install.add_css_class("suggested-action")
+            btn_install.connect("clicked", lambda b: self.on_run_script("instalar-sistema.sh", parent_win))
+            box.append(btn_install)
+
+        group.add(box)
+        return group
+
+    def on_launch_test(self, btn):
+        script = os.path.join(LAB_DIR, "test-nested.sh")
+        if os.path.isfile(script):
+            try:
+                cmd = f"gnome-terminal --title='Cosmic Comp Prueba' -- bash -c '{script}; exec bash'"
+                subprocess.Popen(cmd, shell=True)
+            except Exception:
+                subprocess.Popen(["bash", script])
+            if hasattr(self, "toast_overlay"):
+                toast = Adw.Toast.new("🚀 Abriendo ventana de prueba de compositor...")
+                self.toast_overlay.add_toast(toast)
+
+    def on_run_script(self, script_name, parent_win):
+        script = os.path.join(LAB_DIR, script_name)
+        if not os.path.isfile(script):
+            alt_name = "install.sh" if "instalar" in script_name else "uninstall.sh"
+            alt_script = os.path.join(LAB_DIR, alt_name)
+            if os.path.isfile(alt_script):
+                script = alt_script
+
+        if hasattr(self, "toast_overlay"):
+            toast = Adw.Toast.new("🔑 Ingresa tu contraseña en la ventana emergente...")
+            self.toast_overlay.add_toast(toast)
+
+        def run_thread():
+            proc = subprocess.run(["pkexec", "bash", script])
+            if proc.returncode == 0:
+                GLib.idle_add(self.on_script_success, script_name)
+            else:
+                GLib.idle_add(self.on_script_failure)
+
+        import threading
+        threading.Thread(target=run_thread, daemon=True).start()
+
+    def on_script_success(self, script_name):
+        action = "instalado" if "instalar" in script_name else "restaurado"
+        if hasattr(self, "toast_overlay"):
+            toast = Adw.Toast.new(f"🎉 ¡Compositor {action} con éxito! Cierra sesión para activar.")
+            toast.set_timeout(5)
+            self.toast_overlay.add_toast(toast)
+
+    def on_script_failure(self):
+        if hasattr(self, "toast_overlay"):
+            toast = Adw.Toast.new("⚠️ Acción cancelada o autenticación no completada.")
+            self.toast_overlay.add_toast(toast)
+
+if __name__ == "__main__":
+    app = CosmicFxApp()
+    sys.exit(app.run(sys.argv))
