@@ -239,6 +239,31 @@ switch:checked {
     background-color: #48b9c7;
 }
 
+/* ViewSwitcher Pestañas Pop!_OS */
+viewswitcher button {
+    border-radius: 10px;
+    padding: 6px 18px;
+    font-weight: 700;
+    margin: 2px 4px;
+    transition: all 180ms ease;
+}
+
+viewswitcher button:checked {
+    background: rgba(72, 185, 199, 0.22);
+    color: #48b9c7;
+    border: 1.5px solid rgba(72, 185, 199, 0.5);
+    box-shadow: 0 0 12px rgba(72, 185, 199, 0.25);
+}
+
+.system-badge {
+    background-color: rgba(72, 185, 199, 0.2);
+    color: #48b9c7;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
 /* Área de Laboratorio Interactivo */
 .sandbox-area {
     background: radial-gradient(circle at center, #262c37 0%, #171b22 100%);
@@ -397,7 +422,7 @@ class CosmicFxApp(Adw.Application):
         )
 
         win = Adw.ApplicationWindow(application=self, title="Cosmic FX")
-        win.set_default_size(780, 750)
+        win.set_default_size(840, 700)
         win.add_css_class("cosmic-fx-window")
 
         self.toast_overlay = Adw.ToastOverlay()
@@ -407,49 +432,83 @@ class CosmicFxApp(Adw.Application):
         main_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.toast_overlay.set_child(main_box)
 
-        # Header Bar Pop!_OS
+        # Header Bar Pop!_OS con ViewSwitcher
         header = Adw.HeaderBar()
-        title_widget = Adw.WindowTitle(title="Cosmic FX", subtitle="Control de Físicas y Efectos Compiz")
-        header.set_title_widget(title_widget)
         main_box.append(header)
 
-        # Área de Scroll
-        scrolled = Gtk.ScrolledWindow()
-        scrolled.set_vexpand(True)
-        main_box.append(scrolled)
+        # ViewStack para navegación fluida por pestañas
+        self.stack = Adw.ViewStack()
+        self.stack.set_vexpand(True)
+        main_box.append(self.stack)
 
-        clamp = Adw.Clamp()
-        clamp.set_maximum_size(760)
-        clamp.set_tightening_threshold(580)
-        scrolled.set_child(clamp)
+        view_switcher = Adw.ViewSwitcher()
+        view_switcher.set_stack(self.stack)
+        view_switcher.set_policy(Adw.ViewSwitcherPolicy.WIDE)
+        header.set_title_widget(view_switcher)
 
-        content_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=24)
-        content_box.set_margin_top(18)
-        content_box.set_margin_bottom(28)
-        content_box.set_margin_start(16)
-        content_box.set_margin_end(16)
-        clamp.set_child(content_box)
+        # Helper para crear páginas tabuladas con scroll y clamp elegante
+        def make_tab_page(widgets):
+            scrolled = Gtk.ScrolledWindow()
+            scrolled.set_vexpand(True)
+            clamp = Adw.Clamp()
+            clamp.set_maximum_size(760)
+            clamp.set_tightening_threshold(580)
+            scrolled.set_child(clamp)
 
-        # 1. Banner de Estado
-        content_box.append(self.build_status_banner())
+            box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=20)
+            box.set_margin_top(18)
+            box.set_margin_bottom(28)
+            box.set_margin_start(16)
+            box.set_margin_end(16)
+            clamp.set_child(box)
 
-        # 2. Selector de Preajustes
-        content_box.append(self.build_presets_section())
+            for w in widgets:
+                box.append(w)
+            return scrolled
 
-        # 3. Físicas y Movimiento de Ventana
-        content_box.append(self.build_physics_section())
+        # Pestaña 1: Físicas y Cinemática
+        page_physics = self.stack.add_titled(
+            make_tab_page([
+                self.build_status_banner(),
+                self.build_presets_section(),
+                self.build_physics_section(),
+                self.build_animation_section()
+            ]),
+            "physics",
+            "Físicas"
+        )
+        page_physics.set_icon_name("preferences-desktop-theme-symbolic")
 
-        # 4. Cinemática de Cierre Pop!
-        content_box.append(self.build_animation_section())
+        # Pestaña 2: Sonidos Hápticos
+        page_audio = self.stack.add_titled(
+            make_tab_page([
+                self.build_audio_section()
+            ]),
+            "audio",
+            "Sonidos"
+        )
+        page_audio.set_icon_name("audio-volume-high-symbolic")
 
-        # 5. Orquesta Acústica Háptica
-        content_box.append(self.build_audio_section())
+        # Pestaña 3: Laboratorio Interactivo
+        page_sandbox = self.stack.add_titled(
+            make_tab_page([
+                self.build_sandbox_section()
+            ]),
+            "sandbox",
+            "Laboratorio"
+        )
+        page_sandbox.set_icon_name("applications-science-symbolic")
 
-        # 6. Laboratorio Interactivo
-        content_box.append(self.build_sandbox_section())
-
-        # 7. Herramientas del Sistema
-        content_box.append(self.build_actions_section(win))
+        # Pestaña 4: Mantenimiento y Sistema
+        page_system = self.stack.add_titled(
+            make_tab_page([
+                self.build_system_info_section(),
+                self.build_actions_section(win)
+            ]),
+            "system",
+            "Sistema"
+        )
+        page_system.set_icon_name("emblem-system-symbolic")
 
         # Conectar evento al enfocar la ventana para refrescar estado silenciosamente
         controller = Gtk.EventControllerFocus.new()
@@ -1043,6 +1102,36 @@ class CosmicFxApp(Adw.Application):
         sandbox.append(center_box)
 
         group.add(sandbox)
+        return group
+
+    def build_system_info_section(self):
+        group = Adw.PreferencesGroup()
+        group.set_title("ℹ️ Información del Compositor")
+        group.set_description("Detalles técnicos del entorno de ejecución Pop!_OS COSMIC")
+
+        row_ver = Adw.ActionRow()
+        row_ver.set_title("Versión de Cosmic FX")
+        row_ver.set_subtitle("Motor cinemático y orquesta acústica modular")
+        badge_ver = Gtk.Label(label="v1.0.0 Oficial")
+        badge_ver.add_css_class("system-badge")
+        row_ver.add_suffix(badge_ver)
+        group.add(row_ver)
+
+        row_comp = Adw.ActionRow()
+        row_comp.set_title("Compositor Wayland")
+        row_comp.set_subtitle("cosmic-comp con cinemática Bubble Burst y audio PipeWire")
+        group.add(row_comp)
+
+        row_cfg = Adw.ActionRow()
+        row_cfg.set_title("Archivo de Configuración")
+        row_cfg.set_subtitle(os.path.expanduser("~/.config/cosmic/cosmic-comp-fx.json"))
+        group.add(row_cfg)
+
+        row_sync = Adw.ActionRow()
+        row_sync.set_title("Sincronización en Vivo")
+        row_sync.set_subtitle("Hot-Reload activo: cambios aplicados en tiempo real sin reiniciar")
+        group.add(row_sync)
+
         return group
 
     def build_actions_section(self, parent_win):
