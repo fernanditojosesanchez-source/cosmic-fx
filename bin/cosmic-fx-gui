@@ -1124,7 +1124,7 @@ class CosmicFxApp(Adw.Application):
 
         row_cfg = Adw.ActionRow()
         row_cfg.set_title("Archivo de Configuración")
-        row_cfg.set_subtitle(os.path.expanduser("~/.config/cosmic/cosmic-comp-fx.json"))
+        row_cfg.set_subtitle("~/.config/cosmic/cosmic-comp-fx.json")
         group.add(row_cfg)
 
         row_sync = Adw.ActionRow()
@@ -1156,24 +1156,81 @@ class CosmicFxApp(Adw.Application):
             btn_update.set_tooltip_text("Reescribe el compositor en /usr/bin/ si una actualización del sistema lo sobreescribe")
             btn_update.add_css_class("pill")
             btn_update.add_css_class("suggested-action")
-            btn_update.connect("clicked", lambda b: self.on_run_script("instalar-sistema.sh", parent_win))
+            btn_update.connect("clicked", lambda b: self.confirm_and_run_script("reinstall", parent_win))
             box.append(btn_update)
 
             btn_restore = Gtk.Button(label="🛡️ Restaurar Fábrica")
             btn_restore.set_tooltip_text("Restaura el compositor original de fábrica de Pop!_OS")
             btn_restore.add_css_class("pill")
             btn_restore.add_css_class("destructive-action")
-            btn_restore.connect("clicked", lambda b: self.on_run_script("restaurar-original.sh", parent_win))
+            btn_restore.connect("clicked", lambda b: self.confirm_and_run_script("restore", parent_win))
             box.append(btn_restore)
         else:
             btn_install = Gtk.Button(label="📦 Instalar en Pop!_OS")
             btn_install.add_css_class("pill")
             btn_install.add_css_class("suggested-action")
-            btn_install.connect("clicked", lambda b: self.on_run_script("instalar-sistema.sh", parent_win))
+            btn_install.connect("clicked", lambda b: self.confirm_and_run_script("install", parent_win))
             box.append(btn_install)
 
         group.add(box)
         return group
+
+    def confirm_and_run_script(self, action_type, parent_win):
+        if action_type == "reinstall":
+            heading = "¿Reinstalar o Reparar Cosmic FX?"
+            body = (
+                "Esta acción volverá a escribir el compositor optimizado en el sistema.\n\n"
+                "• Copia el compositor parcheado a /usr/bin/cosmic-comp con físicas elásticas y efectos de audio.\n"
+                "• Útil si una actualización de Pop!_OS sobreescribió el compositor o si deseas actualizar los binarios.\n"
+                "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
+                "• Será necesario cerrar sesión para que el escritorio cargue el binario actualizado."
+            )
+            script_name = "instalar-sistema.sh"
+            appearance = Adw.ResponseAppearance.SUGGESTED
+            confirm_label = "Reinstalar / Reparar"
+        elif action_type == "restore":
+            heading = "¿Restaurar Compositor Original de Fábrica?"
+            body = (
+                "Esta acción devolverá tu sistema al estado original de Pop!_OS.\n\n"
+                "• Restaura el binario oficial de fábrica desde /usr/bin/cosmic-comp.original a /usr/bin/cosmic-comp.\n"
+                "• Desactiva por completo las físicas elásticas y los efectos Compiz.\n"
+                "• Tus configuraciones personalizadas en ~/.config/cosmic/ se conservarán seguras.\n"
+                "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
+                "• Será necesario cerrar sesión para volver a iniciar con el compositor estándar de System76."
+            )
+            script_name = "restaurar-original.sh"
+            appearance = Adw.ResponseAppearance.DESTRUCTIVE
+            confirm_label = "Restaurar Fábrica"
+        else:  # install
+            heading = "¿Instalar Cosmic FX en el Sistema?"
+            body = (
+                "Esta acción integrará Cosmic FX como el compositor activo de tu entorno COSMIC.\n\n"
+                "• Crea un respaldo de seguridad de tu compositor actual en /usr/bin/cosmic-comp.original.\n"
+                "• Instala el nuevo compositor cinemático con soporte para Compiz y audio PipeWire en /usr/bin/cosmic-comp.\n"
+                "• Se te solicitará tu contraseña de administrador (sudo/pkexec).\n"
+                "• Al finalizar la instalación, cierra e inicia sesión para disfrutar de la experiencia."
+            )
+            script_name = "instalar-sistema.sh"
+            appearance = Adw.ResponseAppearance.SUGGESTED
+            confirm_label = "Instalar"
+
+        dialog = Adw.MessageDialog(
+            transient_for=parent_win,
+            heading=heading,
+            body=body
+        )
+        dialog.add_response("cancel", "Cancelar")
+        dialog.add_response("confirm", confirm_label)
+        dialog.set_response_appearance("confirm", appearance)
+        dialog.set_default_response("cancel")
+        dialog.set_close_response("cancel")
+
+        def on_response(dlg, response):
+            if response == "confirm":
+                self.on_run_script(script_name, parent_win)
+
+        dialog.connect("response", on_response)
+        dialog.present()
 
     def on_launch_test(self, btn):
         script = os.path.join(LAB_DIR, "test-nested.sh")
