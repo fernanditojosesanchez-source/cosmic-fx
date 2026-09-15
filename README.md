@@ -20,6 +20,12 @@
   <img src="assets/cosmic-fx-preview.png" width="850" alt="Cosmic FX Control Center Preview" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);" />
 </p>
 
+<p align="center">
+  <video src="assets/cosmic-fx-demo.webm" width="850" controls="controls" poster="assets/cosmic-fx-preview.png" style="border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+    <a href="assets/cosmic-fx-demo.webm">🎬 Watch Cosmic FX Demo Video (WebM 1080p)</a>
+  </video>
+</p>
+
 ---
 
 **Languages / Idiomas:**  
